@@ -1,0 +1,6 @@
+export class AppleService {
+  banana: string;
+  getApplePie(numApples: number, typeOfApple: string): string {
+    return "No apples here";
+  }
+}
