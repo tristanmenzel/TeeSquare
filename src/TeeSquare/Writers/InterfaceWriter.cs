@@ -37,7 +37,7 @@ namespace TeeSquare.Writers
             foreach (var method in _config.Methods)
             {
                 writer.Write(method.IsStatic ? "static " : string.Empty, true);
-                writer.Write($"{method.Id.Name}( ");
+                writer.Write($"{method.Id.Name}(");
                 writer.WriteDelimited(method.Params,
                     (p, w) =>
                     {

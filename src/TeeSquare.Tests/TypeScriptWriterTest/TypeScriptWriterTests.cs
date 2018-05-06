@@ -25,7 +25,7 @@ namespace TeeSquare.Tests.TypeScriptWriterTests
                                 p.Param("b", "Enumerable", "number");
                             });
                         i.Property("ValueOfTwo", "TTwo");
-                        i.Property("MaybeitsOne", "Maybe", "TOne");
+                        i.Property("MaybeItsOne", "Maybe", "TOne");
                     });
             });
             Blurk.CompareImplicitFile()
@@ -36,24 +36,26 @@ namespace TeeSquare.Tests.TypeScriptWriterTests
         [Test]
         public void WriteClass()
         {
-            var res = WriteToMemory(w => { w.WriteClass("AppleService")
-                .With(c =>
-                {
-                    c.Property("banana", "string");
-                    c.Method("getApplePie", "string")
-                        .WithParams(p =>
-                        {
+            var res = WriteToMemory(w =>
+            {
+                w.WriteClass("AppleService")
+                    .With(c =>
+                    {
+                        c.Property("banana", "string");
+                        c.Method("getApplePie", "string")
+                            .WithParams(p =>
+                            {
+                                p.Param("numApples", "number");
+                                p.Param("typeOfApple", "string");
+                            })
+                            .WithBody(x => { x.WriteLine("return \"No apples here\";"); });
+                        c.Method("haveFun", "void")
+                            .WithParams(p => { p.Param("amountOfFun", "number"); })
+                            .Static()
+                            .WithBody(x => x.WriteLine("console.log(\"Having so much fun\", amountOfFun);"));
+                    });
+            });
 
-                            p.Param("numApples", "number");
-                            p.Param("typeOfApple", "string");
-                        })
-                        .WithBody(x => { x.WriteLine("return \"No apples here\";"); });
-                    c.Method("haveFun", "void")
-                        .WithParams(p => { p.Param("amountOfFun", "number"); })
-                        .Static()
-                        .WithBody(x => x.WriteLine("console.log(\"Having so much fun\", amountOfFun);"));
-                }); });
-            
             Blurk.CompareImplicitFile()
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
@@ -63,8 +65,6 @@ namespace TeeSquare.Tests.TypeScriptWriterTests
         [Test]
         public void WriteEnum()
         {
-            Utilty.CreateFileIfNotExists();
-
             var res = WriteToMemory(w =>
             {
                 w.WriteEnum("Fruits")
@@ -83,11 +83,10 @@ namespace TeeSquare.Tests.TypeScriptWriterTests
                         e.Value("ThingThree", "ValueThree", "Description of thing three");
                     });
             });
-            
+
             Blurk.CompareImplicitFile()
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
-
         }
 
 
