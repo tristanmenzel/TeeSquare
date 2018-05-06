@@ -30,7 +30,7 @@ artifacts:
 clone_depth: 1
 test_script:
   # restore packages for our unit tests
-  - cmd: dotnet restore --verbosity m
+  - cmd: dotnet restore ./src/ --verbosity m
   # run the unit tests
   - cmd: dotnet test ./src/teesquare.tests/teesquare.tests.csproj
 on_finish :
