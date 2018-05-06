@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -40,6 +41,28 @@ namespace TeeSquare.Writers
             _writer.WriteLine($"{(indent ? CurrentIndent : string.Empty)}{text}");
         }
 
+        public void WriteDelimitedLines<T>(T[] items, Func<T, string> lineFunc, string delimiter)
+        {
+            for (var i = 0; i < items.Length; i++)
+            {
+                var last = i == items.Length - 1;
+                WriteLine($"{(lineFunc(items[i]))}{(last ? "" : delimiter)}");
+            }
+        }
+
+        public void WriteDelimited<T>(T[] items, Action<T, ICodeWriter> writeItem, string delimiter)
+        {
+            for (var i = 0; i < items.Length; i++)
+            {
+                var last = i == items.Length - 1;
+                writeItem(items[i], this);
+                if (!last)
+                {
+                    Write(delimiter);
+                }
+            }
+        }
+
         public void WriteType(string type, string[] typeParams)
         {
             if (typeParams.Any())
@@ -48,9 +71,9 @@ namespace TeeSquare.Writers
                 _writer.Write($"{type}");
         }
 
-        public void OpenBrace()
+        public void OpenBrace(string text = null)
         {
-            _writer.WriteLine(" {");
+            _writer.WriteLine($"{text} {{");
             _indent++;
         }
 

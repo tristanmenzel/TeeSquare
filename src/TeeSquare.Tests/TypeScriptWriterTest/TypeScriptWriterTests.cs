@@ -36,8 +36,6 @@ namespace TeeSquare.Tests.TypeScriptWriterTests
         [Test]
         public void WriteClass()
         {
-            Utilty.CreateFileIfNotExists();
-
             var res = WriteToMemory(w => { w.WriteClass("AppleService")
                 .With(c =>
                 {
@@ -50,11 +48,46 @@ namespace TeeSquare.Tests.TypeScriptWriterTests
                             p.Param("typeOfApple", "string");
                         })
                         .WithBody(x => { x.WriteLine("return \"No apples here\";"); });
+                    c.Method("haveFun", "void")
+                        .WithParams(p => { p.Param("amountOfFun", "number"); })
+                        .Static()
+                        .WithBody(x => x.WriteLine("console.log(\"Having so much fun\", amountOfFun);"));
                 }); });
             
             Blurk.CompareImplicitFile()
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
+        }
+
+
+        [Test]
+        public void WriteEnum()
+        {
+            Utilty.CreateFileIfNotExists();
+
+            var res = WriteToMemory(w =>
+            {
+                w.WriteEnum("Fruits")
+                    .WithValues(e =>
+                    {
+                        e.Value("Apple", 0);
+                        e.Value("Banana", 1);
+                        e.Value("Cantelope", 2);
+                    });
+
+                w.WriteEnum("Things")
+                    .WithValues(e =>
+                    {
+                        e.Value("ThingOne", "ValueOne", "Description of thing one");
+                        e.Value("ThingTwo", "ValueTwo", "Description of thing two");
+                        e.Value("ThingThree", "ValueThree", "Description of thing three");
+                    });
+            });
+            
+            Blurk.CompareImplicitFile()
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+
         }
 
 

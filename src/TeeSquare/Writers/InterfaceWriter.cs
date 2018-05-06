@@ -38,18 +38,12 @@ namespace TeeSquare.Writers
             {
                 writer.Write(method.IsStatic ? "static " : string.Empty, true);
                 writer.Write($"{method.Id.Name}( ");
-                bool first = true;
-                foreach (var param in method.Params)
-                {
-                    if (!first)
+                writer.WriteDelimited(method.Params,
+                    (p, w) =>
                     {
-                        writer.Write(", ");
-                    }
-
-                    writer.Write($"{param.Name}: ");
-                    writer.WriteType(param.Type, param.GenericTypeParams);
-                    first = false;
-                }
+                        w.Write($"{p.Name}: ");
+                        w.WriteType(p.Type, p.GenericTypeParams);
+                    }, ", ");
 
                 writer.Write("): ");
                 writer.WriteType(method.Id.Type, method.Id.GenericTypeParams);

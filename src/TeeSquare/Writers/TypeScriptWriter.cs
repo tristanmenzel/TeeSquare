@@ -59,5 +59,12 @@ namespace TeeSquare.Writers
                 _codeWriter?.Dispose();
             }
         }
+
+        public EnumWriter WriteEnum(string name)
+        {
+            var part = new EnumWriter(name);
+            _parts.Add(part);
+            return part;
+        }
     }
 }

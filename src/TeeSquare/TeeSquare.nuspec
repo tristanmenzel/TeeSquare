@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package>
+    <metadata>
+        <id>TeeSquare</id>
+        <version>$version$</version>
+        <title>TeeSquare</title>
+        <authors>Tristan Menzel</authors>
+        <owners>Tristan Menzel</owners>
+        <projectUrl>https://github.com/tristanmenzel/TeeSquare</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Contains helper classes for outputting formatted typescript classes, interfaces and enums to be
+            used with code gen
+        </description>
+        <tags>TypeScript CodeGen</tags>
+    </metadata>
+</package>
