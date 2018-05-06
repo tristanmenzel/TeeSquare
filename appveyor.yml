@@ -20,7 +20,7 @@ before_build:
 build_script:
   # Package lib
   - cmd: dotnet build ./src/teesquare/teesquare.csproj --configuration=release
-  - cmd: dotnet pack ../src/teesquare/teesquare.csproj --configuration=release
+  - cmd: dotnet pack ./src/teesquare/teesquare.csproj --configuration=release
 after_build:
   # For once the build has completed
 artifacts:
