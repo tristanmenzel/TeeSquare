@@ -4,7 +4,6 @@ namespace TeeSquare.Tests.Reflection.FakeDomain
 {
     public enum Audience
     {
-        [Description("Children")]
         Children,
         [Description("Teenagers")]
         Teenagers,

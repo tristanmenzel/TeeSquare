@@ -8,6 +8,7 @@ namespace TeeSquare.Writers
     {
         private readonly EnumTypeConfigurator _config;
         private bool _includeDescriptionGetter;
+        private bool _includeAllValuesConstant;
         public string Name { get; }
 
         public EnumWriter(string name)
@@ -28,25 +29,41 @@ namespace TeeSquare.Writers
             return this;
         }
 
+        public EnumWriter IncludeAllValuesConst(bool include)
+        {
+            _includeAllValuesConstant = include;
+            return this;
+        }
+
         private ICodePart BuildDescGetterFunc()
         {
             return new FunctionWriter($"Get{Name}Description")
                 .WithReturnType("string")
-                .WithParams(p=>p.Param("value" ,Name))
+                .WithParams(p => p.Param("value", Name))
                 .AsConstArrows()
                 .WithBody(body => { body.WriteLine($"return {Name}Desc[value];"); });
         }
 
         void ICodePart.WriteTo(ICodeWriter writer)
         {
-            writer.OpenBrace($"export enum {Name}");
+            writer.OpenBrace($"export enum {Name}: {{ [key: number]: string }}");
             writer.WriteDelimitedLines(_config.Values, v => $"{v.Name} = {v.FormattedValue}", ",");
             writer.CloseBrace();
+
+            if (_includeAllValuesConstant)
+            {
+                writer.WriteLine($"export const All{Name}: {Name}[] = [");
+                writer.Indent();
+                writer.WriteDelimitedLines(_config.Values, v => $"{Name}.{v.Name}", ",");
+                writer.Deindent();
+                writer.WriteLine("];");
+            }
 
             if (_config.Values.Any(v => v.Description != null))
             {
                 writer.OpenBrace($"export const {Name}Desc =");
-                writer.WriteDelimitedLines(_config.Values, v => $"{v.FormattedValue}: `{v.Description}`", ",");
+                writer.WriteDelimitedLines(_config.Values, v => $"{v.FormattedValue}: `{v.Description ?? v.Name}`",
+                    ",");
                 writer.CloseBrace(true);
                 if (_includeDescriptionGetter)
                 {
