@@ -46,7 +46,7 @@ namespace TeeSquare.Writers
 
         void ICodePart.WriteTo(ICodeWriter writer)
         {
-            writer.OpenBrace($"export enum {Name}: {{ [key: number]: string }}");
+            writer.OpenBrace($"export enum {Name}");
             writer.WriteDelimitedLines(_config.Values, v => $"{v.Name} = {v.FormattedValue}", ",");
             writer.CloseBrace();
 
@@ -61,7 +61,7 @@ namespace TeeSquare.Writers
 
             if (_config.Values.Any(v => v.Description != null))
             {
-                writer.OpenBrace($"export const {Name}Desc =");
+                writer.OpenBrace($"export const {Name}Desc: {{ [key: number]: string }} =");
                 writer.WriteDelimitedLines(_config.Values, v => $"{v.FormattedValue}: `{v.Description ?? v.Name}`",
                     ",");
                 writer.CloseBrace(true);

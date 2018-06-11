@@ -8,7 +8,7 @@ export enum Things {
   ThingTwo = "ValueTwo",
   ThingThree = "ValueThree"
 }
-export const ThingsDesc = {
+export const ThingsDesc: { [key: number]: string } = {
   "ValueOne": `Description of thing one`,
   "ValueTwo": `Description of thing two`,
   "ValueThree": `Description of thing three`

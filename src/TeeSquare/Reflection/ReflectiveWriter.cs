@@ -96,7 +96,8 @@ namespace TeeSquare.Reflection
                                 e.Value(_namer.EnumName(field.name), field.value, description);
                             }
                         })
-                        .IncludeDescriptionGetter(_options.WriteEnumDescriptionGetters);
+                        .IncludeDescriptionGetter(_options.WriteEnumDescriptionGetters)
+                        .IncludeAllValuesConst(_options.WriteEnumAllValuesConst);
                     continue;
                 }
 
@@ -106,6 +107,12 @@ namespace TeeSquare.Reflection
                     {
                         foreach (var pi in type.GetProperties(_options.PropertyFlags))
                         {
+                            if (_options.DiscriminatorPropertyPredicate(pi, type))
+                            {
+                                var value = _options.DiscriminatorPropertyValueProvider(pi, type);
+                                i.Property(_namer.PropertyName(pi), $"'{value}'");
+                                continue;
+                            }
                             if (pi.PropertyType.IsNullable(out var underlyingType))
                             {
                                 i.Property(_namer.PropertyName(pi) + "?", _namer.TypeName(underlyingType));

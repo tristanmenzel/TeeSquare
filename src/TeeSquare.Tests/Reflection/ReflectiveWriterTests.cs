@@ -42,6 +42,7 @@ namespace TeeSquare.Tests.Reflection
                 {
                     o.WriteEnumDescriptionGetters = true;
                     o.WriteEnumDescriptions = true;
+                    o.WriteEnumAllValuesConst = true;
                 })
                 .WriteToString();
 
@@ -94,6 +95,18 @@ namespace TeeSquare.Tests.Reflection
                 .AddTypes(typeof(Member))
                 .WriteToString();
            
+            Blurk.CompareImplicitFile()
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+        [Test]
+        public void DiscriminatorProperty()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .AddTypes(typeof(Circle), typeof(Square), typeof(Rectangle))
+                .WriteToString();
+            
             Blurk.CompareImplicitFile()
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
