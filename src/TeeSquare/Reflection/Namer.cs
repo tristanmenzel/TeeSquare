@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace TeeSquare.Reflection
@@ -13,6 +14,7 @@ namespace TeeSquare.Reflection
         private readonly IDictionary<Type, string> _staticMappings = new Dictionary<Type, string>
         {
             {typeof(string), "string"},
+            {typeof(Guid), "string"},
             {typeof(Decimal), "number"},
             {typeof(Int16), "number"},
             {typeof(Int32), "number"},
@@ -24,6 +26,11 @@ namespace TeeSquare.Reflection
             {typeof(bool), "boolean"},
         };
 
+        public virtual bool HasStaticMapping(Type type)
+        {
+            return _staticMappings.ContainsKey(type);
+        }
+
         public Namer(NamingConvensions namingConvensions = null)
         {
             _namingConvensions = namingConvensions ?? NamingConvensions.Default;
@@ -32,6 +39,14 @@ namespace TeeSquare.Reflection
         public virtual string TypeName(Type type)
         {
             if (_staticMappings.TryGetValue(type, out var name)) return name;
+            if (type.IsDictionary(out var genericTypeParams))
+                return $"{{ [key: {TypeName(genericTypeParams[0])}]: {TypeName(genericTypeParams[1])} }}";
+            if (type.IsGenericType)
+            {
+                var nonGenericName = ToCase(type.Name.Split("`").First(), _namingConvensions.Types);
+                return $"{nonGenericName}<{string.Join(", ", type.GetGenericArguments().Select(TypeName))}>";
+            }
+
             return ToCase(type.Name, _namingConvensions.Types);
         }
 

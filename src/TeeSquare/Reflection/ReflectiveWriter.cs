@@ -36,8 +36,29 @@ namespace TeeSquare.Reflection
                     continue;
                 }
 
-                if (type.IsValueType && !type.IsEnum) continue;
-                if (type == typeof(string)) continue;
+                if (type.IsDictionary(out var keyValueTypes))
+                {
+                    AddTypes(keyValueTypes);
+                    continue;
+                }
+
+                if (_namer.HasStaticMapping(type))
+                    continue;
+
+
+                if (type.IsGenericType)
+                {
+                    AddTypes(type.GetGenericArguments());
+
+                    var genericType = type.GetGenericTypeDefinition();
+
+                    if (_types.Contains(genericType)) continue;
+                    _types.Add(genericType);
+
+                    var dependencies = type.GetProperties().Select(p => p.PropertyType).ToArray();
+                    AddTypes(dependencies);
+                    continue;
+                }
 
                 if (!_types.Contains(type))
                 {
@@ -53,7 +74,7 @@ namespace TeeSquare.Reflection
 
         public void WriteTo(TypeScriptWriter writer)
         {
-            foreach (var type in _types.OrderBy(t => t.FullName))
+            foreach (var type in _types.OrderBy(t => t.Name))
             {
                 if (type.IsEnum)
                 {

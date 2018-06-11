@@ -86,5 +86,17 @@ namespace TeeSquare.Tests.Reflection
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
+
+        [Test]
+        public void Generics()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .AddTypes(typeof(Member))
+                .WriteToString();
+           
+            Blurk.CompareImplicitFile()
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
     }
 }
