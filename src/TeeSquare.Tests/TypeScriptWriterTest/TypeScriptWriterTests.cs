@@ -1,11 +1,10 @@
 ﻿using System;
 using System.IO;
 using BlurkCompare;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using NUnit.Framework;
 using TeeSquare.Writers;
 
-namespace TeeSquare.Tests.TypeScriptWriterTests
+namespace TeeSquare.Tests.TypeScriptWriterTest
 {
     [TestFixture]
     public class TypeScriptWriterTests
@@ -18,7 +17,8 @@ namespace TeeSquare.Tests.TypeScriptWriterTests
                 w.WriteInterface("FunFunInterface", "TOne", "TTwo")
                     .With(i =>
                     {
-                        i.Method("TestMethod", "string")
+                        i.Method("TestMethod")
+                            .WithReturnType("string")
                             .WithParams(p =>
                             {
                                 p.Param("a", "number");
@@ -42,14 +42,15 @@ namespace TeeSquare.Tests.TypeScriptWriterTests
                     .With(c =>
                     {
                         c.Property("banana", "string");
-                        c.Method("getApplePie", "string")
+                        c.Method("getApplePie")
+                            .WithReturnType("string")
                             .WithParams(p =>
                             {
                                 p.Param("numApples", "number");
                                 p.Param("typeOfApple", "string");
                             })
                             .WithBody(x => { x.WriteLine("return \"No apples here\";"); });
-                        c.Method("haveFun", "void")
+                        c.Method("haveFun")
                             .WithParams(p => { p.Param("amountOfFun", "number"); })
                             .Static()
                             .WithBody(x => x.WriteLine("console.log(\"Having so much fun\", amountOfFun);"));
@@ -89,8 +90,47 @@ namespace TeeSquare.Tests.TypeScriptWriterTests
                 .AssertAreTheSame(Assert.Fail);
         }
 
+        [Test]
+        public void WriteFunction()
+        {
+            var res = WriteToMemory(w =>
+            {
+                w.WriteFunction("HelloWorld")
+                    .WithGenericTypeParams("T1 extends number")
+                    .WithReturnType("number")
+                    .WithBody(body =>
+                    {
+                        body.WriteLine("console.log('Hey');");
+                        body.WriteLine("return 2 * a;");
+                    })
+                    .WithParams(p => { p.Param("a", "T1"); });
+                w.WriteFunction("HelloWorldArrows")
+                    .WithReturnType("Array", "number")
+                    .AsConstArrows()
+                    .WithBody(body =>
+                    {
+                        body.WriteLine("console.log('Hey');");
+                        body.WriteLine("return [2, a];");
+                    })
+                    .WithParams(p => { p.Param("a", "number"); });
+                w.WriteFunction("LogSomething")
+                    .AsConstArrows()
+                    .WithBody(body => { body.WriteLine("console.log(a, b, c);"); })
+                    .WithParams(p =>
+                    {
+                        p.Param("a", "number");
+                        p.Param("b", "Array", "number");
+                        p.Param("c", "string");
+                    });
+            });
 
-        private string WriteToMemory(Action<TypeScriptWriter> writeAction)
+            Blurk.CompareImplicitFile()
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+
+        public static string WriteToMemory(Action<TypeScriptWriter> writeAction)
         {
             using (var ms = new MemoryStream())
             using (var w = new TypeScriptWriter(ms, "  "))

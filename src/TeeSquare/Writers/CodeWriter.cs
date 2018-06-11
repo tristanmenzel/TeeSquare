@@ -77,10 +77,10 @@ namespace TeeSquare.Writers
             _indent++;
         }
 
-        public void CloseBrace()
+        public void CloseBrace(bool semicolon = false)
         {
             _indent--;
-            WriteLine("}");
+            WriteLine(semicolon ? "};" : "}");
         }
 
         public void Flush()

@@ -60,6 +60,13 @@ namespace TeeSquare.Writers
             }
         }
 
+        public FunctionWriter WriteFunction(string name)
+        {
+            var part = new FunctionWriter(name);
+            _parts.Add(part);
+            return part;
+        }
+
         public EnumWriter WriteEnum(string name)
         {
             var part = new EnumWriter(name);

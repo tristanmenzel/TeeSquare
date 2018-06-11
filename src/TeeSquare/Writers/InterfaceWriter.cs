@@ -22,7 +22,7 @@ namespace TeeSquare.Writers
         }
 
 
-        public void WriteTo(ICodeWriter writer)
+        void ICodePart.WriteTo(ICodeWriter writer)
         {
             writer.Write($"export interface ");
             writer.WriteType(_name, _genericTypeParams);
@@ -46,7 +46,7 @@ namespace TeeSquare.Writers
                     }, ", ");
 
                 writer.Write("): ");
-                writer.WriteType(method.Id.Type, method.Id.GenericTypeParams);
+                writer.WriteType(method.ReturnType.Type, method.ReturnType.GenericTypeParams);
                 writer.WriteLine(";", false);
             }
 

@@ -1,4 +1,4 @@
-﻿namespace TeeSquare.Writers
+﻿namespace TeeSquare.TypeMetadata
 {
     class PropertyInfo
     {

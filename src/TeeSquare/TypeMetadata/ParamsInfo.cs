@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace TeeSquare.Writers
+namespace TeeSquare.TypeMetadata
 {
     class ParamsInfo : IParamsInfo
     {

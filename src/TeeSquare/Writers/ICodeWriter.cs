@@ -13,7 +13,7 @@ namespace TeeSquare.Writers
         void WriteDelimited<T>(T[] items, Action<T, ICodeWriter> lineFunc, string delimiter);
         void WriteType(string type, string[] typeParams);
         void OpenBrace(string text =null);
-        void CloseBrace();
+        void CloseBrace(bool semicolon = false);
 
         void Flush();
     }

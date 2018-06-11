@@ -12,5 +12,5 @@ export const ThingsDesc = {
   "ValueOne": `Description of thing one`,
   "ValueTwo": `Description of thing two`,
   "ValueThree": `Description of thing three`
-}
+};
 

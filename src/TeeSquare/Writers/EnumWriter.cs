@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
+using TeeSquare.TypeMetadata;
 
 namespace TeeSquare.Writers
 {
     public class EnumWriter : ICodePart
     {
         private readonly EnumTypeConfigurator _config;
+        private bool _includeDescriptionGetter;
         public string Name { get; }
 
         public EnumWriter(string name)
@@ -20,7 +22,22 @@ namespace TeeSquare.Writers
             return this;
         }
 
-        public void WriteTo(ICodeWriter writer)
+        public EnumWriter IncludeDescriptionGetter(bool include)
+        {
+            _includeDescriptionGetter = include;
+            return this;
+        }
+
+        private ICodePart BuildDescGetterFunc()
+        {
+            return new FunctionWriter($"Get{Name}Description")
+                .WithReturnType("string")
+                .WithParams(p=>p.Param("value" ,Name))
+                .AsConstArrows()
+                .WithBody(body => { body.WriteLine($"return {Name}Desc[value];"); });
+        }
+
+        void ICodePart.WriteTo(ICodeWriter writer)
         {
             writer.OpenBrace($"export enum {Name}");
             writer.WriteDelimitedLines(_config.Values, v => $"{v.Name} = {v.FormattedValue}", ",");
@@ -30,7 +47,11 @@ namespace TeeSquare.Writers
             {
                 writer.OpenBrace($"export const {Name}Desc =");
                 writer.WriteDelimitedLines(_config.Values, v => $"{v.FormattedValue}: `{v.Description}`", ",");
-                writer.CloseBrace();
+                writer.CloseBrace(true);
+                if (_includeDescriptionGetter)
+                {
+                    BuildDescGetterFunc().WriteTo(writer);
+                }
             }
         }
     }
