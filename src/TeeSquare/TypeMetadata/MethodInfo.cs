@@ -3,9 +3,18 @@ using TeeSquare.Writers;
 
 namespace TeeSquare.TypeMetadata
 {
-    class MethodInfo : IMethodInfo
+    public interface IMethodInfo
     {
-        private readonly ParamsInfo _params;
+        bool IsStatic { get; }
+        IIdentifierInfo Id { get; }
+        IIdentifierInfo[] Params { get; }
+        IIdentifierInfo ReturnType { get; }
+        Action<ICodeWriter> WriteBody { get; }
+    }
+
+    class MethodInfo : IMethodConfigurator, IMethodInfo
+    {
+        private readonly ParamInfo _params;
         public bool IsStatic { get; private set; }
         public IIdentifierInfo Id { get; private set; }
         public IIdentifierInfo[] Params => _params.Params;
@@ -15,34 +24,34 @@ namespace TeeSquare.TypeMetadata
         {
             Id = new IdentifierInfo(name, null);
             ReturnType = new IdentifierInfo(null, "void");
-            _params = new ParamsInfo();
+            _params = new ParamInfo();
         }
 
-        public IMethodInfo WithGenericTypeParams(params string[] genericTypeParams)
+        public IMethodConfigurator WithGenericTypeParams(params string[] genericTypeParams)
         {
             Id = new IdentifierInfo(Id.Name, null, genericTypeParams);
             return this;
         }
 
-        public IMethodInfo WithReturnType(string type, params string[] genericTypeParams)
+        public IMethodConfigurator WithReturnType(string type, params string[] genericTypeParams)
         {
             ReturnType = new IdentifierInfo(null, type, genericTypeParams);
             return this;
         }
 
-        public IMethodInfo Static()
+        public IMethodConfigurator Static()
         {
             IsStatic = true;
             return this;
         }
 
-        public IMethodInfo WithParams(Action<IParamsInfo> configureParams)
+        public IMethodConfigurator WithParams(Action<IParamConfigurator> configureParams)
         {
             configureParams(_params);
             return this;
         }
 
-        public IMethodInfo WithBody(Action<ICodeWriter> writeBody)
+        public IMethodConfigurator WithBody(Action<ICodeWriter> writeBody)
         {
             WriteBody = writeBody;
             return this;

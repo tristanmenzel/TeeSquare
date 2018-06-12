@@ -2,6 +2,9 @@
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Reflection;
+using TeeSquare.TypeMetadata;
+using TeeSquare.Writers;
+using PropertyInfo = System.Reflection.PropertyInfo;
 
 namespace TeeSquare.Reflection
 {
@@ -18,6 +21,10 @@ namespace TeeSquare.Reflection
         public string IndentChars { get; set; } = "  ";
         public bool WriteEnumAllValuesConst { get; set; }
 
+        public Action<IEnumInfo, ICodeWriter> CustomEnumWriter { get; set; }
+
+        public Action<ITypeInfo, ICodeWriter> CustomInterfaceWriter { get; set; }
+
         public DiscriminatorPropertyPredicate DiscriminatorPropertyPredicate { get; set; } = DefaultDescriminator;
         public DiscriminatorPropertyValueProvider DiscriminatorPropertyValueProvider { get; set; } = DefaultDescriminatorValueProvider;
 
@@ -25,6 +32,7 @@ namespace TeeSquare.Reflection
         {
             return property.GetCustomAttributes<TypeDiscriminatorAttribute>().Any();
         }
+        
         private static string DefaultDescriminatorValueProvider(PropertyInfo property, Type parentType)
         {
             return property.GetCustomAttributes<TypeDiscriminatorAttribute>()

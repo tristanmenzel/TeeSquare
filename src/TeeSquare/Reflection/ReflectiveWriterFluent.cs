@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
 
 namespace TeeSquare.Reflection
@@ -9,6 +10,7 @@ namespace TeeSquare.Reflection
     {
         private readonly WriterOptions _options;
         private readonly List<Type> _types;
+
         public ReflectiveWriterFluent()
         {
             _options = new WriterOptions();
@@ -56,7 +58,5 @@ namespace TeeSquare.Reflection
                 }
             }
         }
-        
-        
     }
 }

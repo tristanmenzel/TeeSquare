@@ -5,36 +5,34 @@ namespace TeeSquare.Writers
 {
     public class InterfaceWriter : ICodePart
     {
-        private readonly string _name;
-        private readonly string[] _genericTypeParams;
-        private readonly TypeConfigurer _config;
+        private readonly TypeInfo _typeInfo;
+        private Action<ITypeInfo, ICodeWriter> _customCodeWriter;
 
         public InterfaceWriter(string name, string[] genericTypeParams)
         {
-            _name = name;
-            _genericTypeParams = genericTypeParams;
-            _config = new TypeConfigurer();
+            _typeInfo = new TypeInfo(name, genericTypeParams);
         }
 
-        public void With(Action<ITypeConfigurer> configure)
+        public InterfaceWriter With(Action<ITypeConfigurer> configure)
         {
-            configure(_config);
+            configure(_typeInfo);
+            return this;
         }
 
 
         void ICodePart.WriteTo(ICodeWriter writer)
         {
             writer.Write($"export interface ");
-            writer.WriteType(_name, _genericTypeParams);
+            writer.WriteType(_typeInfo.Name, _typeInfo.GenericTypeParams);
             writer.OpenBrace();
-            foreach (var prop in _config.Properties)
+            foreach (var prop in _typeInfo.Properties)
             {
                 writer.Write($"{prop.Name}: ", true);
                 writer.WriteType(prop.Type, prop.GenericTypeParams);
                 writer.WriteLine(";", false);
             }
 
-            foreach (var method in _config.Methods)
+            foreach (var method in _typeInfo.Methods)
             {
                 writer.Write(method.IsStatic ? "static " : string.Empty, true);
                 writer.Write($"{method.Id.Name}(");
@@ -51,6 +49,16 @@ namespace TeeSquare.Writers
             }
 
             writer.CloseBrace();
+            if (_customCodeWriter != null)
+            {
+                _customCodeWriter(_typeInfo, writer);
+            }
+        }
+
+        public InterfaceWriter IncludeCustomCode(Action<ITypeInfo, ICodeWriter> customCodeWriter)
+        {
+            _customCodeWriter = customCodeWriter;
+            return this;
         }
     }
 }

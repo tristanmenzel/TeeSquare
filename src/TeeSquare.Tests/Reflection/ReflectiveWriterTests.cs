@@ -1,4 +1,5 @@
 ﻿using BlurkCompare;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using TeeSquare.Reflection;
 using TeeSquare.Tests.Reflection.FakeDomain;
@@ -43,6 +44,10 @@ namespace TeeSquare.Tests.Reflection
                     o.WriteEnumDescriptionGetters = true;
                     o.WriteEnumDescriptions = true;
                     o.WriteEnumAllValuesConst = true;
+                    o.CustomEnumWriter = (enumInfo, writer) =>
+                    {
+                        writer.WriteLine($"// Custom enum code for: {enumInfo.Name}");
+                    };
                 })
                 .WriteToString();
 

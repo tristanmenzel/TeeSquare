@@ -6,20 +6,19 @@ namespace TeeSquare.Writers
 {
     public class EnumWriter : ICodePart
     {
-        private readonly EnumTypeConfigurator _config;
+        private readonly EnumInfo _enumInfo;
         private bool _includeDescriptionGetter;
         private bool _includeAllValuesConstant;
-        public string Name { get; }
+        private Action<IEnumInfo, ICodeWriter> _customCodeWriter;
 
         public EnumWriter(string name)
         {
-            Name = name;
-            _config = new EnumTypeConfigurator();
+            _enumInfo = new EnumInfo(name);
         }
 
-        public EnumWriter WithValues(Action<IEnumTypeConfigurator> configure)
+        public EnumWriter With(Action<IEnumConfigurator> configure)
         {
-            configure(_config);
+            configure(_enumInfo);
             return this;
         }
 
@@ -35,40 +34,51 @@ namespace TeeSquare.Writers
             return this;
         }
 
+        public EnumWriter IncludeCustomCode(Action<IEnumInfo, ICodeWriter> customCodeWriter)
+        {
+            _customCodeWriter = customCodeWriter;
+            return this;
+        }
+
         private ICodePart BuildDescGetterFunc()
         {
-            return new FunctionWriter($"Get{Name}Description")
+            return new FunctionWriter($"Get{_enumInfo.Name}Description")
                 .WithReturnType("string")
-                .WithParams(p => p.Param("value", Name))
+                .WithParams(p => p.Param("value", _enumInfo.Name))
                 .AsConstArrows()
-                .WithBody(body => { body.WriteLine($"return {Name}Desc[value];"); });
+                .WithBody(body => { body.WriteLine($"return {_enumInfo.Name}Desc[value];"); });
         }
 
         void ICodePart.WriteTo(ICodeWriter writer)
         {
-            writer.OpenBrace($"export enum {Name}");
-            writer.WriteDelimitedLines(_config.Values, v => $"{v.Name} = {v.FormattedValue}", ",");
+            writer.OpenBrace($"export enum {_enumInfo.Name}");
+            writer.WriteDelimitedLines(_enumInfo.Values, v => $"{v.Name} = {v.FormattedValue}", ",");
             writer.CloseBrace();
 
             if (_includeAllValuesConstant)
             {
-                writer.WriteLine($"export const All{Name}: {Name}[] = [");
+                writer.WriteLine($"export const All{_enumInfo.Name}: {_enumInfo.Name}[] = [");
                 writer.Indent();
-                writer.WriteDelimitedLines(_config.Values, v => $"{Name}.{v.Name}", ",");
+                writer.WriteDelimitedLines(_enumInfo.Values, v => $"{_enumInfo.Name}.{v.Name}", ",");
                 writer.Deindent();
                 writer.WriteLine("];");
             }
 
-            if (_config.Values.Any(v => v.Description != null))
+            if (_enumInfo.Values.Any(v => v.Description != null))
             {
-                writer.OpenBrace($"export const {Name}Desc: {{ [key: number]: string }} =");
-                writer.WriteDelimitedLines(_config.Values, v => $"{v.FormattedValue}: `{v.Description ?? v.Name}`",
+                writer.OpenBrace($"export const {_enumInfo.Name}Desc: {{ [key: number]: string }} =");
+                writer.WriteDelimitedLines(_enumInfo.Values, v => $"{v.FormattedValue}: `{v.Description ?? v.Name}`",
                     ",");
                 writer.CloseBrace(true);
                 if (_includeDescriptionGetter)
                 {
                     BuildDescGetterFunc().WriteTo(writer);
                 }
+            }
+
+            if (_customCodeWriter != null)
+            {
+                _customCodeWriter(_enumInfo, writer);
             }
         }
     }

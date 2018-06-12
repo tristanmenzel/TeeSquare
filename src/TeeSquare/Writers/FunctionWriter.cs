@@ -33,7 +33,7 @@ namespace TeeSquare.Writers
             return this;
         }
 
-        public FunctionWriter WithParams(Action<IParamsInfo> configureParams)
+        public FunctionWriter WithParams(Action<IParamConfigurator> configureParams)
         {
             _method.WithParams(configureParams);
             return this;

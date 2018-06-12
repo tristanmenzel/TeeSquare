@@ -1,15 +1,22 @@
 ﻿namespace TeeSquare.TypeMetadata
 {
-    class ValueInfo
+    public interface IEnumValueInfo
     {
-        public ValueInfo(string name, int value, string description)
+        string Name { get; }
+        string Description { get; }
+        string FormattedValue { get; }
+    }
+
+    class EnumValueInfo : IEnumValueInfo
+    {
+        public EnumValueInfo(string name, int value, string description)
         {
             Name = name;
             Description = description;
             FormattedValue = value.ToString();
         }
 
-        public ValueInfo(string name, string value, string description)
+        public EnumValueInfo(string name, string value, string description)
         {
             Name = name;
             Description = description;

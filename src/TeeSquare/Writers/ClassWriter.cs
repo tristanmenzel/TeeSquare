@@ -6,43 +6,38 @@ namespace TeeSquare.Writers
 {
     public class ClassWriter : ICodePart
     {
-        private readonly string _name;
-        private readonly string[] _genericTypeParams;
-        private readonly TypeConfigurer _config;
-        private string _abstract = string.Empty;
+        private readonly TypeInfo _typeInfo;
 
         public ClassWriter(string name, string[] genericTypeParams)
         {
-            _name = name;
-            _genericTypeParams = genericTypeParams;
-            _config = new TypeConfigurer();
+            _typeInfo = new TypeInfo(name, genericTypeParams);
         }
 
         public ClassWriter Abstract()
         {
-            _abstract = "abstract ";
+            _typeInfo.IsAbstract = true;
             return this;
         }
 
         public void With(Action<ITypeConfigurer> configure)
         {
-            configure(_config);
+            configure(_typeInfo);
         }
 
 
         void ICodePart.WriteTo(ICodeWriter writer)
         {
-            writer.Write($"export {_abstract}class ");
-            writer.WriteType(_name, _genericTypeParams);
+            writer.Write($"export {(_typeInfo.IsAbstract?"abstract ": "")}class ");
+            writer.WriteType(_typeInfo.Name, _typeInfo.GenericTypeParams);
             writer.OpenBrace();
-            foreach (var prop in _config.Properties)
+            foreach (var prop in _typeInfo.Properties)
             {
                 writer.Write($"{prop.Name}: ", true);
                 writer.WriteType(prop.Type, prop.GenericTypeParams);
                 writer.WriteLine(";", false);
             }
 
-            foreach (var method in _config.Methods)
+            foreach (var method in _typeInfo.Methods)
             {
                 writer.Write(method.IsStatic ? "static " : string.Empty, true);
                 writer.Write($"{method.Id.Name}(");

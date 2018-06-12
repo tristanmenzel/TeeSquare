@@ -69,7 +69,7 @@ namespace TeeSquare.Tests.TypeScriptWriterTest
             var res = WriteToMemory(w =>
             {
                 w.WriteEnum("Fruits")
-                    .WithValues(e =>
+                    .With(e =>
                     {
                         e.Value("Apple", 0);
                         e.Value("Banana", 1);
@@ -77,7 +77,7 @@ namespace TeeSquare.Tests.TypeScriptWriterTest
                     });
 
                 w.WriteEnum("Things")
-                    .WithValues(e =>
+                    .With(e =>
                     {
                         e.Value("ThingOne", "ValueOne", "Description of thing one");
                         e.Value("ThingTwo", "ValueTwo", "Description of thing two");

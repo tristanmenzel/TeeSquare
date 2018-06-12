@@ -1,6 +1,13 @@
 ﻿namespace TeeSquare.TypeMetadata
 {
-    class PropertyInfo
+    public interface IPropertyInfo
+    {
+        string Name { get; }
+        string Type { get; }
+        string[] GenericTypeParams { get; }
+    }
+
+    class PropertyInfo : IPropertyInfo
     {
         public string Name { get; }
         public string Type { get; }

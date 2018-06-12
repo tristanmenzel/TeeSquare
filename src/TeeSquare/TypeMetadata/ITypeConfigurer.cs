@@ -6,8 +6,6 @@ namespace TeeSquare.TypeMetadata
     {
         void Property(string name, string type, params string[] genericTypeParams);
 
-        [Obsolete]
-        IMethodInfo Method(string name, string returnType, params string[] returnTypeGenericTypeParams);
-        IMethodInfo Method(string name);
+        IMethodConfigurator Method(string name);
     }
 }

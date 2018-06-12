@@ -79,7 +79,7 @@ namespace TeeSquare.Reflection
                 if (type.IsEnum)
                 {
                     writer.WriteEnum(_namer.TypeName(type))
-                        .WithValues(e =>
+                        .With(e =>
                         {
                             foreach (var field in Enum.GetNames(type).Zip(Enum.GetValues(type).Cast<int>(),
                                 (name, value) => new {name, value}))
@@ -97,7 +97,8 @@ namespace TeeSquare.Reflection
                             }
                         })
                         .IncludeDescriptionGetter(_options.WriteEnumDescriptionGetters)
-                        .IncludeAllValuesConst(_options.WriteEnumAllValuesConst);
+                        .IncludeAllValuesConst(_options.WriteEnumAllValuesConst)
+                        .IncludeCustomCode(_options.CustomEnumWriter);
                     continue;
                 }
 
@@ -127,7 +128,8 @@ namespace TeeSquare.Reflection
 
                             i.Property(_namer.PropertyName(pi), _namer.TypeName(pi.PropertyType));
                         }
-                    });
+                    })
+                    .IncludeCustomCode(_options.CustomInterfaceWriter);
             }
 
             writer.Flush();
