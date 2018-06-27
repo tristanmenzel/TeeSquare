@@ -10,9 +10,9 @@ namespace TeeSquare.Reflection
 {
     public class WriterOptions
     {
-        public Namer Namer { get; set; } = Namer.Default;
+        public Namer Namer { get; set; } = new Namer();
 
-        public BindingFlags PropertyFlags = BindingFlags.GetProperty
+        public BindingFlags PropertyFlags { get; set; } = BindingFlags.GetProperty
                                             | BindingFlags.Public
                                             | BindingFlags.Instance;
 
@@ -28,12 +28,12 @@ namespace TeeSquare.Reflection
         public DiscriminatorPropertyPredicate DiscriminatorPropertyPredicate { get; set; } = DefaultDescriminator;
         public DiscriminatorPropertyValueProvider DiscriminatorPropertyValueProvider { get; set; } = DefaultDescriminatorValueProvider;
 
-        private static bool DefaultDescriminator(PropertyInfo property, Type parentType)
+        public static bool DefaultDescriminator(PropertyInfo property, Type parentType)
         {
             return property.GetCustomAttributes<TypeDiscriminatorAttribute>().Any();
         }
         
-        private static string DefaultDescriminatorValueProvider(PropertyInfo property, Type parentType)
+        public static string DefaultDescriminatorValueProvider(PropertyInfo property, Type parentType)
         {
             return property.GetCustomAttributes<TypeDiscriminatorAttribute>()
                        .Select(a => a.Value)

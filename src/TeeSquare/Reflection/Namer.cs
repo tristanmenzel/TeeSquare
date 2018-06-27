@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace TeeSquare.Reflection
 {
     public class Namer
     {
-        public static Namer Default => new Namer();
-
         private readonly NamingConvensions _namingConvensions;
 
         private readonly IDictionary<Type, string> _staticMappings = new Dictionary<Type, string>
@@ -24,12 +23,17 @@ namespace TeeSquare.Reflection
             {typeof(Single), "number"},
             {typeof(DateTime), "string"},
             {typeof(DateTimeOffset), "string"},
-            {typeof(bool), "boolean"},
+            {typeof(bool), "boolean"}
         };
 
         public virtual bool HasStaticMapping(Type type)
         {
             return _staticMappings.ContainsKey(type);
+        }
+
+        public virtual bool TryGetStaticMapping(Type type, out string name)
+        {
+            return _staticMappings.TryGetValue(type, out name);
         }
 
         public Namer(NamingConvensions namingConvensions = null)
@@ -39,7 +43,12 @@ namespace TeeSquare.Reflection
 
         public virtual string TypeName(Type type)
         {
-            if (_staticMappings.TryGetValue(type, out var name)) return name;
+            if (TryGetStaticMapping(type, out var name)) return name;
+            if (type.IsTask(out var resultType))
+            {
+                return TypeName(resultType);
+            }
+            
             if (type.IsDictionary(out var genericTypeParams))
                 return $"{{ [key: {TypeName(genericTypeParams[0])}]: {TypeName(genericTypeParams[1])} }}";
 
@@ -70,6 +79,9 @@ namespace TeeSquare.Reflection
 
         protected virtual string ToCase(string name, NameConvention nameConvention)
         {
+            if (string.IsNullOrEmpty(name)) return name;
+            name = new Regex(@"\-([a-z]?)", RegexOptions.IgnoreCase)
+                .Replace(name, m => m.Groups[1].Value.ToUpper());
             switch (nameConvention)
             {
                 case NameConvention.CamelCase:

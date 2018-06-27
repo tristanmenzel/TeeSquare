@@ -24,6 +24,11 @@ namespace TeeSquare.Reflection
         {
             foreach (var type in types)
             {
+                if (type.IsTask(out var resultType))
+                {
+                    AddTypes(resultType);
+                    continue;
+                }
                 if (type.IsNullable(out var underlyingType))
                 {
                     AddTypes(underlyingType);

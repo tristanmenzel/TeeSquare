@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace TeeSquare.Reflection
 {
@@ -37,6 +38,19 @@ namespace TeeSquare.Reflection
             return false;
         }
 
+        public static bool IsTask(this Type type, out Type resultType)
+        {
+            if (type.IsGenericType && typeof(Task<>)
+                    .MakeGenericType(type.GetGenericArguments().First()).IsAssignableFrom(type))
+            {
+                resultType = type.GetGenericArguments().First();
+                return true;
+            }
+
+            resultType = null;
+            return false;
+        }
+        
         public static bool IsDictionary(this Type type, out Type[] genericTypeParams)
         {
             if (type.IsGenericType && type.GetGenericArguments().Length == 2 && typeof(IDictionary<,>)
