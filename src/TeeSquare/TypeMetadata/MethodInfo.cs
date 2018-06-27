@@ -25,6 +25,7 @@ namespace TeeSquare.TypeMetadata
             Id = new IdentifierInfo(name, null);
             ReturnType = new IdentifierInfo(null, "void");
             _params = new ParamInfo();
+            WriteBody = w => { };
         }
 
         public IMethodConfigurator WithGenericTypeParams(params string[] genericTypeParams)
