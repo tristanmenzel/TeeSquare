@@ -15,6 +15,7 @@ namespace TeeSquare.Reflection
         {
             {typeof(string), "string"},
             {typeof(Guid), "string"},
+            {typeof(void), "void"},
             {typeof(Decimal), "number"},
             {typeof(Int16), "number"},
             {typeof(Int32), "number"},
@@ -41,6 +42,12 @@ namespace TeeSquare.Reflection
             if (_staticMappings.TryGetValue(type, out var name)) return name;
             if (type.IsDictionary(out var genericTypeParams))
                 return $"{{ [key: {TypeName(genericTypeParams[0])}]: {TypeName(genericTypeParams[1])} }}";
+
+            if (type.IsCollection(out var itemType))
+            {
+                return $"{TypeName(itemType)}[]";
+            }
+
             if (type.IsGenericType)
             {
                 var nonGenericName = ToCase(type.Name.Split("`").First(), _namingConvensions.Types);

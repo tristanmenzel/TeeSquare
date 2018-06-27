@@ -25,6 +25,7 @@ namespace TeeSquare.Reflection
                 itemType = type.GetElementType();
                 return true;
             }
+
             if (type.IsGenericType && typeof(IEnumerable<>)
                     .MakeGenericType(type.GetGenericArguments().First()).IsAssignableFrom(type))
             {
@@ -38,7 +39,7 @@ namespace TeeSquare.Reflection
 
         public static bool IsDictionary(this Type type, out Type[] genericTypeParams)
         {
-            if (type.IsGenericType && typeof(IDictionary<,>)
+            if (type.IsGenericType && type.GetGenericArguments().Length == 2 && typeof(IDictionary<,>)
                     .MakeGenericType(
                         type.GetGenericArguments().First(),
                         type.GetGenericArguments().Skip(1).FirstOrDefault()).IsAssignableFrom(type))
@@ -50,6 +51,5 @@ namespace TeeSquare.Reflection
             genericTypeParams = null;
             return false;
         }
-        
     }
 }
