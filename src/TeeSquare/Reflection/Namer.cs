@@ -55,6 +55,11 @@ namespace TeeSquare.Reflection
             return ToCase(propertyInfo.Name, _namingConvensions.Properties);
         }
 
+        public virtual string MethodName(MethodInfo methodInfo)
+        {
+            return ToCase(methodInfo.Name, _namingConvensions.Methods);
+        }
+
 
         protected virtual string ToCase(string name, NameConvention nameConvention)
         {
