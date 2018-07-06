@@ -4,6 +4,7 @@ branches:
   only:
   - master
   - feat/reflective-writer
+  - feat/web-api
 init:
   # Good practise, because Windows line endings are different from Unix/Linux ones
   - cmd: git config --global core.autocrlf true
@@ -19,11 +20,12 @@ before_build:
   # Display minimal restore text
   - cmd: dotnet restore ./src/ --verbosity m
 build_script:
-  # Package lib
-  - cmd: dotnet build ./src/teesquare/teesquare.csproj --configuration=release
-  - cmd: dotnet pack ./src/teesquare/teesquare.csproj --configuration=release
+  # Build lib
+  - cmd: dotnet build ./src/teesquare.sln --configuration=release --no-restore
 after_build:
   # For once the build has completed
+  - cmd: dotnet pack ./src/teesquare/teesquare.csproj --configuration=release --no-restore
+  - cmd: dotnet pack ./src/teesquare/teesquare.webapi.csproj --configuration=release --no-restore
 artifacts:
  - path: '\src\teesquare\bin\release\*.nupkg'
    name: Package
@@ -34,6 +36,7 @@ test_script:
   - cmd: dotnet restore ./src/ --verbosity m
   # run the unit tests
   - cmd: dotnet test ./src/teesquare.tests/teesquare.tests.csproj
+  - cmd: dotnet test ./src/teesquare.tests/teesquare.webapi.tests.csproj
 on_finish :
   # any cleanup in here
 deploy: 
