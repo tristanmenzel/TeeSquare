@@ -65,7 +65,7 @@ namespace TeeSquare.WebApi.Reflection
 
         public void AddAssembly(Assembly assembly)
         {
-            var controllers = assembly.GetTypes()
+            var controllers = assembly.GetExportedTypes()
                 .Where(t => typeof(Controller).IsAssignableFrom(t));
 
             foreach (var controller in controllers)
