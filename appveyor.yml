@@ -25,7 +25,7 @@ build_script:
 after_build:
   # For once the build has completed
   - cmd: dotnet pack ./src/teesquare/teesquare.csproj --configuration=release --no-restore
-  - cmd: dotnet pack ./src/teesquare/teesquare.webapi.csproj --configuration=release --no-restore
+  - cmd: dotnet pack ./src/teesquare.webapi/teesquare.webapi.csproj --configuration=release --no-restore
 artifacts:
  - path: '\src\teesquare\bin\release\*.nupkg'
    name: Package
