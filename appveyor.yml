@@ -36,7 +36,7 @@ test_script:
   - cmd: dotnet restore ./src/ --verbosity m
   # run the unit tests
   - cmd: dotnet test ./src/teesquare.tests/teesquare.tests.csproj
-  - cmd: dotnet test ./src/teesquare.tests/teesquare.webapi.tests.csproj
+  - cmd: dotnet test ./src/teesquare.webapi.tests/teesquare.webapi.tests.csproj
 on_finish :
   # any cleanup in here
 deploy: 

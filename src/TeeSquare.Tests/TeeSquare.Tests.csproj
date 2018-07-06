@@ -7,7 +7,7 @@
     <ProjectReference Include="..\TeeSquare\TeeSquare.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Blurk" Version="2.0.0" />
+    <PackageReference Include="Blurk" Version="2.1.8" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
     <PackageReference Include="NUnit" Version="3.10.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />

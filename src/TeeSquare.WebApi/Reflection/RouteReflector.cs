@@ -240,7 +240,7 @@ namespace TeeSquare.WebApi.Reflection
                                 var queryParams = req.RequestParams.Where(x => x.Kind == ParameterKind.Query).ToArray();
                                 if (queryParams.Any())
                                 {
-                                    w.Write("var query = RequestFactory.toQuery({", true);
+                                    w.Write("let query = RequestFactory.toQuery({", true);
                                     w.WriteDelimited(queryParams,
                                         (p, wr) => wr.Write(p.Name), ", ");
                                     w.WriteLine("});", false);
