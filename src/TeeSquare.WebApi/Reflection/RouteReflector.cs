@@ -160,21 +160,31 @@ namespace TeeSquare.WebApi.Reflection
         public void WriteTo(TypeScriptWriter writer)
         {
             writer.WriteInterface("GetRequest", "TResponse")
-                .With(i => i.Property("url", "string"));
+                .With(i =>
+                {
+                    i.Property("url", "string");
+                    i.Property("method", "'GET'");
+                });
             writer.WriteInterface("DeleteRequest", "TResponse")
-                .With(i => i.Property("url", "string"));
+                .With(i =>
+                {
+                    i.Property("url", "string");
+                    i.Property("method", "'DELETE'");
+                });
 
             writer.WriteInterface("PostRequest", "TRequest", "TResponse")
                 .With(i =>
                 {
                     i.Property("data", "TRequest");
                     i.Property("url", "string");
+                    i.Property("method", "'POST'");
                 });
             writer.WriteInterface("PutRequest", "TRequest", "TResponse")
                 .With(i =>
                 {
                     i.Property("data", "TRequest");
                     i.Property("url", "string");
+                    i.Property("method", "'PUT'");
                 });
 
 
@@ -184,15 +194,15 @@ namespace TeeSquare.WebApi.Reflection
                 {
                     c.Method("toQuery")
                         .WithReturnType("string")
-                        .WithParams(p => p.Param("o", "{[key:string]: any}"))
+                        .WithParams(p => p.Param("o", "{[key: string]: any}"))
                         .Static()
                         .WithBody(w =>
                         {
                             w.WriteLine("let q = Object.keys(o)");
                             w.Indent();
-                            w.WriteLine(".map(k=>({k, v: o[k]}))");
-                            w.WriteLine(".filter(x=>x.v !== undefined && x.v===null)");
-                            w.WriteLine(".map(x=>`${encodeURIComponent(x.k)}=${encodeURIComponent(x.v)}`)");
+                            w.WriteLine(".map(k => ({k, v: o[k]}))");
+                            w.WriteLine(".filter(x => x.v !== undefined && x.v === null)");
+                            w.WriteLine(".map(x => `${encodeURIComponent(x.k)}=${encodeURIComponent(x.v)}`)");
                             w.WriteLine(".join('&');");
                             w.Deindent();
                             w.WriteLine("return q && `?${q}` || '';");
@@ -248,6 +258,7 @@ namespace TeeSquare.WebApi.Reflection
 
                                 w.WriteLine("return {");
                                 w.Indent();
+                                w.WriteLine($"method: '{req.Method.GetName().ToUpper()}',");
                                 if (req.Method.HasRequestBody())
                                     w.WriteLine("data,");
                                 w.WriteLine(

@@ -47,6 +47,12 @@ namespace TeeSquare.Reflection
                 return true;
             }
 
+            if (type == typeof(Task))
+            {
+                resultType = typeof(void);
+                return true;
+            }
+
             resultType = null;
             return false;
         }
