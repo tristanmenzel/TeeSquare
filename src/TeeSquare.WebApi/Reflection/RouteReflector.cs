@@ -11,7 +11,7 @@ using TeeSquare.Writers;
 
 namespace TeeSquare.WebApi.Reflection
 {
-    
+
     public class RouteReflectorOptions
     {
         public WriterOptions BuildWriterOptions()
@@ -30,7 +30,7 @@ namespace TeeSquare.WebApi.Reflection
                 DiscriminatorPropertyValueProvider = DiscriminatorPropertyValueProvider
             };
         }
-        
+
         public RouteNamer Namer { get; set; } = new RouteNamer();
 
         public BindingFlags PropertyFlags { get; set; } = BindingFlags.GetProperty
@@ -49,7 +49,7 @@ namespace TeeSquare.WebApi.Reflection
         public DiscriminatorPropertyPredicate DiscriminatorPropertyPredicate { get; set; } = WriterOptions.DefaultDescriminator;
         public DiscriminatorPropertyValueProvider DiscriminatorPropertyValueProvider { get; set; } = WriterOptions.DefaultDescriminatorValueProvider;
     }
-    
+
     public class RouteReflector
     {
         private readonly RouteReflectorOptions _options;
@@ -201,7 +201,7 @@ namespace TeeSquare.WebApi.Reflection
                             w.WriteLine("let q = Object.keys(o)");
                             w.Indent();
                             w.WriteLine(".map(k => ({k, v: o[k]}))");
-                            w.WriteLine(".filter(x => x.v !== undefined && x.v === null)");
+                            w.WriteLine(".filter(x => x.v !== undefined && x.v !== null)");
                             w.WriteLine(".map(x => `${encodeURIComponent(x.k)}=${encodeURIComponent(x.v)}`)");
                             w.WriteLine(".join('&');");
                             w.Deindent();
