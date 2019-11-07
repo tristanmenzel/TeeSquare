@@ -1,55 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using TeeSquare.Reflection;
-using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
 
 namespace TeeSquare.WebApi.Reflection
 {
-
-    public class RouteReflectorOptions
-    {
-        public WriterOptions BuildWriterOptions()
-        {
-            return new WriterOptions
-            {
-                Namer = Namer,
-                PropertyFlags = PropertyFlags,
-                WriteEnumDescriptions = WriteEnumDescriptions,
-                WriteEnumDescriptionGetters = WriteEnumDescriptionGetters,
-                IndentChars = IndentChars,
-                WriteEnumAllValuesConst = WriteEnumAllValuesConst,
-                CustomEnumWriter = CustomEnumWriter,
-                CustomInterfaceWriter = CustomInterfaceWriter,
-                DiscriminatorPropertyPredicate = DiscriminatorPropertyPredicate,
-                DiscriminatorPropertyValueProvider = DiscriminatorPropertyValueProvider
-            };
-        }
-
-        public RouteNamer Namer { get; set; } = new RouteNamer();
-
-        public BindingFlags PropertyFlags { get; set; } = BindingFlags.GetProperty
-                                                          | BindingFlags.Public
-                                                          | BindingFlags.Instance;
-
-        public bool WriteEnumDescriptions { get; set; }
-        public bool WriteEnumDescriptionGetters { get; set; }
-        public string IndentChars { get; set; } = "  ";
-        public bool WriteEnumAllValuesConst { get; set; }
-
-        public Action<IEnumInfo, ICodeWriter> CustomEnumWriter { get; set; }
-
-        public Action<ITypeInfo, ICodeWriter> CustomInterfaceWriter { get; set; }
-
-        public DiscriminatorPropertyPredicate DiscriminatorPropertyPredicate { get; set; } = WriterOptions.DefaultDescriminator;
-        public DiscriminatorPropertyValueProvider DiscriminatorPropertyValueProvider { get; set; } = WriterOptions.DefaultDescriminatorValueProvider;
-    }
-
     public class RouteReflector
     {
         private readonly RouteReflectorOptions _options;
@@ -70,22 +29,27 @@ namespace TeeSquare.WebApi.Reflection
 
             foreach (var controller in controllers)
             {
-                foreach (var action in controller
-                    .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod)
-                    .Where(a => a.IsAction()))
-                {
-                    var route = BuildRoute(controller, action);
+                AddController(controller);
+            }
+        }
 
-                    var factory = GetRequestFactory(action);
-                    var requestParams = GetRequestParams(action);
+        public void AddController(Type controller)
+        {
+            foreach (var action in controller
+                .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod)
+                .Where(a => a.IsAction()))
+            {
+                var route = BuildRoute(controller, action);
+
+                var factory = GetRequestFactory(action);
+                var requestParams = GetRequestParams(action);
 
 
-                    _requests.Add(factory(_options.Namer.RouteName(controller, action, route),
-                        route,
-                        action.ReturnType,
-                        requestParams
-                    ));
-                }
+                _requests.Add(factory(_options.Namer.RouteName(controller, action, route),
+                    route,
+                    action.ReturnType,
+                    requestParams
+                ));
             }
         }
 
@@ -274,146 +238,6 @@ namespace TeeSquare.WebApi.Reflection
             var rWriter = new ReflectiveWriter(_options.BuildWriterOptions());
             rWriter.AddTypes(types.ToArray());
             rWriter.WriteTo(writer);
-        }
-    }
-
-    public enum ParameterKind
-    {
-        Route,
-        Query,
-        Body
-    }
-
-    public class ParamInfo
-    {
-        public ParameterKind Kind { get; set; }
-        public string Name { get; set; }
-        public Type Type { get; set; }
-    }
-
-    public class RequestInfo
-    {
-        private RequestInfo(string name, HttpMethod method, string path, Type responseType,
-            ParamInfo[] requestParams)
-        {
-            Name = name;
-            Method = method;
-            Path = path;
-            ResponseType = responseType;
-            RequestParams = requestParams;
-        }
-
-        public string Name { get; }
-        public HttpMethod Method { get; }
-        public string Path { get; }
-        public Type ResponseType { get; }
-        public ParamInfo[] RequestParams { get; }
-
-        public Type GetRequestBodyType()
-        {
-            return RequestParams
-                       .Where(p => p.Kind == ParameterKind.Body)
-                       .Select(p => p.Type)
-                       .FirstOrDefault() ?? typeof(void);
-        }
-
-        public static RequestInfo Post(string name, string path, Type responseType, ParamInfo[] requestParams)
-        {
-            return new RequestInfo(name, HttpMethod.Post, path, responseType, requestParams);
-        }
-
-        public static RequestInfo Get(string name, string path, Type responseType, ParamInfo[] requestParams)
-        {
-            return new RequestInfo(name, HttpMethod.Get, path, responseType, requestParams);
-        }
-
-        public static RequestInfo Put(string name, string path, Type responseType, ParamInfo[] requestParams)
-        {
-            return new RequestInfo(name, HttpMethod.Put, path, responseType, requestParams);
-        }
-
-        public static RequestInfo Delete(string name, string path, Type responseType, ParamInfo[] requestParams)
-        {
-            return new RequestInfo(name, HttpMethod.Delete, path, responseType, requestParams);
-        }
-    }
-
-    public delegate RequestInfo RequestFactory(string name, string path, Type responseType,
-        ParamInfo[] requestParams);
-
-    public class RouteNamer : Namer
-    {
-        public override bool HasStaticMapping(Type type)
-        {
-            if (type == typeof(IActionResult))
-                return true;
-            return base.HasStaticMapping(type);
-        }
-
-        public override bool TryGetStaticMapping(Type type, out string name)
-        {
-            if (type == typeof(IActionResult))
-            {
-                name = "any";
-                return true;
-            }
-
-            return base.TryGetStaticMapping(type, out name);
-        }
-
-        public virtual string RouteName(Type controller, MethodInfo action, string route)
-        {
-            var parts = route.Split('/')
-                .Select(part =>
-                {
-                    if (part.StartsWith("{"))
-                    {
-                        return $"By{ToCase(part.Substring(1, part.Length - 2), NameConvention.PascalCase)}";
-                    }
-
-                    return ToCase(part, NameConvention.PascalCase);
-                });
-            return string.Join("", parts).Replace("[controller]", ControllerName(controller));
-        }
-
-        public string ControllerName(Type controller)
-        {
-            return controller.Name.Replace("Controller", "");
-        }
-    }
-
-    public static class WebApiTypeExtension
-    {
-        public static bool IsAction(this MethodInfo action)
-        {
-            if (action.IsDefined(typeof(NonActionAttribute))
-                || action.IsSpecialName
-                || action.DeclaringType.Namespace.StartsWith("System")
-                || action.DeclaringType.Namespace.StartsWith("Microsoft"))
-                return false;
-            return true;
-        }
-    }
-
-    public static class HttpMethodExtensions
-    {
-        public static bool HasRequestBody(this HttpMethod method)
-        {
-            return method == HttpMethod.Put || method == HttpMethod.Post;
-        }
-
-        public static string GetName(this HttpMethod method)
-        {
-            if (method == HttpMethod.Delete)
-                return "Delete";
-
-            if (method == HttpMethod.Post)
-                return "Post";
-
-            if (method == HttpMethod.Put)
-                return "Put";
-
-            return "Get";
         }
     }
 }

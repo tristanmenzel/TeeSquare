@@ -1,5 +1,3 @@
-﻿using System;
-using System.Reflection;
 using BlurkCompare;
 using NUnit.Framework;
 using TeeSquare.DemoApi.Controllers;
@@ -8,15 +6,12 @@ using TeeSquare.WebApi.Reflection;
 namespace TeeSquare.WebApi.Tests
 {
     [TestFixture]
-    public class WhenGeneratingTypeScriptForWebApi
+    public class WhenGeneratingTypeScriptForWebApiController
     {
-        public Assembly WebApiAssembly => typeof(ValuesController).Assembly;
-
-
         [Test]
-        public void AllRoutesAndDtosAreOutput()
+        public void OnlyTypesForThatControllerAreOutput()
         {
-            var res = TeeSquareWebApi.GenerateForAssemblies(WebApiAssembly)
+            var res = TeeSquareWebApi.GenerateForControllers(typeof(RouteOnActionController))
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")

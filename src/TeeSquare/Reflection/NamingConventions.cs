@@ -1,8 +1,8 @@
 ﻿namespace TeeSquare.Reflection
 {
-    public class NamingConvensions
+    public class NamingConventions
     {
-        public static NamingConvensions Default => new NamingConvensions();
+        public static NamingConventions Default => new NamingConventions();
 
         public NameConvention Properties { get; set; } = NameConvention.CamelCase;
         public NameConvention Methods { get; set; } = NameConvention.CamelCase;

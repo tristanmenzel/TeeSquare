@@ -8,7 +8,7 @@ namespace TeeSquare.Reflection
 {
     public class Namer
     {
-        private readonly NamingConvensions _namingConvensions;
+        private readonly NamingConventions _namingConventions;
 
         private readonly IDictionary<Type, string> _staticMappings = new Dictionary<Type, string>
         {
@@ -36,9 +36,9 @@ namespace TeeSquare.Reflection
             return _staticMappings.TryGetValue(type, out name);
         }
 
-        public Namer(NamingConvensions namingConvensions = null)
+        public Namer(NamingConventions namingConventions = null)
         {
-            _namingConvensions = namingConvensions ?? NamingConvensions.Default;
+            _namingConventions = namingConventions ?? NamingConventions.Default;
         }
 
         public virtual string TypeName(Type type)
@@ -59,21 +59,21 @@ namespace TeeSquare.Reflection
 
             if (type.IsGenericType)
             {
-                var nonGenericName = ToCase(type.Name.Split("`").First(), _namingConvensions.Types);
+                var nonGenericName = ToCase(type.Name.Split("`").First(), _namingConventions.Types);
                 return $"{nonGenericName}<{string.Join(", ", type.GetGenericArguments().Select(TypeName))}>";
             }
 
-            return ToCase(type.Name, _namingConvensions.Types);
+            return ToCase(type.Name, _namingConventions.Types);
         }
 
         public virtual string PropertyName(PropertyInfo propertyInfo)
         {
-            return ToCase(propertyInfo.Name, _namingConvensions.Properties);
+            return ToCase(propertyInfo.Name, _namingConventions.Properties);
         }
 
         public virtual string MethodName(MethodInfo methodInfo)
         {
-            return ToCase(methodInfo.Name, _namingConvensions.Methods);
+            return ToCase(methodInfo.Name, _namingConventions.Methods);
         }
 
 
@@ -95,7 +95,7 @@ namespace TeeSquare.Reflection
 
         public string EnumName(string name)
         {
-            return ToCase(name, _namingConvensions.EnumsMembers);
+            return ToCase(name, _namingConventions.EnumsMembers);
         }
     }
 }
