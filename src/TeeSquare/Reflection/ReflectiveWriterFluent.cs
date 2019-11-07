@@ -39,7 +39,12 @@ namespace TeeSquare.Reflection
 
         public void WriteToStream(Stream stream)
         {
-            var tsWriter = new TypeScriptWriter(stream, _options.IndentChars);
+            var tsWriter = new TypeScriptWriter(stream,
+                    _options.InterfaceWriterFactory,
+                    _options.ClassWriterFactory,
+                    _options.EnumWriterFactory,
+                    _options.FunctionWriterFactory,
+                    _options.IndentChars);
             var rWriter = new ReflectiveWriter(_options);
             rWriter.AddTypes(_types.ToArray());
             rWriter.WriteTo(tsWriter);

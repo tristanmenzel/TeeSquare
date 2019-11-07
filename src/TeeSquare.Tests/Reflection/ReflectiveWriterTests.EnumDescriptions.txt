@@ -19,4 +19,3 @@ export const AudienceDesc: { [key: number]: string } = {
 export const GetAudienceDescription = (value: Audience): string => {
   return AudienceDesc[value];
 };
-// Custom enum code for: Audience

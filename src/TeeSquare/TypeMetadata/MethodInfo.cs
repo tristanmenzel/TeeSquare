@@ -40,6 +40,11 @@ namespace TeeSquare.TypeMetadata
             return this;
         }
 
+        public IMethodInfo Done()
+        {
+            return this;
+        }
+
         public IMethodConfigurator Static()
         {
             IsStatic = true;

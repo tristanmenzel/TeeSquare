@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace TeeSquare.TypeMetadata
@@ -17,19 +18,30 @@ namespace TeeSquare.TypeMetadata
         {
             Name = name;
         }
-        
+
         private readonly List<EnumValueInfo> _values = new List<EnumValueInfo>();
-        
+
         public IEnumValueInfo[] Values => _values.Cast<IEnumValueInfo>().ToArray();
 
-        void IEnumConfigurator.Value(string name, int value, string description)
+        public IEnumConfigurator Configure(Action<IEnumConfigurator> configure)
+        {
+            configure(this);
+            return this;
+        }
+
+        void IEnumConfigurator.AddValue(string name, int value, string description)
         {
             _values.Add(new EnumValueInfo(name, value, description));
         }
 
-        void IEnumConfigurator.Value(string name, string value, string description)
+        void IEnumConfigurator.AddValue(string name, string value, string description)
         {
             _values.Add(new EnumValueInfo(name, value, description));
+        }
+
+        public IEnumInfo Done()
+        {
+            return this;
         }
     }
 }

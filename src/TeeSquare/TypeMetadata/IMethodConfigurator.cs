@@ -11,5 +11,6 @@ namespace TeeSquare.TypeMetadata
         IIdentifierInfo ReturnType { get; }
         IMethodConfigurator WithGenericTypeParams(params string[] genericTypeParams);
         IMethodConfigurator WithReturnType(string type, params string[] genericTypeParams);
+        IMethodInfo Done();
     }
 }

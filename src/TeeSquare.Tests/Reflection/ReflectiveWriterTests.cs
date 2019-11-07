@@ -4,6 +4,7 @@ using NUnit.Framework;
 using TeeSquare.Reflection;
 using TeeSquare.Tests.Reflection.FakeDomain;
 using TeeSquare.Tests.TypeScriptWriterTest;
+using TeeSquare.Writers;
 
 namespace TeeSquare.Tests.Reflection
 {
@@ -41,13 +42,10 @@ namespace TeeSquare.Tests.Reflection
                 .AddTypes(typeof(Audience))
                 .Configure(o =>
                 {
-                    o.WriteEnumDescriptionGetters = true;
-                    o.WriteEnumDescriptions = true;
-                    o.WriteEnumAllValuesConst = true;
-                    o.CustomEnumWriter = (enumInfo, writer) =>
-                    {
-                        writer.WriteLine($"// Custom enum code for: {enumInfo.Name}");
-                    };
+                    o.EnumWriterFactory = new EnumWriterFactory()
+                        .IncludeDescriptionGetter(true)
+                        .IncludeAllValuesConst(true)
+                        .IncludeDescriptions(true);
                 })
                 .WriteToString();
 
@@ -99,7 +97,7 @@ namespace TeeSquare.Tests.Reflection
             var res = TeeSquareFluent.ReflectiveWriter()
                 .AddTypes(typeof(Member))
                 .WriteToString();
-           
+
             Blurk.CompareImplicitFile()
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
@@ -111,7 +109,7 @@ namespace TeeSquare.Tests.Reflection
             var res = TeeSquareFluent.ReflectiveWriter()
                 .AddTypes(typeof(Circle), typeof(Square), typeof(Rectangle))
                 .WriteToString();
-            
+
             Blurk.CompareImplicitFile()
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);

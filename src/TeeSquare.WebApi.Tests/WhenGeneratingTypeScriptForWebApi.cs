@@ -4,6 +4,7 @@ using BlurkCompare;
 using NUnit.Framework;
 using TeeSquare.DemoApi.Controllers;
 using TeeSquare.WebApi.Reflection;
+using TeeSquare.Writers;
 
 namespace TeeSquare.WebApi.Tests
 {

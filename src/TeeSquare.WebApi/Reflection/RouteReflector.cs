@@ -124,39 +124,39 @@ namespace TeeSquare.WebApi.Reflection
         public void WriteTo(TypeScriptWriter writer)
         {
             writer.WriteInterface("GetRequest", "TResponse")
-                .With(i =>
+                .Configure(i =>
                 {
-                    i.Property("url", "string");
-                    i.Property("method", "'GET'");
+                    i.AddProperty("url", "string");
+                    i.AddProperty("method", "'GET'");
                 });
             writer.WriteInterface("DeleteRequest", "TResponse")
-                .With(i =>
+                .Configure(i =>
                 {
-                    i.Property("url", "string");
-                    i.Property("method", "'DELETE'");
+                    i.AddProperty("url", "string");
+                    i.AddProperty("method", "'DELETE'");
                 });
 
             writer.WriteInterface("PostRequest", "TRequest", "TResponse")
-                .With(i =>
+                .Configure(i =>
                 {
-                    i.Property("data", "TRequest");
-                    i.Property("url", "string");
-                    i.Property("method", "'POST'");
+                    i.AddProperty("data", "TRequest");
+                    i.AddProperty("url", "string");
+                    i.AddProperty("method", "'POST'");
                 });
             writer.WriteInterface("PutRequest", "TRequest", "TResponse")
-                .With(i =>
+                .Configure(i =>
                 {
-                    i.Property("data", "TRequest");
-                    i.Property("url", "string");
-                    i.Property("method", "'PUT'");
+                    i.AddProperty("data", "TRequest");
+                    i.AddProperty("url", "string");
+                    i.AddProperty("method", "'PUT'");
                 });
 
 
             writer.WriteClass("RequestFactory")
-                .Abstract()
-                .With(c =>
+                .Configure(c =>
                 {
-                    c.Method("toQuery")
+                    c.MakeAbstract();
+                    c.AddMethod("toQuery")
                         .WithReturnType("string")
                         .WithParams(p => p.Param("o", "{[key: string]: any}"))
                         .Static()
@@ -175,7 +175,7 @@ namespace TeeSquare.WebApi.Reflection
 
                     foreach (var req in _requests)
                     {
-                        var methodBuilder = c.Method($"{req.Method.GetName()}{req.Name}")
+                        var methodBuilder = c.AddMethod($"{req.Method.GetName()}{req.Name}")
                             .Static();
 
                         if (req.Method.HasRequestBody())

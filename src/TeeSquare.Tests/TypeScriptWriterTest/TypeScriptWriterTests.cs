@@ -1,7 +1,10 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using BlurkCompare;
 using NUnit.Framework;
+using TeeSquare.Reflection;
+using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
 
 namespace TeeSquare.Tests.TypeScriptWriterTest
@@ -15,17 +18,17 @@ namespace TeeSquare.Tests.TypeScriptWriterTest
             var res = WriteToMemory(w =>
             {
                 w.WriteInterface("FunFunInterface", "TOne", "TTwo")
-                    .With(i =>
+                    .Configure(i =>
                     {
-                        i.Method("TestMethod")
+                        i.AddMethod("TestMethod")
                             .WithReturnType("string")
                             .WithParams(p =>
                             {
                                 p.Param("a", "number");
                                 p.Param("b", "Enumerable", "number");
                             });
-                        i.Property("ValueOfTwo", "TTwo");
-                        i.Property("MaybeItsOne", "Maybe", "TOne");
+                        i.AddProperty("ValueOfTwo", "TTwo");
+                        i.AddProperty("MaybeItsOne", "Maybe", "TOne");
                     });
             });
             Blurk.CompareImplicitFile()
@@ -39,10 +42,10 @@ namespace TeeSquare.Tests.TypeScriptWriterTest
             var res = WriteToMemory(w =>
             {
                 w.WriteClass("AppleService")
-                    .With(c =>
+                    .Configure(c =>
                     {
-                        c.Property("banana", "string");
-                        c.Method("getApplePie")
+                        c.AddProperty("banana", "string");
+                        c.AddMethod("getApplePie")
                             .WithReturnType("string")
                             .WithParams(p =>
                             {
@@ -50,7 +53,7 @@ namespace TeeSquare.Tests.TypeScriptWriterTest
                                 p.Param("typeOfApple", "string");
                             })
                             .WithBody(x => { x.WriteLine("return \"No apples here\";"); });
-                        c.Method("haveFun")
+                        c.AddMethod("haveFun")
                             .WithParams(p => { p.Param("amountOfFun", "number"); })
                             .Static()
                             .WithBody(x => x.WriteLine("console.log(\"Having so much fun\", amountOfFun);"));
@@ -66,24 +69,27 @@ namespace TeeSquare.Tests.TypeScriptWriterTest
         [Test]
         public void WriteEnum()
         {
+            var options = new WriterOptions();
+            options.EnumWriterFactory = new EnumWriterFactory()
+                .IncludeDescriptions();
             var res = WriteToMemory(w =>
             {
                 w.WriteEnum("Fruits")
-                    .With(e =>
+                    .Configure(e =>
                     {
-                        e.Value("Apple", 0);
-                        e.Value("Banana", 1);
-                        e.Value("Cantelope", 2);
+                        e.AddValue("Apple", 0);
+                        e.AddValue("Banana", 1);
+                        e.AddValue("Cantelope", 2);
                     });
 
                 w.WriteEnum("Things")
-                    .With(e =>
+                    .Configure(e =>
                     {
-                        e.Value("ThingOne", "ValueOne", "Description of thing one");
-                        e.Value("ThingTwo", "ValueTwo", "Description of thing two");
-                        e.Value("ThingThree", "ValueThree", "Description of thing three");
+                        e.AddValue("ThingOne", "ValueOne", "Description of thing one");
+                        e.AddValue("ThingTwo", "ValueTwo", "Description of thing two");
+                        e.AddValue("ThingThree", "ValueThree", "Description of thing three");
                     });
-            });
+            }, options);
 
             Blurk.CompareImplicitFile()
                 .To(res)
@@ -106,7 +112,6 @@ namespace TeeSquare.Tests.TypeScriptWriterTest
                     .WithParams(p => { p.Param("a", "T1"); });
                 w.WriteFunction("HelloWorldArrows")
                     .WithReturnType("Array", "number")
-                    .AsConstArrows()
                     .WithBody(body =>
                     {
                         body.WriteLine("console.log('Hey');");
@@ -114,7 +119,6 @@ namespace TeeSquare.Tests.TypeScriptWriterTest
                     })
                     .WithParams(p => { p.Param("a", "number"); });
                 w.WriteFunction("LogSomething")
-                    .AsConstArrows()
                     .WithBody(body => { body.WriteLine("console.log(a, b, c);"); })
                     .WithParams(p =>
                     {
@@ -130,10 +134,17 @@ namespace TeeSquare.Tests.TypeScriptWriterTest
         }
 
 
-        public static string WriteToMemory(Action<TypeScriptWriter> writeAction)
+        public static string WriteToMemory(Action<TypeScriptWriter> writeAction,
+            WriterOptions options= null)
         {
+            options ??= new WriterOptions();
             using (var ms = new MemoryStream())
-            using (var w = new TypeScriptWriter(ms, "  "))
+            using (var w = new TypeScriptWriter(ms,
+                options.InterfaceWriterFactory,
+                options.ClassWriterFactory,
+                options.EnumWriterFactory,
+                options.FunctionWriterFactory,
+                options.IndentChars))
             {
                 writeAction(w);
                 w.Flush();

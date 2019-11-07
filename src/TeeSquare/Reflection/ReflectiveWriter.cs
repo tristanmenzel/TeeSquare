@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection;
+using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
 
 namespace TeeSquare.Reflection
@@ -84,57 +85,51 @@ namespace TeeSquare.Reflection
                 if (type.IsEnum)
                 {
                     writer.WriteEnum(_namer.TypeName(type))
-                        .With(e =>
+                        .Configure(e =>
                         {
+
                             foreach (var field in Enum.GetNames(type).Zip(Enum.GetValues(type).Cast<int>(),
                                 (name, value) => new {name, value}))
                             {
                                 string description = null;
-                                if (_options.WriteEnumDescriptions)
-                                {
-                                    description = type.GetMember(field.name)
-                                        .SelectMany(m => m.GetCustomAttributes<DescriptionAttribute>())
-                                        .Select(a => a.Description)
-                                        .FirstOrDefault();
-                                }
+                                description = type.GetMember(field.name)
+                                    .SelectMany(m => m.GetCustomAttributes<DescriptionAttribute>())
+                                    .Select(a => a.Description)
+                                    .FirstOrDefault();
 
-                                e.Value(_namer.EnumName(field.name), field.value, description);
+                                e.AddValue(_namer.EnumName(field.name), field.value, description);
                             }
-                        })
-                        .IncludeDescriptionGetter(_options.WriteEnumDescriptionGetters)
-                        .IncludeAllValuesConst(_options.WriteEnumAllValuesConst)
-                        .IncludeCustomCode(_options.CustomEnumWriter);
+                        });
                     continue;
                 }
 
-
                 writer.WriteInterface(_namer.TypeName(type))
-                    .With(i =>
+                    .Configure(i =>
                     {
                         foreach (var pi in type.GetProperties(_options.PropertyFlags))
                         {
                             if (_options.DiscriminatorPropertyPredicate(pi, type))
                             {
                                 var value = _options.DiscriminatorPropertyValueProvider(pi, type);
-                                i.Property(_namer.PropertyName(pi), $"'{value}'");
+                                i.AddProperty(_namer.PropertyName(pi), $"'{value}'");
                                 continue;
                             }
+
                             if (pi.PropertyType.IsNullable(out var underlyingType))
                             {
-                                i.Property(_namer.PropertyName(pi) + "?", _namer.TypeName(underlyingType));
+                                i.AddProperty(_namer.PropertyName(pi) + "?", _namer.TypeName(underlyingType));
                                 continue;
                             }
 
                             if (pi.PropertyType.IsCollection(out var itemType))
                             {
-                                i.Property(_namer.PropertyName(pi), _namer.TypeName(itemType) + "[]");
+                                i.AddProperty(_namer.PropertyName(pi), _namer.TypeName(itemType) + "[]");
                                 continue;
                             }
 
-                            i.Property(_namer.PropertyName(pi), _namer.TypeName(pi.PropertyType));
+                            i.AddProperty(_namer.PropertyName(pi), _namer.TypeName(pi.PropertyType));
                         }
-                    })
-                    .IncludeCustomCode(_options.CustomInterfaceWriter);
+                    });
             }
 
             writer.Flush();

@@ -16,24 +16,23 @@ namespace TeeSquare.Reflection
                                             | BindingFlags.Public
                                             | BindingFlags.Instance;
 
-        public bool WriteEnumDescriptions { get; set; }
-        public bool WriteEnumDescriptionGetters { get; set; }
         public string IndentChars { get; set; } = "  ";
-        public bool WriteEnumAllValuesConst { get; set; }
 
-        public Action<IEnumInfo, ICodeWriter> CustomEnumWriter { get; set; }
 
-        public Action<ITypeInfo, ICodeWriter> CustomInterfaceWriter { get; set; }
+        public IEnumWriterFactory EnumWriterFactory = new EnumWriterFactory();
+        public IInterfaceWriterFactory InterfaceWriterFactory = new InterfaceWriterFactory();
+        public IClassWriterFactory ClassWriterFactory = new ClassWriterFactory();
+        public IFunctionWriterFactory FunctionWriterFactory = new FunctionWriterFactory();
 
-        public DiscriminatorPropertyPredicate DiscriminatorPropertyPredicate { get; set; } = DefaultDescriminator;
-        public DiscriminatorPropertyValueProvider DiscriminatorPropertyValueProvider { get; set; } = DefaultDescriminatorValueProvider;
+        public DiscriminatorPropertyPredicate DiscriminatorPropertyPredicate { get; set; } = DefaultDiscriminator;
+        public DiscriminatorPropertyValueProvider DiscriminatorPropertyValueProvider { get; set; } = DefaultDiscriminatorValueProvider;
 
-        public static bool DefaultDescriminator(PropertyInfo property, Type parentType)
+        public static bool DefaultDiscriminator(PropertyInfo property, Type parentType)
         {
             return property.GetCustomAttributes<TypeDiscriminatorAttribute>().Any();
         }
-        
-        public static string DefaultDescriminatorValueProvider(PropertyInfo property, Type parentType)
+
+        public static string DefaultDiscriminatorValueProvider(PropertyInfo property, Type parentType)
         {
             return property.GetCustomAttributes<TypeDiscriminatorAttribute>()
                        .Select(a => a.Value)
@@ -50,7 +49,7 @@ namespace TeeSquare.Reflection
         {
             Value = value;
         }
-        
+
     }
 
     public delegate bool DiscriminatorPropertyPredicate(PropertyInfo property, Type parentType);

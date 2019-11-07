@@ -14,14 +14,13 @@ namespace TeeSquare.WebApi.Reflection
             {
                 Namer = Namer,
                 PropertyFlags = PropertyFlags,
-                WriteEnumDescriptions = WriteEnumDescriptions,
-                WriteEnumDescriptionGetters = WriteEnumDescriptionGetters,
                 IndentChars = IndentChars,
-                WriteEnumAllValuesConst = WriteEnumAllValuesConst,
-                CustomEnumWriter = CustomEnumWriter,
-                CustomInterfaceWriter = CustomInterfaceWriter,
                 DiscriminatorPropertyPredicate = DiscriminatorPropertyPredicate,
-                DiscriminatorPropertyValueProvider = DiscriminatorPropertyValueProvider
+                DiscriminatorPropertyValueProvider = DiscriminatorPropertyValueProvider,
+                EnumWriterFactory = EnumWriterFactory,
+                InterfaceWriterFactory = InterfaceWriterFactory,
+                ClassWriterFactory = ClassWriterFactory,
+                FunctionWriterFactory = FunctionWriterFactory
             };
         }
 
@@ -36,14 +35,17 @@ namespace TeeSquare.WebApi.Reflection
         public string IndentChars { get; set; } = "  ";
         public bool WriteEnumAllValuesConst { get; set; }
 
-        public Action<IEnumInfo, ICodeWriter> CustomEnumWriter { get; set; }
 
-        public Action<ITypeInfo, ICodeWriter> CustomInterfaceWriter { get; set; }
+
+        public IEnumWriterFactory EnumWriterFactory = new EnumWriterFactory();
+        public IInterfaceWriterFactory InterfaceWriterFactory = new InterfaceWriterFactory();
+        public IClassWriterFactory ClassWriterFactory = new ClassWriterFactory();
+        public IFunctionWriterFactory FunctionWriterFactory = new FunctionWriterFactory();
 
         public DiscriminatorPropertyPredicate DiscriminatorPropertyPredicate { get; set; } =
-            WriterOptions.DefaultDescriminator;
+            WriterOptions.DefaultDiscriminator;
 
         public DiscriminatorPropertyValueProvider DiscriminatorPropertyValueProvider { get; set; } =
-            WriterOptions.DefaultDescriminatorValueProvider;
+            WriterOptions.DefaultDiscriminatorValueProvider;
     }
 }
