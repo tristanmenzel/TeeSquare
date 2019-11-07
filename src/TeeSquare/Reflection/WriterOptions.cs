@@ -19,11 +19,11 @@ namespace TeeSquare.Reflection
         public string IndentChars { get; set; } = "  ";
 
 
-        public IEnumWriterFactory EnumWriterFactory = new EnumWriterFactory();
-        public IInterfaceWriterFactory InterfaceWriterFactory = new InterfaceWriterFactory();
-        public IClassWriterFactory ClassWriterFactory = new ClassWriterFactory();
-        public IFunctionWriterFactory FunctionWriterFactory = new FunctionWriterFactory();
-
+        public IEnumWriterFactory EnumWriterFactory{ get; set; } = new EnumWriterFactory();
+        public IInterfaceWriterFactory InterfaceWriterFactory{ get; set; } = new InterfaceWriterFactory();
+        public IClassWriterFactory ClassWriterFactory { get; set; }= new ClassWriterFactory();
+        public IFunctionWriterFactory FunctionWriterFactory { get; set; }= new FunctionWriterFactory();
+        public WriteComplexType ComplexTypeStrategy{ get; set; } = (writer, typeInfo) => writer.WriteInterface(typeInfo);
         public DiscriminatorPropertyPredicate DiscriminatorPropertyPredicate { get; set; } = DefaultDiscriminator;
         public DiscriminatorPropertyValueProvider DiscriminatorPropertyValueProvider { get; set; } = DefaultDiscriminatorValueProvider;
 
@@ -39,6 +39,8 @@ namespace TeeSquare.Reflection
                        .FirstOrDefault() ?? parentType.Name;
         }
     }
+
+    public delegate void WriteComplexType(TypeScriptWriter writer, IComplexTypeInfo complexType);
 
     [AttributeUsage(AttributeTargets.Property)]
     public class TypeDiscriminatorAttribute : Attribute

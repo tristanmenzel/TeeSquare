@@ -18,7 +18,7 @@ namespace TeeSquare.Tests.Reflection
                 .AddTypes(typeof(Location))
                 .WriteToString();
 
-            Blurk.CompareImplicitFile()
+            Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
@@ -30,7 +30,7 @@ namespace TeeSquare.Tests.Reflection
                 .AddTypes(typeof(Title))
                 .WriteToString();
 
-            Blurk.CompareImplicitFile()
+            Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
@@ -49,7 +49,7 @@ namespace TeeSquare.Tests.Reflection
                 })
                 .WriteToString();
 
-            Blurk.CompareImplicitFile()
+            Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
@@ -62,7 +62,7 @@ namespace TeeSquare.Tests.Reflection
                 .AddTypes(typeof(Name))
                 .WriteToString();
 
-            Blurk.CompareImplicitFile()
+            Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
@@ -74,7 +74,7 @@ namespace TeeSquare.Tests.Reflection
                 .AddTypes(typeof(Book))
                 .WriteToString();
 
-            Blurk.CompareImplicitFile()
+            Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
@@ -86,7 +86,20 @@ namespace TeeSquare.Tests.Reflection
                 .AddTypes(typeof(Library))
                 .WriteToString();
 
-            Blurk.CompareImplicitFile()
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+        [Test]
+        public void OutputClassStrategy()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .Configure(options => { options.ComplexTypeStrategy = (writer, type) => writer.WriteClass(type); })
+                .AddTypes(typeof(Library))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
@@ -98,7 +111,7 @@ namespace TeeSquare.Tests.Reflection
                 .AddTypes(typeof(Member))
                 .WriteToString();
 
-            Blurk.CompareImplicitFile()
+            Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
@@ -110,7 +123,7 @@ namespace TeeSquare.Tests.Reflection
                 .AddTypes(typeof(Circle), typeof(Square), typeof(Rectangle))
                 .WriteToString();
 
-            Blurk.CompareImplicitFile()
+            Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }

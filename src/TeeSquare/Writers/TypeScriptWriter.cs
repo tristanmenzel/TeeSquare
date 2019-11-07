@@ -40,6 +40,12 @@ namespace TeeSquare.Writers
             return type;
         }
 
+        public void WriteInterface(IComplexTypeInfo type)
+        {
+            var part = _interfaceWriterFactory.Build(type);
+            _parts.Add(part);
+        }
+
 
         public IComplexTypeConfigurator WriteClass(string name, params string[] genericTypeParams)
         {
@@ -47,6 +53,12 @@ namespace TeeSquare.Writers
             var part = _classWriterFactory.Build(type);
             _parts.Add(part);
             return type;
+        }
+
+        public void WriteClass(IComplexTypeInfo type)
+        {
+            var part = _classWriterFactory.Build(type);
+            _parts.Add(part);
         }
 
         public void Flush()

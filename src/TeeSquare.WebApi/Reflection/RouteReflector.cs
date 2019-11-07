@@ -42,7 +42,7 @@ namespace TeeSquare.WebApi.Reflection
                 var route = BuildRoute(controller, action);
 
                 var factory = GetRequestFactory(action);
-                var requestParams = GetRequestParams(action);
+                var requestParams = GetRequestParams(action, route);
 
 
                 _requests.Add(factory(_options.Namer.RouteName(controller, action, route),
@@ -53,18 +53,18 @@ namespace TeeSquare.WebApi.Reflection
             }
         }
 
-        private ParamInfo[] GetRequestParams(MethodInfo action)
+        private ParamInfo[] GetRequestParams(MethodInfo action, string route)
         {
             return action.GetParameters()
                 .Select(p => new ParamInfo
                 {
-                    Kind = GetParameterKind(p),
+                    Kind = GetParameterKind(p, route),
                     Name = p.Name,
                     Type = p.ParameterType
                 }).ToArray();
         }
 
-        public ParameterKind GetParameterKind(ParameterInfo parameterInfo)
+        public ParameterKind GetParameterKind(ParameterInfo parameterInfo, string route)
         {
             if (parameterInfo.GetCustomAttributes<FromBodyAttribute>().Any())
                 return ParameterKind.Body;
@@ -72,8 +72,9 @@ namespace TeeSquare.WebApi.Reflection
                 return ParameterKind.Query;
             if (parameterInfo.GetCustomAttributes<FromRouteAttribute>().Any())
                 return ParameterKind.Route;
-            // TODO: Check if in route, else use query
-            return ParameterKind.Route;
+            return route.Contains($"{{{parameterInfo.Name}}}")
+                ? ParameterKind.Route
+                : ParameterKind.Query;
         }
 
         private RequestFactory GetRequestFactory(MethodInfo action)
@@ -150,32 +151,32 @@ namespace TeeSquare.WebApi.Reflection
                     i.AddProperty("url", "string");
                     i.AddProperty("method", "'PUT'");
                 });
-
+            writer.WriteFunction("toQuery")
+                .WithReturnType("string")
+                .WithParams(p => p.Param("o", "{[key: string]: any}"))
+                .Static()
+                .WithBody(w =>
+                {
+                    w.WriteLine("let q = Object.keys(o)");
+                    w.Indent();
+                    w.WriteLine(".map(k => ({k, v: o[k]}))");
+                    w.WriteLine(".filter(x => x.v !== undefined && x.v !== null)");
+                    w.WriteLine(".map(x => `${encodeURIComponent(x.k)}=${encodeURIComponent(x.v)}`)");
+                    w.WriteLine(".join('&');");
+                    w.Deindent();
+                    w.WriteLine("return q && `?${q}` || '';");
+                });
 
             writer.WriteClass("RequestFactory")
                 .Configure(c =>
                 {
                     c.MakeAbstract();
-                    c.AddMethod("toQuery")
-                        .WithReturnType("string")
-                        .WithParams(p => p.Param("o", "{[key: string]: any}"))
-                        .Static()
-                        .WithBody(w =>
-                        {
-                            w.WriteLine("let q = Object.keys(o)");
-                            w.Indent();
-                            w.WriteLine(".map(k => ({k, v: o[k]}))");
-                            w.WriteLine(".filter(x => x.v !== undefined && x.v !== null)");
-                            w.WriteLine(".map(x => `${encodeURIComponent(x.k)}=${encodeURIComponent(x.v)}`)");
-                            w.WriteLine(".join('&');");
-                            w.Deindent();
-                            w.WriteLine("return q && `?${q}` || '';");
-                        });
+
 
 
                     foreach (var req in _requests)
                     {
-                        var methodBuilder = c.AddMethod($"{req.Method.GetName()}{req.Name}")
+                        var methodBuilder = c.AddMethod($"{req.Name}{req.Method.GetName()}")
                             .Static();
 
                         if (req.Method.HasRequestBody())
@@ -214,7 +215,7 @@ namespace TeeSquare.WebApi.Reflection
                                 var queryParams = req.RequestParams.Where(x => x.Kind == ParameterKind.Query).ToArray();
                                 if (queryParams.Any())
                                 {
-                                    w.Write("let query = RequestFactory.toQuery({", true);
+                                    w.Write("let query = toQuery({", true);
                                     w.WriteDelimited(queryParams,
                                         (p, wr) => wr.Write(p.Name), ", ");
                                     w.WriteLine("});", false);

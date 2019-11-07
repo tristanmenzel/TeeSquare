@@ -11,7 +11,7 @@ namespace TeeSquare.DemoApi.Controllers
             return "RouteNumberOne";
         }
 
-        [Route("/alt-api/route-number-two/")]
+        [Route("/alt-api/route-number-two/{id}")]
         [HttpGet]
         public string RouteNumberTwo(string id)
         {

@@ -20,7 +20,8 @@ namespace TeeSquare.WebApi.Reflection
                 EnumWriterFactory = EnumWriterFactory,
                 InterfaceWriterFactory = InterfaceWriterFactory,
                 ClassWriterFactory = ClassWriterFactory,
-                FunctionWriterFactory = FunctionWriterFactory
+                FunctionWriterFactory = FunctionWriterFactory,
+                ComplexTypeStrategy = ComplexTypeStrategy
             };
         }
 
@@ -36,11 +37,13 @@ namespace TeeSquare.WebApi.Reflection
         public bool WriteEnumAllValuesConst { get; set; }
 
 
+        public IEnumWriterFactory EnumWriterFactory { get; set; } = new EnumWriterFactory();
+        public IInterfaceWriterFactory InterfaceWriterFactory { get; set; } = new InterfaceWriterFactory();
+        public IClassWriterFactory ClassWriterFactory { get; set; } = new ClassWriterFactory();
+        public IFunctionWriterFactory FunctionWriterFactory { get; set; } = new FunctionWriterFactory();
 
-        public IEnumWriterFactory EnumWriterFactory = new EnumWriterFactory();
-        public IInterfaceWriterFactory InterfaceWriterFactory = new InterfaceWriterFactory();
-        public IClassWriterFactory ClassWriterFactory = new ClassWriterFactory();
-        public IFunctionWriterFactory FunctionWriterFactory = new FunctionWriterFactory();
+        public WriteComplexType ComplexTypeStrategy { get; set; } =
+            (writer, typeInfo) => writer.WriteInterface(typeInfo);
 
         public DiscriminatorPropertyPredicate DiscriminatorPropertyPredicate { get; set; } =
             WriterOptions.DefaultDiscriminator;

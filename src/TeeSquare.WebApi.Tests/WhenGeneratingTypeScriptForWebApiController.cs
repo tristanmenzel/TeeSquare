@@ -10,8 +10,9 @@ namespace TeeSquare.WebApi.Tests
     {
         [Test]
         public void OnlyTypesForThatControllerAreOutput()
-        {
-            var res = TeeSquareWebApi.GenerateForControllers(typeof(RouteOnActionController))
+        {TeeSquareWebApi.GenerateForControllers(typeof(TestController))
+                .WriteToFile("test2.ts");
+            var res = TeeSquareWebApi.GenerateForControllers(typeof(TestController))
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")

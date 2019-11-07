@@ -103,7 +103,7 @@ namespace TeeSquare.Reflection
                     continue;
                 }
 
-                writer.WriteInterface(_namer.TypeName(type))
+                _options.ComplexTypeStrategy(writer, new ComplexTypeInfo(_namer.TypeName(type))
                     .Configure(i =>
                     {
                         foreach (var pi in type.GetProperties(_options.PropertyFlags))
@@ -129,7 +129,8 @@ namespace TeeSquare.Reflection
 
                             i.AddProperty(_namer.PropertyName(pi), _namer.TypeName(pi.PropertyType));
                         }
-                    });
+                    })
+                    .Done());
             }
 
             writer.Flush();

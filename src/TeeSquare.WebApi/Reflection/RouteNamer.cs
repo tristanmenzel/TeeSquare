@@ -19,7 +19,7 @@ namespace TeeSquare.WebApi.Reflection
         {
             if (type == typeof(IActionResult))
             {
-                name = "any";
+                name = "unknown";
                 return true;
             }
 

@@ -17,6 +17,8 @@ namespace TeeSquare.WebApi.Tests
         [Test]
         public void AllRoutesAndDtosAreOutput()
         {
+            TeeSquareWebApi.GenerateForAssemblies(WebApiAssembly)
+                .WriteToFile("test.ts");
             var res = TeeSquareWebApi.GenerateForAssemblies(WebApiAssembly)
                 .WriteToString();
 

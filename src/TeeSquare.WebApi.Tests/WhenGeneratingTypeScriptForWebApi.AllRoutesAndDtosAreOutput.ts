@@ -16,76 +16,101 @@ export interface PutRequest<TRequest, TResponse> {
   url: string;
   method: 'PUT';
 }
+export const toQuery = (o: {[key: string]: any}): string => {
+  let q = Object.keys(o)
+    .map(k => ({k, v: o[k]}))
+    .filter(x => x.v !== undefined && x.v !== null)
+    .map(x => `${encodeURIComponent(x.k)}=${encodeURIComponent(x.v)}`)
+    .join('&');
+  return q && `?${q}` || '';
+};
 export abstract class RequestFactory {
-  static toQuery(o: {[key: string]: any}): string {
-    let q = Object.keys(o)
-      .map(k => ({k, v: o[k]}))
-      .filter(x => x.v !== undefined && x.v !== null)
-      .map(x => `${encodeURIComponent(x.k)}=${encodeURIComponent(x.v)}`)
-      .join('&');
-    return q && `?${q}` || '';
-  }
-  static GetApiOtherDoAThing(when?: string): GetRequest<number> {
-    let query = RequestFactory.toQuery({when});
+  static ApiOtherDoAThingGet(when?: string): GetRequest<number> {
+    let query = toQuery({when});
     return {
       method: 'GET',
       url: `api/other/do-a-thing${query}`
     };
   }
-  static GetApiRouteNumberOne(): GetRequest<string> {
+  static ApiRouteNumberOneGet(): GetRequest<string> {
     return {
       method: 'GET',
       url: `api/route-number-one`
     };
   }
-  static GetAltApiRouteNumberTwo(id: string): GetRequest<string> {
+  static AltApiRouteNumberTwoByIdGet(id: string): GetRequest<string> {
     return {
       method: 'GET',
-      url: `alt-api/route-number-two`
+      url: `alt-api/route-number-two/${id}`
     };
   }
-  static GetGettit(): GetRequest<boolean> {
+  static GettitGet(): GetRequest<boolean> {
     return {
       method: 'GET',
       url: `gettit`
     };
   }
-  static GetApi(): GetRequest<any> {
+  static ApiGet(): GetRequest<any> {
     return {
       method: 'GET',
       url: `api`
     };
   }
-  static GetApiValues(): GetRequest<string[]> {
+  static ApiTestByIdGet(id: number): GetRequest<TestDto> {
+    return {
+      method: 'GET',
+      url: `api/test/${id}`
+    };
+  }
+  static ApiTestPost(data: TestDto): PostRequest<TestDto, number> {
+    return {
+      method: 'POST',
+      data,
+      url: `api/test`
+    };
+  }
+  static ApiTestByIdPut(id: number, data: TestDto): PutRequest<TestDto, any> {
+    return {
+      method: 'PUT',
+      data,
+      url: `api/test/${id}`
+    };
+  }
+  static ApiValuesGet(): GetRequest<string[]> {
     return {
       method: 'GET',
       url: `api/values`
     };
   }
-  static GetApiValuesById(id: number): GetRequest<string> {
+  static ApiValuesByIdGet(id: number): GetRequest<string> {
     return {
       method: 'GET',
       url: `api/values/${id}`
     };
   }
-  static PostApiValues(data: string): PostRequest<string, void> {
+  static ApiValuesPost(data: string): PostRequest<string, void> {
     return {
       method: 'POST',
       data,
       url: `api/values`
     };
   }
-  static PutApiValuesById(id: number, data: string): PutRequest<string, void> {
+  static ApiValuesByIdPut(id: number, data: string): PutRequest<string, void> {
     return {
       method: 'PUT',
       data,
       url: `api/values/${id}`
     };
   }
-  static DeleteApiValuesById(id: number): DeleteRequest<void> {
+  static ApiValuesByIdDelete(id: number): DeleteRequest<void> {
     return {
       method: 'DELETE',
       url: `api/values/${id}`
     };
   }
+}
+export interface TestDto {
+  hello: string;
+  count: number;
+  createdOn: string;
 }

@@ -31,7 +31,7 @@ namespace TeeSquare.Tests.TypeScriptWriterTest
                         i.AddProperty("MaybeItsOne", "Maybe", "TOne");
                     });
             });
-            Blurk.CompareImplicitFile()
+            Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
@@ -60,7 +60,7 @@ namespace TeeSquare.Tests.TypeScriptWriterTest
                     });
             });
 
-            Blurk.CompareImplicitFile()
+            Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
@@ -91,7 +91,7 @@ namespace TeeSquare.Tests.TypeScriptWriterTest
                     });
             }, options);
 
-            Blurk.CompareImplicitFile()
+            Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
@@ -128,7 +128,7 @@ namespace TeeSquare.Tests.TypeScriptWriterTest
                     });
             });
 
-            Blurk.CompareImplicitFile()
+            Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
