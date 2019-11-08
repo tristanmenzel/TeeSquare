@@ -5,6 +5,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using TeeSquare.Reflection;
+using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
 
 namespace TeeSquare.WebApi.Reflection
@@ -124,36 +125,38 @@ namespace TeeSquare.WebApi.Reflection
 
         public void WriteTo(TypeScriptWriter writer)
         {
-            writer.WriteInterface("GetRequest", "TResponse")
+            _options.WriteHeader(writer);
+
+            writer.WriteInterface("GetRequest", new TypeReference("TResponse"))
                 .Configure(i =>
                 {
-                    i.AddProperty("url", "string");
-                    i.AddProperty("method", "'GET'");
+                    i.AddProperty("url", new TypeReference("string"));
+                    i.AddProperty("method", new TypeReference( "'GET'"));
                 });
-            writer.WriteInterface("DeleteRequest", "TResponse")
+            writer.WriteInterface("DeleteRequest", new TypeReference("TResponse"))
                 .Configure(i =>
                 {
-                    i.AddProperty("url", "string");
-                    i.AddProperty("method", "'DELETE'");
+                    i.AddProperty("url", new TypeReference("string"));
+                    i.AddProperty("method", new TypeReference("'DELETE'"));
                 });
 
-            writer.WriteInterface("PostRequest", "TRequest", "TResponse")
+            writer.WriteInterface("PostRequest", new TypeReference("TRequest"), new TypeReference("TResponse"))
                 .Configure(i =>
                 {
-                    i.AddProperty("data", "TRequest");
-                    i.AddProperty("url", "string");
-                    i.AddProperty("method", "'POST'");
+                    i.AddProperty("data", new TypeReference("TRequest"));
+                    i.AddProperty("url", new TypeReference("string"));
+                    i.AddProperty("method", new TypeReference("'POST'"));
                 });
-            writer.WriteInterface("PutRequest", "TRequest", "TResponse")
+            writer.WriteInterface("PutRequest", new TypeReference("TRequest"), new TypeReference("TResponse"))
                 .Configure(i =>
                 {
-                    i.AddProperty("data", "TRequest");
-                    i.AddProperty("url", "string");
-                    i.AddProperty("method", "'PUT'");
+                    i.AddProperty("data", new TypeReference("TRequest"));
+                    i.AddProperty("url", new TypeReference("string"));
+                    i.AddProperty("method", new TypeReference("'PUT'"));
                 });
             writer.WriteFunction("toQuery")
-                .WithReturnType("string")
-                .WithParams(p => p.Param("o", "{[key: string]: any}"))
+                .WithReturnType(new TypeReference("string"))
+                .WithParams(p => p.Param("o", new TypeReference("{[key: string]: any}")))
                 .Static()
                 .WithBody(w =>
                 {
@@ -182,15 +185,17 @@ namespace TeeSquare.WebApi.Reflection
                         if (req.Method.HasRequestBody())
                         {
                             methodBuilder
-                                .WithReturnType($"{req.Method.GetName()}Request",
-                                    _options.Namer.TypeName(req.GetRequestBodyType()),
-                                    _options.Namer.TypeName(req.ResponseType));
+                                .WithReturnType(new TypeReference($"{req.Method.GetName()}Request",
+                                    new [] {
+                                    _options.Namer.Type(req.GetRequestBodyType()),
+                                    _options.Namer.Type(req.ResponseType)}));
                         }
                         else
                         {
                             methodBuilder
-                                .WithReturnType($"{req.Method.GetName()}Request",
-                                    _options.Namer.TypeName(req.ResponseType));
+                                .WithReturnType(new TypeReference($"{req.Method.GetName()}Request",
+                                    new [] {
+                                    _options.Namer.Type(req.ResponseType)}));
                         }
 
                         methodBuilder.WithParams(p =>
@@ -198,17 +203,11 @@ namespace TeeSquare.WebApi.Reflection
                                 foreach (var rp in req.RequestParams.Where(x => x.Kind != ParameterKind.Body))
 
                                 {
-                                    if (rp.Type.IsNullable(out var underlyingType))
-                                    {
-                                        p.Param(rp.Name + "?", _options.Namer.TypeName(underlyingType));
-                                        continue;
-                                    }
-
-                                    p.Param(rp.Name, _options.Namer.TypeName(rp.Type));
+                                    p.Param(rp.Name, _options.Namer.Type(rp.Type, rp.Kind == ParameterKind.Query));
                                 }
 
                                 if (req.Method.HasRequestBody())
-                                    p.Param("data", _options.Namer.TypeName(req.GetRequestBodyType()));
+                                    p.Param("data", _options.Namer.Type(req.GetRequestBodyType()));
                             })
                             .WithBody(w =>
                             {
@@ -238,7 +237,7 @@ namespace TeeSquare.WebApi.Reflection
 
             var rWriter = new ReflectiveWriter(_options.BuildWriterOptions());
             rWriter.AddTypes(types.ToArray());
-            rWriter.WriteTo(writer);
+            rWriter.WriteTo(writer, false);
         }
     }
 }

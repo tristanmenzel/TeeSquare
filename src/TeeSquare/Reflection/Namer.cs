@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
+using TeeSquare.TypeMetadata;
+using MethodInfo = System.Reflection.MethodInfo;
+using PropertyInfo = System.Reflection.PropertyInfo;
 
 namespace TeeSquare.Reflection
 {
@@ -41,29 +43,47 @@ namespace TeeSquare.Reflection
             _namingConventions = namingConventions ?? NamingConventions.Default;
         }
 
-        public virtual string TypeName(Type type)
+        public virtual ITypeReference Type(Type type, bool optional = false)
         {
-            if (TryGetStaticMapping(type, out var name)) return name;
+            if (TryGetStaticMapping(type, out var name)) return new TypeReference(name);
             if (type.IsTask(out var resultType))
             {
-                return TypeName(resultType);
+                return Type(resultType, optional);
             }
-            
+
+            if (type.IsEnum)
+            {
+                return new TypeReference(ToCase(type.Name, _namingConventions.Types)){Enum = true};
+            }
+
+            if (type.IsNullable(out var underlyingType))
+            {
+                return Type(underlyingType, true);
+            }
+
             if (type.IsDictionary(out var genericTypeParams))
-                return $"{{ [key: {TypeName(genericTypeParams[0])}]: {TypeName(genericTypeParams[1])} }}";
+                return new TypeReference( $"{{ [key: {Type(genericTypeParams[0]).FullName}]: {Type(genericTypeParams[1]).FullName} }}");
 
             if (type.IsCollection(out var itemType))
             {
-                return $"{TypeName(itemType)}[]";
+                return new TypeReference($"{Type(itemType).FullName}") {Array = true, Optional = optional};
             }
 
             if (type.IsGenericType)
             {
                 var nonGenericName = ToCase(type.Name.Split("`").First(), _namingConventions.Types);
-                return $"{nonGenericName}<{string.Join(", ", type.GetGenericArguments().Select(TypeName))}>";
+                return new TypeReference(nonGenericName, type.GetGenericArguments()
+                    .Select(t => Type(t))
+                    .ToArray())
+                {
+                    Optional = optional
+                };
             }
 
-            return ToCase(type.Name, _namingConventions.Types);
+            return new TypeReference(ToCase(type.Name, _namingConventions.Types))
+            {
+                Optional = optional
+            };
         }
 
         public virtual string PropertyName(PropertyInfo propertyInfo)

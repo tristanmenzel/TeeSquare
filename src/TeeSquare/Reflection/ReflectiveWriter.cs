@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using TeeSquare.TypeMetadata;
@@ -30,6 +29,7 @@ namespace TeeSquare.Reflection
                     AddTypes(resultType);
                     continue;
                 }
+
                 if (type.IsNullable(out var underlyingType))
                 {
                     AddTypes(underlyingType);
@@ -78,16 +78,20 @@ namespace TeeSquare.Reflection
             }
         }
 
-        public void WriteTo(TypeScriptWriter writer)
+        public void WriteTo(TypeScriptWriter writer, bool includeHeader = true)
         {
-            foreach (var type in _types.OrderBy(t => t.Name))
+            if (includeHeader)
+                _options.WriteHeader(writer);
+
+            foreach (var type in _types.OrderBy(t=>t.IsEnum ? 0 : 1).ThenBy(t => t.Name))
             {
-                if (type.IsEnum)
+                var typeRef = _namer.Type(type);
+
+                if (typeRef.Enum)
                 {
-                    writer.WriteEnum(_namer.TypeName(type))
+                    writer.WriteEnum(typeRef.TypeName)
                         .Configure(e =>
                         {
-
                             foreach (var field in Enum.GetNames(type).Zip(Enum.GetValues(type).Cast<int>(),
                                 (name, value) => new {name, value}))
                             {
@@ -103,7 +107,7 @@ namespace TeeSquare.Reflection
                     continue;
                 }
 
-                _options.ComplexTypeStrategy(writer, new ComplexTypeInfo(_namer.TypeName(type))
+                _options.ComplexTypeStrategy(writer, new ComplexTypeInfo(typeRef.TypeName, typeRef.GenericTypeParams)
                     .Configure(i =>
                     {
                         foreach (var pi in type.GetProperties(_options.PropertyFlags))
@@ -111,23 +115,10 @@ namespace TeeSquare.Reflection
                             if (_options.DiscriminatorPropertyPredicate(pi, type))
                             {
                                 var value = _options.DiscriminatorPropertyValueProvider(pi, type);
-                                i.AddProperty(_namer.PropertyName(pi), $"'{value}'");
+                                i.AddProperty(_namer.PropertyName(pi), new TypeReference( $"'{value}'"));
                                 continue;
                             }
-
-                            if (pi.PropertyType.IsNullable(out var underlyingType))
-                            {
-                                i.AddProperty(_namer.PropertyName(pi) + "?", _namer.TypeName(underlyingType));
-                                continue;
-                            }
-
-                            if (pi.PropertyType.IsCollection(out var itemType))
-                            {
-                                i.AddProperty(_namer.PropertyName(pi), _namer.TypeName(itemType) + "[]");
-                                continue;
-                            }
-
-                            i.AddProperty(_namer.PropertyName(pi), _namer.TypeName(pi.PropertyType));
+                            i.AddProperty(_namer.PropertyName(pi), _namer.Type(pi.PropertyType));
                         }
                     })
                     .Done());

@@ -1,3 +1,5 @@
+// Generated Code
+
 export interface GetRequest<TResponse> {
   url: string;
   method: 'GET';
@@ -50,7 +52,7 @@ export abstract class RequestFactory {
       url: `gettit`
     };
   }
-  static ApiGet(): GetRequest<any> {
+  static ApiGet(): GetRequest<unknown> {
     return {
       method: 'GET',
       url: `api`
@@ -69,7 +71,7 @@ export abstract class RequestFactory {
       url: `api/test`
     };
   }
-  static ApiTestByIdPut(id: number, data: TestDto): PutRequest<TestDto, any> {
+  static ApiTestByIdPut(id: number, data: TestDto): PutRequest<TestDto, unknown> {
     return {
       method: 'PUT',
       data,

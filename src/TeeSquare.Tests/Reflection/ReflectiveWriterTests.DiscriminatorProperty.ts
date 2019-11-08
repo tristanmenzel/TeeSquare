@@ -1,3 +1,5 @@
+// Generated Code
+
 export interface Circle {
   radius: number;
   kind: 'Circle';

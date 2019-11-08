@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
-using TeeSquare.Writers;
 
 namespace TeeSquare.TypeMetadata
 {
     public interface IComplexTypeInfo
     {
+        ITypeReference TypeReference { get; }
         bool IsAbstract { get; }
-        string[] GenericTypeParams { get; }
+        ITypeReference[] GenericTypeParams { get; }
         string Name { get; }
         IPropertyInfo[] Properties { get; }
         IMethodInfo[] Methods { get; }
@@ -17,17 +16,18 @@ namespace TeeSquare.TypeMetadata
 
     class ComplexTypeInfo : IComplexTypeConfigurator, IComplexTypeInfo
     {
-        public ComplexTypeInfo(string name, string[] genericTypeParams = null)
+        public ComplexTypeInfo(string name, ITypeReference[] genericTypeParams = null)
         {
             Name = name;
-            GenericTypeParams = genericTypeParams ?? Array.Empty<string>();
+            GenericTypeParams = genericTypeParams ?? Array.Empty<ITypeReference>();
         }
 
-        public string[] GenericTypeParams { get; }
+        public ITypeReference[] GenericTypeParams { get; }
 
         public Type OriginalType { get; }
         public string Name { get;  }
 
+        public ITypeReference TypeReference => new TypeReference(Name, GenericTypeParams);
         public bool IsAbstract { get; set; }
 
         private readonly List<PropertyInfo> _properties = new List<PropertyInfo>();
@@ -43,9 +43,9 @@ namespace TeeSquare.TypeMetadata
         }
 
 
-        public void AddProperty(string name, string type, string[] genericTypeParams)
+        public void AddProperty(string name, ITypeReference typeReference)
         {
-            _properties.Add(new PropertyInfo(name, type, genericTypeParams));
+            _properties.Add(new PropertyInfo(name,  typeReference));
         }
 
         public IMethodConfigurator AddMethod(string name)

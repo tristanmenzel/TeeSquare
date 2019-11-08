@@ -3,14 +3,12 @@
     class IdentifierInfo : IIdentifierInfo
     {
         public string Name { get; }
-        public string Type { get; }
-        public string[] GenericTypeParams { get; }
+        public ITypeReference Type { get; }
 
-        public IdentifierInfo(string name, string type, params string[] genericTypeParams)
+        public IdentifierInfo(string name, ITypeReference type)
         {
             Name = name;
             Type = type;
-            GenericTypeParams = genericTypeParams;
         }
     }
 }

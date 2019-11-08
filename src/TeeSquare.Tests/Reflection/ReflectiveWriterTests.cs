@@ -1,9 +1,6 @@
 ﻿using BlurkCompare;
-using Newtonsoft.Json;
 using NUnit.Framework;
-using TeeSquare.Reflection;
 using TeeSquare.Tests.Reflection.FakeDomain;
-using TeeSquare.Tests.TypeScriptWriterTest;
 using TeeSquare.Writers;
 
 namespace TeeSquare.Tests.Reflection

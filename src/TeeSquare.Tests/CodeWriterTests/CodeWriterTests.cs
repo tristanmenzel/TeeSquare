@@ -14,10 +14,10 @@ namespace TeeSquare.Tests.CodeWriterTests
         {
             var res = WriteToMemory(w =>
             {
-                w.OpenBrace();
+                w.OpenBlock();
                 w.WriteLine("let i = 0;");
                 w.WriteLine("return i;");
-                w.CloseBrace();
+                w.CloseBlock();
             });
             Blurk.CompareImplicitFile()
                 .To(res)
@@ -57,10 +57,10 @@ namespace TeeSquare.Tests.CodeWriterTests
             Blurk.CompareImplicitFile()
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
-            
+
         }
 
-        
+
 
         private string WriteToMemory(Action<ICodeWriter> writeAction)
         {

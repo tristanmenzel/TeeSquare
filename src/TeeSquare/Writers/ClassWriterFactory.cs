@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using TeeSquare.TypeMetadata;
+﻿using TeeSquare.TypeMetadata;
 
 namespace TeeSquare.Writers
 {
@@ -16,37 +14,37 @@ namespace TeeSquare.Writers
             return writer =>
             {
                 writer.Write($"export {(typeInfo.IsAbstract ? "abstract " : "")}class ");
-                writer.WriteType(typeInfo.Name, typeInfo.GenericTypeParams);
-                writer.OpenBrace();
+                writer.WriteTypeRef(typeInfo.TypeReference);
+                writer.OpenBlock();
                 foreach (var prop in typeInfo.Properties)
                 {
-                    writer.Write($"{prop.Name}: ", true);
-                    writer.WriteType(prop.Type, prop.GenericTypeParams);
+                    writer.Write($"{prop.Name}{(prop.Type.Optional ? "?":"")}: ", true);
+                    writer.WriteTypeRef(prop.Type);
                     writer.WriteLine(";", false);
                 }
 
                 foreach (var method in typeInfo.Methods)
                 {
                     writer.Write(method.IsStatic ? "static " : string.Empty, true);
-                    writer.Write($"{method.Id.Name}(");
+                    writer.Write($"{method.Name}(");
 
                     writer.WriteDelimited(method.Params,
                         (p, w) =>
                         {
-                            w.Write($"{p.Name}: ");
-                            w.WriteType(p.Type, p.GenericTypeParams);
+                            w.Write($"{p.Name}{(p.Type.Optional ? "?": "")}: ");
+                            w.WriteTypeRef(p.Type);
                         }, ", ");
 
                     writer.Write("): ");
-                    writer.WriteType(method.ReturnType.Type, method.ReturnType.GenericTypeParams);
-                    writer.OpenBrace();
+                    writer.WriteTypeRef(method.ReturnType);
+                    writer.OpenBlock();
 
                     method.WriteBody(writer);
 
-                    writer.CloseBrace();
+                    writer.CloseBlock();
                 }
 
-                writer.CloseBrace();
+                writer.CloseBlock();
             };
         }
     }

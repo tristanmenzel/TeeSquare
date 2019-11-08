@@ -6,9 +6,10 @@ namespace TeeSquare.TypeMetadata
     public interface IMethodInfo
     {
         bool IsStatic { get; }
-        IIdentifierInfo Id { get; }
+        string Name { get; }
+        string[] GenericTypeParams { get; }
         IIdentifierInfo[] Params { get; }
-        IIdentifierInfo ReturnType { get; }
+        ITypeReference ReturnType { get; }
         Action<ICodeWriter> WriteBody { get; }
     }
 
@@ -16,27 +17,23 @@ namespace TeeSquare.TypeMetadata
     {
         private readonly ParamInfo _params;
         public bool IsStatic { get; private set; }
-        public IIdentifierInfo Id { get; private set; }
+        public string Name { get; private set; }
+        public string[] GenericTypeParams { get; }
         public IIdentifierInfo[] Params => _params.Params;
-        public IIdentifierInfo ReturnType { get; private set; }
+        public ITypeReference ReturnType { get; private set; }
 
-        public MethodInfo(string name)
+        public MethodInfo(string name, params string[] genericTypeParams)
         {
-            Id = new IdentifierInfo(name, null);
-            ReturnType = new IdentifierInfo(null, "void");
+            Name = name;
+            GenericTypeParams = genericTypeParams;
+            ReturnType = new TypeReference("void");
             _params = new ParamInfo();
             WriteBody = w => { };
         }
 
-        public IMethodConfigurator WithGenericTypeParams(params string[] genericTypeParams)
+        public IMethodConfigurator WithReturnType(ITypeReference type)
         {
-            Id = new IdentifierInfo(Id.Name, null, genericTypeParams);
-            return this;
-        }
-
-        public IMethodConfigurator WithReturnType(string type, params string[] genericTypeParams)
-        {
-            ReturnType = new IdentifierInfo(null, type, genericTypeParams);
+            ReturnType = type;
             return this;
         }
 

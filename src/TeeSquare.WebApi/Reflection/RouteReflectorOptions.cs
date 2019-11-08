@@ -1,7 +1,5 @@
-using System;
 using System.Reflection;
 using TeeSquare.Reflection;
-using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
 
 namespace TeeSquare.WebApi.Reflection
@@ -21,7 +19,8 @@ namespace TeeSquare.WebApi.Reflection
                 InterfaceWriterFactory = InterfaceWriterFactory,
                 ClassWriterFactory = ClassWriterFactory,
                 FunctionWriterFactory = FunctionWriterFactory,
-                ComplexTypeStrategy = ComplexTypeStrategy
+                ComplexTypeStrategy = ComplexTypeStrategy,
+                WriteHeader = WriteHeader
             };
         }
 
@@ -44,6 +43,12 @@ namespace TeeSquare.WebApi.Reflection
 
         public WriteComplexType ComplexTypeStrategy { get; set; } =
             (writer, typeInfo) => writer.WriteInterface(typeInfo);
+
+        public WriteHeader WriteHeader { get; set; } = writer =>
+        {
+            writer.WriteComment("Generated Code");
+            writer.WriteLine();
+        };
 
         public DiscriminatorPropertyPredicate DiscriminatorPropertyPredicate { get; set; } =
             WriterOptions.DefaultDiscriminator;

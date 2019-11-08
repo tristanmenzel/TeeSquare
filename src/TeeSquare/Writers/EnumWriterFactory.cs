@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using TeeSquare.TypeMetadata;
 
 namespace TeeSquare.Writers
@@ -40,8 +39,8 @@ namespace TeeSquare.Writers
         private CodeSnippetWriter BuildDescGetterFunc(IEnumInfo enumInfo)
         {
             var methodInfo = new MethodInfo($"Get{enumInfo.Name}Description")
-                .WithReturnType("string")
-                .WithParams(p => p.Param("value", enumInfo.Name))
+                .WithReturnType(new TypeReference( "string"))
+                .WithParams(p => p.Param("value",new TypeReference(enumInfo.Name){ Enum = true}))
                 .WithBody(body => { body.WriteLine($"return {enumInfo.Name}Desc[value];"); })
                 .Done();
             return new FunctionWriterFactory().Build(methodInfo);
@@ -51,9 +50,9 @@ namespace TeeSquare.Writers
         {
             return writer =>
             {
-                writer.OpenBrace($"export enum {enumInfo.Name}");
+                writer.OpenBlock($"export enum {enumInfo.Name}");
                 writer.WriteDelimitedLines(enumInfo.Values, v => $"{v.Name} = {v.FormattedValue}", ",");
-                writer.CloseBrace();
+                writer.CloseBlock();
 
                 if (_includeAllValuesConstant)
                 {
@@ -66,10 +65,11 @@ namespace TeeSquare.Writers
 
                 if (enumInfo.Values.Any(v => v.Description != null) && _includeDescriptions)
                 {
-                    writer.OpenBrace($"export const {enumInfo.Name}Desc: {{ [key: number]: string }} =");
+                    var dictionaryKeyType = enumInfo.ValueType == EnumValueType.Number ? "number" : "string";
+                    writer.OpenBlock($"export const {enumInfo.Name}Desc: {{ [key: {dictionaryKeyType}]: string }} =");
                     writer.WriteDelimitedLines(enumInfo.Values, v => $"{v.FormattedValue}: `{v.Description ?? v.Name}`",
                         ",");
-                    writer.CloseBrace(true);
+                    writer.CloseBlock("};");
                     if (_includeDescriptionGetter)
                     {
                         BuildDescGetterFunc(enumInfo)(writer);

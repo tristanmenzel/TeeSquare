@@ -1,10 +1,7 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using BlurkCompare;
 using NUnit.Framework;
 using TeeSquare.DemoApi.Controllers;
-using TeeSquare.WebApi.Reflection;
-using TeeSquare.Writers;
 
 namespace TeeSquare.WebApi.Tests
 {
@@ -17,8 +14,6 @@ namespace TeeSquare.WebApi.Tests
         [Test]
         public void AllRoutesAndDtosAreOutput()
         {
-            TeeSquareWebApi.GenerateForAssemblies(WebApiAssembly)
-                .WriteToFile("test.ts");
             var res = TeeSquareWebApi.GenerateForAssemblies(WebApiAssembly)
                 .WriteToString();
 

@@ -8,9 +8,7 @@ namespace TeeSquare.TypeMetadata
         IMethodConfigurator Static();
         IMethodConfigurator WithParams(Action<IParamConfigurator> configureParams);
         IMethodConfigurator WithBody(Action<ICodeWriter> writeBody);
-        IIdentifierInfo ReturnType { get; }
-        IMethodConfigurator WithGenericTypeParams(params string[] genericTypeParams);
-        IMethodConfigurator WithReturnType(string type, params string[] genericTypeParams);
+        IMethodConfigurator WithReturnType(ITypeReference typeReference);
         IMethodInfo Done();
     }
 }

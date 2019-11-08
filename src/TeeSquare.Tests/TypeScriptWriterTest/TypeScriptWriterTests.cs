@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using BlurkCompare;
 using NUnit.Framework;
@@ -17,18 +16,18 @@ namespace TeeSquare.Tests.TypeScriptWriterTest
         {
             var res = WriteToMemory(w =>
             {
-                w.WriteInterface("FunFunInterface", "TOne", "TTwo")
+                w.WriteInterface( "FunFunInterface", new TypeReference("TOne"), new TypeReference("TTwo"))
                     .Configure(i =>
                     {
                         i.AddMethod("TestMethod")
-                            .WithReturnType("string")
+                            .WithReturnType(new TypeReference("string"))
                             .WithParams(p =>
                             {
-                                p.Param("a", "number");
-                                p.Param("b", "Enumerable", "number");
+                                p.Param("a", new TypeReference("number"));
+                                p.Param("b",  new TypeReference("Enumerable", "number"));
                             });
-                        i.AddProperty("ValueOfTwo", "TTwo");
-                        i.AddProperty("MaybeItsOne", "Maybe", "TOne");
+                        i.AddProperty("ValueOfTwo",  new TypeReference("TTwo"));
+                        i.AddProperty("MaybeItsOne",  new TypeReference("Maybe", "TOne"));
                     });
             });
             Blurk.CompareImplicitFile("ts")
@@ -44,17 +43,17 @@ namespace TeeSquare.Tests.TypeScriptWriterTest
                 w.WriteClass("AppleService")
                     .Configure(c =>
                     {
-                        c.AddProperty("banana", "string");
+                        c.AddProperty("banana",  new TypeReference("string"));
                         c.AddMethod("getApplePie")
-                            .WithReturnType("string")
+                            .WithReturnType( new TypeReference("string"))
                             .WithParams(p =>
                             {
-                                p.Param("numApples", "number");
-                                p.Param("typeOfApple", "string");
+                                p.Param("numApples",  new TypeReference("number"));
+                                p.Param("typeOfApple",  new TypeReference("string"));
                             })
                             .WithBody(x => { x.WriteLine("return \"No apples here\";"); });
                         c.AddMethod("haveFun")
-                            .WithParams(p => { p.Param("amountOfFun", "number"); })
+                            .WithParams(p => { p.Param("amountOfFun",  new TypeReference("number")); })
                             .Static()
                             .WithBody(x => x.WriteLine("console.log(\"Having so much fun\", amountOfFun);"));
                     });
@@ -82,7 +81,7 @@ namespace TeeSquare.Tests.TypeScriptWriterTest
                         e.AddValue("Cantelope", 2);
                     });
 
-                w.WriteEnum("Things")
+                w.WriteEnum("Things", EnumValueType.String)
                     .Configure(e =>
                     {
                         e.AddValue("ThingOne", "ValueOne", "Description of thing one");
@@ -101,30 +100,29 @@ namespace TeeSquare.Tests.TypeScriptWriterTest
         {
             var res = WriteToMemory(w =>
             {
-                w.WriteFunction("HelloWorld")
-                    .WithGenericTypeParams("T1 extends number")
-                    .WithReturnType("number")
+                w.WriteFunction("HelloWorld", "T1 extends number")
+                    .WithReturnType(new TypeReference("number"))
                     .WithBody(body =>
                     {
                         body.WriteLine("console.log('Hey');");
                         body.WriteLine("return 2 * a;");
                     })
-                    .WithParams(p => { p.Param("a", "T1"); });
+                    .WithParams(p => { p.Param("a", new TypeReference("T1")); });
                 w.WriteFunction("HelloWorldArrows")
-                    .WithReturnType("Array", "number")
+                    .WithReturnType(new TypeReference( "Array", "number"))
                     .WithBody(body =>
                     {
                         body.WriteLine("console.log('Hey');");
                         body.WriteLine("return [2, a];");
                     })
-                    .WithParams(p => { p.Param("a", "number"); });
+                    .WithParams(p => { p.Param("a",new TypeReference( "number")); });
                 w.WriteFunction("LogSomething")
                     .WithBody(body => { body.WriteLine("console.log(a, b, c);"); })
                     .WithParams(p =>
                     {
-                        p.Param("a", "number");
-                        p.Param("b", "Array", "number");
-                        p.Param("c", "string");
+                        p.Param("a", new TypeReference( "number"));
+                        p.Param("b", new TypeReference("Array", "number"));
+                        p.Param("c", new TypeReference("string"));
                     });
             });
 

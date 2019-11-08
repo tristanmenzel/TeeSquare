@@ -4,7 +4,7 @@ namespace TeeSquare.TypeMetadata
 {
     public interface IComplexTypeConfigurator
     {
-        void AddProperty(string name, string type, params string[] genericTypeParams);
+        void AddProperty(string name, ITypeReference typeReference);
 
         IMethodConfigurator AddMethod(string name);
 

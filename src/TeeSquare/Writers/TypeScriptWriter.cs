@@ -32,7 +32,7 @@ namespace TeeSquare.Writers
             _parts = new List<CodeSnippetWriter>();
         }
 
-        public IComplexTypeConfigurator WriteInterface(string name, params string[] genericTypeParams)
+        public IComplexTypeConfigurator WriteInterface(string name, params ITypeReference[] genericTypeParams)
         {
             var type = new ComplexTypeInfo(name, genericTypeParams);
             var part = _interfaceWriterFactory.Build(type);
@@ -46,8 +46,13 @@ namespace TeeSquare.Writers
             _parts.Add(part);
         }
 
+        public void WriteComment(string commentText)
+        {
+            _parts.Add(writer => writer.WriteLine($"// {commentText}"));
+        }
 
-        public IComplexTypeConfigurator WriteClass(string name, params string[] genericTypeParams)
+
+        public IComplexTypeConfigurator WriteClass(string name, params ITypeReference[] genericTypeParams)
         {
             var type = new ComplexTypeInfo(name, genericTypeParams);
             var part = _classWriterFactory.Build(type);
@@ -59,6 +64,11 @@ namespace TeeSquare.Writers
         {
             var part = _classWriterFactory.Build(type);
             _parts.Add(part);
+        }
+
+        public void WriteSnippet(CodeSnippetWriter snippetWriter)
+        {
+            _parts.Add(snippetWriter);
         }
 
         public void Flush()
@@ -88,20 +98,25 @@ namespace TeeSquare.Writers
             }
         }
 
-        public IMethodConfigurator WriteFunction(string name)
+        public IMethodConfigurator WriteFunction(string name, params string[] genericTypeParams)
         {
-            var methodInfo = new MethodInfo(name);
+            var methodInfo = new MethodInfo(name, genericTypeParams);
             var part = _functionWriterFactory.Build(methodInfo);
             _parts.Add(part);
             return methodInfo;
         }
 
-        public IEnumConfigurator WriteEnum(string name)
+        public IEnumConfigurator WriteEnum(string name, EnumValueType valueType = EnumValueType.Number)
         {
-            var enumInfo = new EnumInfo(name);
+            var enumInfo = new EnumInfo(name, valueType);
             var part = _enumWriterFactory.Build(enumInfo);
             _parts.Add(part);
             return enumInfo;
+        }
+
+        public void WriteLine()
+        {
+            _parts.Add(writer => writer.WriteLine(""));
         }
     }
 }
