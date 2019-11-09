@@ -71,7 +71,7 @@ export class AppleService {
 
 ## Writing an enum
 
-You can optional provide descriptions for enum values and they will be written as an object map such that you can access the value by going `MyEnumDesc[MyEnum.SomeValue]`
+You can optionally provide descriptions for enum values and they will be written as an object map such that you can access the value by going `MyEnumDesc[MyEnum.SomeValue]`
 
 ```cs
 using (var writer = new TypeScriptWriter(File.Open("demo.ts", FileMode.OpenOrCreate)))

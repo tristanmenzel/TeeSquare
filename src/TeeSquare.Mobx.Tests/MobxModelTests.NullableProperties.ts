@@ -26,8 +26,8 @@ export const BookModel = types.model('BookModel',  {
   title: types.string,
   author: NameModel,
   isAvailable: types.boolean,
-  firstPublished: types.string,
-  lastRevisedOn: types.maybe(types.string),
+  firstPublished: types.Date,
+  lastRevisedOn: types.maybe(types.Date),
   reviewedPositively: types.maybe(types.boolean),
   recommendedAudience: types.maybe(types.enumeration<Audience>("Audience", [Object.values(Audience)])),
 });
