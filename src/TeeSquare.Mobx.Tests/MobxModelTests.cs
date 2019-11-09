@@ -42,10 +42,6 @@ namespace TeeSquare.Mobx.Tests
                 .AddTypes(typeof(Book))
                 .WriteToString();
 
-            TeeSquareFluent.ReflectiveWriter()
-                .Configure(TeeSquareMobx.ConfigureMobxWriter)
-                .AddTypes(typeof(Book))
-                .WriteToFile(@"C:\Source\Tristan\TeeSquare\src\TeeSquare.Mobx.Tests\Test.ts");
             Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);

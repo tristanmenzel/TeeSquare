@@ -12,30 +12,31 @@ namespace TeeSquare.Reflection
     {
         private readonly NamingConventions _namingConventions;
 
-        private readonly IDictionary<Type, string> _staticMappings = new Dictionary<Type, string>
-        {
-            {typeof(string), "string"},
-            {typeof(Guid), "string"},
-            {typeof(void), "void"},
-            {typeof(Decimal), "number"},
-            {typeof(Int16), "number"},
-            {typeof(Int32), "number"},
-            {typeof(Int64), "number"},
-            {typeof(double), "number"},
-            {typeof(Single), "number"},
-            {typeof(DateTime), "string"},
-            {typeof(DateTimeOffset), "string"},
-            {typeof(bool), "boolean"}
-        };
+        private readonly IDictionary<Type, (string tsType, TsTypeFormat format)> _staticMappings =
+            new Dictionary<Type, (string tsType, TsTypeFormat format)>
+            {
+                {typeof(string), ("string", TsTypeFormat.None)},
+                {typeof(Guid), ("string", TsTypeFormat.Guid)},
+                {typeof(void), ("void", TsTypeFormat.None)},
+                {typeof(Decimal), ("number", TsTypeFormat.Decimal)},
+                {typeof(Int16), ("number", TsTypeFormat.Integer)},
+                {typeof(Int32), ("number", TsTypeFormat.Integer)},
+                {typeof(Int64), ("number", TsTypeFormat.Integer)},
+                {typeof(double), ("number", TsTypeFormat.Decimal)},
+                {typeof(Single), ("number", TsTypeFormat.Decimal)},
+                {typeof(DateTime), ("string", TsTypeFormat.DateTime)},
+                {typeof(DateTimeOffset), ("string", TsTypeFormat.DateTime)},
+                {typeof(bool), ("boolean", TsTypeFormat.None)}
+            };
 
         public virtual bool HasStaticMapping(Type type)
         {
             return _staticMappings.ContainsKey(type);
         }
 
-        public virtual bool TryGetStaticMapping(Type type, out string name)
+        public virtual bool TryGetStaticMapping(Type type, out (string tsType, TsTypeFormat format) typeMapping)
         {
-            return _staticMappings.TryGetValue(type, out name);
+            return _staticMappings.TryGetValue(type, out typeMapping);
         }
 
         public Namer(NamingConventions namingConventions = null)
@@ -45,7 +46,7 @@ namespace TeeSquare.Reflection
 
         public virtual ITypeReference Type(Type type, bool optional = false)
         {
-            if (TryGetStaticMapping(type, out var name)) return new TypeReference(name);
+            if (TryGetStaticMapping(type, out var mapping)) return new TypeReference(mapping.tsType) {Optional = optional, Format = mapping.format};
             if (type.IsTask(out var resultType))
             {
                 return Type(resultType, optional);
@@ -53,7 +54,8 @@ namespace TeeSquare.Reflection
 
             if (type.IsEnum)
             {
-                return new TypeReference(ToCase(type.Name, _namingConventions.Types)){Enum = true};
+                return new TypeReference(ToCase(type.Name, _namingConventions.Types))
+                    {Enum = true, Optional = optional};
             }
 
             if (type.IsNullable(out var underlyingType))
@@ -62,7 +64,9 @@ namespace TeeSquare.Reflection
             }
 
             if (type.IsDictionary(out var genericTypeParams))
-                return new TypeReference( $"{{ [key: {Type(genericTypeParams[0]).FullName}]: {Type(genericTypeParams[1]).FullName} }}");
+                return new TypeReference(
+                        $"{{ [key: {Type(genericTypeParams[0]).FullName}]: {Type(genericTypeParams[1]).FullName} }}")
+                    {Optional = optional};
 
             if (type.IsCollection(out var itemType))
             {

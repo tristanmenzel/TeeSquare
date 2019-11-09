@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using TeeSquare.Reflection;
+using TeeSquare.TypeMetadata;
 
 namespace TeeSquare.WebApi.Reflection
 {
@@ -15,15 +16,15 @@ namespace TeeSquare.WebApi.Reflection
             return base.HasStaticMapping(type);
         }
 
-        public override bool TryGetStaticMapping(Type type, out string name)
+        public override bool TryGetStaticMapping(Type type, out (string tsType, TsTypeFormat format) mapping)
         {
             if (type == typeof(IActionResult))
             {
-                name = "unknown";
+                mapping = ("unknown", TsTypeFormat.None);
                 return true;
             }
 
-            return base.TryGetStaticMapping(type, out name);
+            return base.TryGetStaticMapping(type, out mapping);
         }
 
         public virtual string RouteName(Type controller, MethodInfo action, string route)

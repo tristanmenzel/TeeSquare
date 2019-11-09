@@ -22,7 +22,7 @@ namespace TeeSquare.Reflection
 
         public void AddTypes(params Type[] types)
         {
-            foreach (var type in types)
+            foreach (var type in types.OrderBy(t => t.Name))
             {
                 if (type.IsTask(out var resultType))
                 {
@@ -59,21 +59,22 @@ namespace TeeSquare.Reflection
                     var genericType = type.GetGenericTypeDefinition();
 
                     if (_types.Contains(genericType)) continue;
-                    _types.Add(genericType);
 
                     var dependencies = type.GetProperties().Select(p => p.PropertyType).ToArray();
                     AddTypes(dependencies);
+                    _types.Add(genericType);
                     continue;
                 }
 
                 if (!_types.Contains(type))
                 {
+                    if (!type.IsEnum)
+                    {
+                        var dependencies = type.GetProperties().Select(p => p.PropertyType).ToArray();
+                        AddTypes(dependencies);
+                    }
+
                     _types.Add(type);
-
-                    if (type.IsEnum) continue;
-
-                    var dependencies = type.GetProperties().Select(p => p.PropertyType).ToArray();
-                    AddTypes(dependencies);
                 }
             }
         }
@@ -83,7 +84,7 @@ namespace TeeSquare.Reflection
             if (includeHeader)
                 _options.WriteHeader(writer);
 
-            foreach (var type in _types.OrderBy(t=>t.IsEnum ? 0 : 1).ThenBy(t => t.Name))
+            foreach (var type in _types)
             {
                 var typeRef = _namer.Type(type);
 
@@ -115,9 +116,10 @@ namespace TeeSquare.Reflection
                             if (_options.DiscriminatorPropertyPredicate(pi, type))
                             {
                                 var value = _options.DiscriminatorPropertyValueProvider(pi, type);
-                                i.AddProperty(_namer.PropertyName(pi), new TypeReference( $"'{value}'"));
+                                i.AddProperty(_namer.PropertyName(pi), new TypeReference($"'{value}'"));
                                 continue;
                             }
+
                             i.AddProperty(_namer.PropertyName(pi), _namer.Type(pi.PropertyType));
                         }
                     })

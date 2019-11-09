@@ -26,6 +26,7 @@ after_build:
   # For once the build has completed
   - cmd: dotnet pack ./src/teesquare/teesquare.csproj --configuration=release --no-restore
   - cmd: dotnet pack ./src/teesquare.webapi/teesquare.webapi.csproj --configuration=release --no-restore
+  - cmd: dotnet pack ./src/teesquare.mobx/teesquare.mobx.csproj --configuration=release --no-restore
 artifacts:
  - path: '\src\teesquare\bin\release\*.nupkg'
  - path: '\src\teesquare.webapi\bin\release\*.nupkg'
@@ -38,11 +39,12 @@ test_script:
   # run the unit tests
   - cmd: dotnet test ./src/teesquare.tests/teesquare.tests.csproj
   - cmd: dotnet test ./src/teesquare.webapi.tests/teesquare.webapi.tests.csproj
+  - cmd: dotnet test ./src/teesquare.mobx.tests/teesquare.mobx.tests.csproj
 on_finish :
   # any cleanup in here
 deploy: 
   provider: NuGet
   api_key: 
-    secure: RkHFHd1enewSOYaQ4wnbpGG26YdP9vBMDGhSMMFO8Od9yUNC+smckUUXuC0lxdOO
+    secure: g7T/PUgacy6zYmJTVFpYow2U4d62R8q0X4KKpNxWj6ieQPUvHi1U2LOECMPr+fNE
   skip_symbols: true
   artifact: /.*\.nupkg/
