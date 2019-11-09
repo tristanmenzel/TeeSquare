@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using TeeSquare.TypeMetadata;
 
 namespace TeeSquare.Writers
 {
@@ -63,24 +63,29 @@ namespace TeeSquare.Writers
             }
         }
 
-        public void WriteType(string type, string[] typeParams)
+        public void WriteTypeRef(ITypeReference typeReference)
         {
-            if (typeParams.Any())
-                _writer.Write($"{type}<{(string.Join(", ", typeParams))}>");
-            else
-                _writer.Write($"{type}");
+            _writer.Write(typeReference.FullName);
         }
 
-        public void OpenBrace(string text = null)
+        public void WriteTypeDec(string typeName, ITypeReference[] genericTypeParams)
         {
-            _writer.WriteLine($"{text} {{");
+            if (genericTypeParams.Any())
+                _writer.Write($"{typeName}<{(string.Join(", ", genericTypeParams.Select(t=>t.FullName)))}>");
+            else
+                _writer.Write($"{typeName}");
+        }
+
+        public void OpenBlock(string text = null, string openBlockDelimiter = "{")
+        {
+            _writer.WriteLine($"{text} {openBlockDelimiter}");
             _indent++;
         }
 
-        public void CloseBrace()
+        public void CloseBlock(string closeBlockDelimiter = "}")
         {
             _indent--;
-            WriteLine("}");
+            WriteLine(closeBlockDelimiter);
         }
 
         public void Flush()

@@ -10,7 +10,8 @@ using (var writer = new TypeScriptWriter(File.Open("demo.ts", FileMode.OpenOrCre
     writer.WriteInterface("FunFunInterface", "TOne", "TTwo")
         .With(i =>
         {
-            i.Method("TestMethod", "string")
+            i.Method("TestMethod")
+                .WithReturnType("string")
                 .WithParams(p =>
                 {
                     p.Param("a", "number");
@@ -39,14 +40,15 @@ using (var writer = new TypeScriptWriter(File.Open("demo.ts", FileMode.OpenOrCre
         .With(c =>
         {
             c.Property("banana", "string");
-            c.Method("getApplePie", "string")
+            c.Method("getApplePie")
+                .WithReturnType("string")
                 .WithParams(p =>
                 {
                     p.Param("numApples", "number");
                     p.Param("typeOfApple", "string");
                 })
                 .WithBody(x => { x.WriteLine("return \"No apples here\";"); });
-            c.Method("haveFun", "void")
+            c.Method("haveFun")
                 .WithParams(p => { p.Param("amountOfFun", "number"); })
                 .Static()
                 .WithBody(x => x.WriteLine("console.log(\"Having so much fun\", amountOfFun);"));
@@ -69,7 +71,7 @@ export class AppleService {
 
 ## Writing an enum
 
-You can optional provide descriptions for enum values and they will be written as an object map such that you can access the value by going `MyEnumDesc[MyEnum.SomeValue]`
+You can optionally provide descriptions for enum values and they will be written as an object map such that you can access the value by going `MyEnumDesc[MyEnum.SomeValue]`
 
 ```cs
 using (var writer = new TypeScriptWriter(File.Open("demo.ts", FileMode.OpenOrCreate)))

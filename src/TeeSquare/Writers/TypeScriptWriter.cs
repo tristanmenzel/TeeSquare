@@ -2,35 +2,73 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using TeeSquare.TypeMetadata;
 
 namespace TeeSquare.Writers
 {
     public class TypeScriptWriter : IDisposable
     {
-        private readonly List<ICodePart> _parts;
+        private readonly IInterfaceWriterFactory _interfaceWriterFactory;
+        private readonly IClassWriterFactory _classWriterFactory;
+        private readonly IEnumWriterFactory _enumWriterFactory;
+        private readonly IFunctionWriterFactory _functionWriterFactory;
+        private readonly List<CodeSnippetWriter> _parts;
 
         private int _cursor = 0;
         private readonly ICodeWriter _codeWriter;
 
-        public TypeScriptWriter(Stream stream, string indentCharacters = "  ")
+        public TypeScriptWriter(Stream stream,
+            IInterfaceWriterFactory interfaceWriterFactory,
+            IClassWriterFactory classWriterFactory,
+            IEnumWriterFactory enumWriterFactory,
+            IFunctionWriterFactory functionWriterFactory,
+            string indentCharacters = "  ")
         {
+            _interfaceWriterFactory = interfaceWriterFactory;
+            _classWriterFactory = classWriterFactory;
+            _enumWriterFactory = enumWriterFactory;
+            _functionWriterFactory = functionWriterFactory;
             _codeWriter = new CodeWriter(stream, indentCharacters);
-            _parts = new List<ICodePart>();
+            _parts = new List<CodeSnippetWriter>();
         }
 
-        public InterfaceWriter WriteInterface(string name, params string[] genericTypeParams)
+        public IComplexTypeConfigurator WriteInterface(string name, params ITypeReference[] genericTypeParams)
         {
-            var part = new InterfaceWriter(name, genericTypeParams);
+            var type = new ComplexTypeInfo(name, genericTypeParams);
+            var part = _interfaceWriterFactory.Build(type);
             _parts.Add(part);
-            return part;
+            return type;
+        }
+
+        public void WriteInterface(IComplexTypeInfo type)
+        {
+            var part = _interfaceWriterFactory.Build(type);
+            _parts.Add(part);
+        }
+
+        public void WriteComment(string commentText)
+        {
+            _parts.Add(writer => writer.WriteLine($"// {commentText}"));
         }
 
 
-        public ClassWriter WriteClass(string name, params string[] genericTypeParams)
+        public IComplexTypeConfigurator WriteClass(string name, params ITypeReference[] genericTypeParams)
         {
-            var part = new ClassWriter(name, genericTypeParams);
+            var type = new ComplexTypeInfo(name, genericTypeParams);
+            var part = _classWriterFactory.Build(type);
             _parts.Add(part);
-            return part;
+            return type;
+        }
+
+        public void WriteClass(IComplexTypeInfo type)
+        {
+            var part = _classWriterFactory.Build(type);
+            _parts.Add(part);
+        }
+
+        public void WriteSnippet(CodeSnippetWriter snippetWriter)
+        {
+            _parts.Add(snippetWriter);
         }
 
         public void Flush()
@@ -39,7 +77,7 @@ namespace TeeSquare.Writers
             _cursor += parts.Length;
             foreach (var part in parts)
             {
-                part.WriteTo(_codeWriter);
+                part(_codeWriter);
             }
 
             _codeWriter.Flush();
@@ -60,11 +98,25 @@ namespace TeeSquare.Writers
             }
         }
 
-        public EnumWriter WriteEnum(string name)
+        public IMethodConfigurator WriteFunction(string name, params string[] genericTypeParams)
         {
-            var part = new EnumWriter(name);
+            var methodInfo = new MethodInfo(name, genericTypeParams);
+            var part = _functionWriterFactory.Build(methodInfo);
             _parts.Add(part);
-            return part;
+            return methodInfo;
+        }
+
+        public IEnumConfigurator WriteEnum(string name, EnumValueType valueType = EnumValueType.Number)
+        {
+            var enumInfo = new EnumInfo(name, valueType);
+            var part = _enumWriterFactory.Build(enumInfo);
+            _parts.Add(part);
+            return enumInfo;
+        }
+
+        public void WriteLine()
+        {
+            _parts.Add(writer => writer.WriteLine(""));
         }
     }
 }

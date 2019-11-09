@@ -1,16 +1,20 @@
-﻿namespace TeeSquare.Writers
+﻿namespace TeeSquare.TypeMetadata
 {
-    class PropertyInfo
+    public interface IPropertyInfo
+    {
+        string Name { get; }
+        ITypeReference Type { get; }
+    }
+
+    class PropertyInfo : IPropertyInfo
     {
         public string Name { get; }
-        public string Type { get; }
-        public string[] GenericTypeParams { get; }
+        public ITypeReference Type { get; }
 
-        public PropertyInfo(string name, string type, string[] genericTypeParams)
+        public PropertyInfo(string name, ITypeReference typeReference)
         {
             Name = name;
-            Type = type;
-            GenericTypeParams = genericTypeParams;
+            Type = typeReference;
         }
     }
 }

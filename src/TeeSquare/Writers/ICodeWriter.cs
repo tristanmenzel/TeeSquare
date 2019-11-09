@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using TeeSquare.TypeMetadata;
 
 namespace TeeSquare.Writers
 {
@@ -11,9 +11,10 @@ namespace TeeSquare.Writers
         void WriteLine(string text, bool indent = true);
         void WriteDelimitedLines<T>(T[] items, Func<T, string> lineFunc, string delimiter);
         void WriteDelimited<T>(T[] items, Action<T, ICodeWriter> lineFunc, string delimiter);
-        void WriteType(string type, string[] typeParams);
-        void OpenBrace(string text =null);
-        void CloseBrace();
+        void WriteTypeRef(ITypeReference typeReference);
+        void WriteTypeDec(string typeName, ITypeReference[] genericTypeParams);
+        void OpenBlock(string text = null, string openBlockDelimiter = "{");
+        void CloseBlock(string closeBlockDelimiter = "}");
 
         void Flush();
     }

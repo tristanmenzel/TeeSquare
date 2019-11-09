@@ -1,33 +1,60 @@
 ﻿using System;
+using TeeSquare.Writers;
 
-namespace TeeSquare.Writers
+namespace TeeSquare.TypeMetadata
 {
-    class MethodInfo : IMethodInfo
+    public interface IMethodInfo
     {
-        private readonly ParamsInfo _params;
-        public bool IsStatic { get; private set; }
-        public IIdentifierInfo Id { get; }
-        public IIdentifierInfo[] Params => _params.Params;
+        bool IsStatic { get; }
+        string Name { get; }
+        string[] GenericTypeParams { get; }
+        IIdentifierInfo[] Params { get; }
+        ITypeReference ReturnType { get; }
+        Action<ICodeWriter> WriteBody { get; }
+    }
 
-        public MethodInfo(string name, string returnType, params string[] returnTypeGenericTypeParams)
+    class MethodInfo : IMethodConfigurator, IMethodInfo
+    {
+        private readonly ParamInfo _params;
+        public bool IsStatic { get; private set; }
+        public string Name { get; private set; }
+        public string[] GenericTypeParams { get; }
+        public IIdentifierInfo[] Params => _params.Params;
+        public ITypeReference ReturnType { get; private set; }
+
+        public MethodInfo(string name, params string[] genericTypeParams)
         {
-            Id = new IdentifierInfo(name, returnType, returnTypeGenericTypeParams);
-            _params = new ParamsInfo();
+            Name = name;
+            GenericTypeParams = genericTypeParams;
+            ReturnType = new TypeReference("void");
+            _params = new ParamInfo();
+            WriteBody = w => { };
         }
 
-        public IMethodInfo Static()
+        public IMethodConfigurator WithReturnType(ITypeReference type)
+        {
+            ReturnType = type;
+            return this;
+        }
+
+        public IMethodInfo Done()
+        {
+            return this;
+        }
+
+        public IMethodConfigurator Static()
         {
             IsStatic = true;
             return this;
         }
 
-        public IMethodInfo WithParams(Action<IParamsInfo> configureParams)
+        public IMethodConfigurator WithParams(Action<IParamConfigurator> configureParams)
         {
             configureParams(_params);
             return this;
         }
 
-        public IMethodInfo WithBody(Action<ICodeWriter> writeBody)
+        public IMethodConfigurator WithBody(Action<ICodeWriter> writeBody)
         {
             WriteBody = writeBody;
             return this;
