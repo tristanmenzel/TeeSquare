@@ -30,6 +30,7 @@ after_build:
 artifacts:
  - path: '\src\teesquare\bin\release\*.nupkg'
  - path: '\src\teesquare.webapi\bin\release\*.nupkg'
+ - path: '\src\teesquare.mobx\bin\release\*.nupkg'
    name: Package
    type: NugetPackage
 clone_depth: 1
