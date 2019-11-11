@@ -75,7 +75,7 @@ namespace TeeSquare.Reflection
 
             if (type.IsGenericType)
             {
-                var nonGenericName = ToCase(type.Name.Split("`").First(), _namingConventions.Types);
+                var nonGenericName = ToCase(type.Name.Split('`').First(), _namingConventions.Types);
                 return new TypeReference(nonGenericName, type.GetGenericArguments()
                     .Select(t => Type(t))
                     .ToArray())

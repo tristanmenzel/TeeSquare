@@ -23,10 +23,10 @@ namespace TeeSquare.WebApi.Reflection
             _requests = new List<RequestInfo>();
         }
 
-        public void AddAssembly(Assembly assembly)
+        public void AddAssembly(Assembly assembly, Type baseController = null)
         {
             var controllers = assembly.GetExportedTypes()
-                .Where(t => typeof(Controller).IsAssignableFrom(t));
+                .Where(t => (baseController ?? typeof(Controller)).IsAssignableFrom(t));
 
             foreach (var controller in controllers)
             {
@@ -136,7 +136,7 @@ namespace TeeSquare.WebApi.Reflection
                 .Configure(i =>
                 {
                     i.AddProperty("url", new TypeReference("string"));
-                    i.AddProperty("method", new TypeReference( "'GET'"));
+                    i.AddProperty("method", new TypeReference("'GET'"));
                 });
             writer.WriteInterface("DeleteRequest", new TypeReference("TResponse"))
                 .Configure(i =>
@@ -181,7 +181,6 @@ namespace TeeSquare.WebApi.Reflection
                     c.MakeAbstract();
 
 
-
                     foreach (var req in _requests)
                     {
                         var methodBuilder = c.AddMethod($"{req.Name}{req.Method.GetName()}")
@@ -191,16 +190,20 @@ namespace TeeSquare.WebApi.Reflection
                         {
                             methodBuilder
                                 .WithReturnType(new TypeReference($"{req.Method.GetName()}Request",
-                                    new [] {
-                                    _options.Namer.Type(req.GetRequestBodyType()),
-                                    _options.Namer.Type(req.ResponseType)}));
+                                    new[]
+                                    {
+                                        _options.Namer.Type(req.GetRequestBodyType()),
+                                        _options.Namer.Type(req.ResponseType)
+                                    }));
                         }
                         else
                         {
                             methodBuilder
                                 .WithReturnType(new TypeReference($"{req.Method.GetName()}Request",
-                                    new [] {
-                                    _options.Namer.Type(req.ResponseType)}));
+                                    new[]
+                                    {
+                                        _options.Namer.Type(req.ResponseType)
+                                    }));
                         }
 
                         methodBuilder.WithParams(p =>
