@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using TeeSquare.Reflection;
 using TeeSquare.Writers;
@@ -44,6 +45,8 @@ namespace TeeSquare.WebApi.Reflection
         public WriteComplexType ComplexTypeStrategy { get; set; } =
             (writer, typeInfo) => writer.WriteInterface(typeInfo);
 
+
+        public GetApiReturnType GetApiReturnTypeStrategy { get; set; } = RouteReflector.DefaultApiReturnTypeStrategy;
         public WriteHeader WriteHeader { get; set; } = writer =>
         {
             writer.WriteComment("Generated Code");
@@ -55,5 +58,9 @@ namespace TeeSquare.WebApi.Reflection
 
         public DiscriminatorPropertyValueProvider DiscriminatorPropertyValueProvider { get; set; } =
             WriterOptions.DefaultDiscriminatorValueProvider;
+
     }
+
+    public delegate Type GetApiReturnType(Type controller, MethodInfo action);
+
 }

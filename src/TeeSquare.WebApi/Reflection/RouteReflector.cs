@@ -45,16 +45,21 @@ namespace TeeSquare.WebApi.Reflection
                 var factory = GetRequestFactory(action);
                 var requestParams = GetRequestParams(action, route);
 
-
+                var returnType = _options.GetApiReturnTypeStrategy(controller, action);
                 _requests.Add(factory(_options.Namer.RouteName(controller, action, route),
                     route,
-                    action.ReturnType,
+                    returnType,
                     requestParams
                 ));
             }
         }
 
-        private ParamInfo[] GetRequestParams(MethodInfo action, string route)
+        internal static Type DefaultApiReturnTypeStrategy(Type controller, MethodInfo action)
+        {
+            return action.ReturnType;
+        }
+
+        internal static ParamInfo[] GetRequestParams(MethodInfo action, string route)
         {
             return action.GetParameters()
                 .Select(p => new ParamInfo
@@ -65,7 +70,7 @@ namespace TeeSquare.WebApi.Reflection
                 }).ToArray();
         }
 
-        public ParameterKind GetParameterKind(ParameterInfo parameterInfo, string route)
+        internal static ParameterKind GetParameterKind(ParameterInfo parameterInfo, string route)
         {
             if (parameterInfo.GetCustomAttributes<FromBodyAttribute>().Any())
                 return ParameterKind.Body;
@@ -78,7 +83,7 @@ namespace TeeSquare.WebApi.Reflection
                 : ParameterKind.Query;
         }
 
-        private RequestFactory GetRequestFactory(MethodInfo action)
+        protected RequestFactory GetRequestFactory(MethodInfo action)
         {
             if (action.GetCustomAttributes<HttpPutAttribute>().Any())
                 return RequestInfo.Put;
@@ -89,7 +94,7 @@ namespace TeeSquare.WebApi.Reflection
             return RequestInfo.Get;
         }
 
-        private string BuildRoute(Type controller, MethodInfo action)
+        internal static string BuildRoute(Type controller, MethodInfo action)
         {
             var controllerRouteTemplate = controller.GetCustomAttributes<RouteAttribute>()
                 .Select(r => r.Template)

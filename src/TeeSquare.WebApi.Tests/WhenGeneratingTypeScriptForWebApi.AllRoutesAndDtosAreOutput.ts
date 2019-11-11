@@ -34,6 +34,12 @@ export abstract class RequestFactory {
       url: `api/other/do-a-thing${query}`
     };
   }
+  static ApiReturnTestGet(): GetRequest<unknown> {
+    return {
+      method: 'GET',
+      url: `api/return-test`
+    };
+  }
   static ApiRouteNumberOneGet(): GetRequest<string> {
     return {
       method: 'GET',
