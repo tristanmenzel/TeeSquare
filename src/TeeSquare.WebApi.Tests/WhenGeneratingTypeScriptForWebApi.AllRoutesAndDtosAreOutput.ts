@@ -27,6 +27,26 @@ export const toQuery = (o: {[key: string]: any}): string => {
   return q && `?${q}` || '';
 };
 export abstract class RequestFactory {
+  static ApiOtherImplicitQueryGet(id?: number): GetRequest<number> {
+    let query = toQuery({id});
+    return {
+      method: 'GET',
+      url: `api/other/implicit-query${query}`
+    };
+  }
+  static ApiOtherImplicitRouteByIdGet(id: number): GetRequest<number> {
+    return {
+      method: 'GET',
+      url: `api/other/implicit-route/${id}`
+    };
+  }
+  static ApiOtherImplicitBodyPost(data: TestDto): PostRequest<TestDto, number> {
+    return {
+      method: 'POST',
+      data,
+      url: `api/other/implicit-body`
+    };
+  }
   static ApiOtherDoAThingGet(when?: string): GetRequest<number> {
     let query = toQuery({when});
     return {

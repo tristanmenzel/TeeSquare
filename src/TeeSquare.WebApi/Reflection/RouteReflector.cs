@@ -42,8 +42,8 @@ namespace TeeSquare.WebApi.Reflection
             {
                 var route = _options.BuildRouteStrategy(controller, action);
 
-                var factory = GetRequestFactory(action);
-                var requestParams = GetRequestParams(action, route);
+                var (factory, method) = GetRequestFactory(action);
+                var requestParams = GetRequestParams(action, route, method);
 
                 var returnType = _options.GetApiReturnTypeStrategy(controller, action);
                 _requests.Add(factory(_options.Namer.RouteName(controller, action, route),
@@ -59,18 +59,18 @@ namespace TeeSquare.WebApi.Reflection
             return action.ReturnType;
         }
 
-        internal static ParamInfo[] GetRequestParams(MethodInfo action, string route)
+        internal static ParamInfo[] GetRequestParams(MethodInfo action, string route, HttpMethod method)
         {
             return action.GetParameters()
                 .Select(p => new ParamInfo
                 {
-                    Kind = GetParameterKind(p, route),
+                    Kind = GetParameterKind(p, route, method),
                     Name = p.Name,
                     Type = p.ParameterType
                 }).ToArray();
         }
 
-        internal static ParameterKind GetParameterKind(ParameterInfo parameterInfo, string route)
+        internal static ParameterKind GetParameterKind(ParameterInfo parameterInfo, string route, HttpMethod method)
         {
             if (parameterInfo.GetCustomAttributes<FromBodyAttribute>().Any())
                 return ParameterKind.Body;
@@ -78,20 +78,38 @@ namespace TeeSquare.WebApi.Reflection
                 return ParameterKind.Query;
             if (parameterInfo.GetCustomAttributes<FromRouteAttribute>().Any())
                 return ParameterKind.Route;
-            return route.Contains($"{{{parameterInfo.Name}}}")
-                ? ParameterKind.Route
-                : ParameterKind.Query;
+
+            if (route.Contains($"{{{parameterInfo.Name}}}"))
+            {
+                return ParameterKind.Route;
+            }
+
+            if ((method == HttpMethod.Post || method == HttpMethod.Put)
+                && IsPossibleDto(parameterInfo.ParameterType))
+            {
+                return ParameterKind.Body;
+            }
+
+            return ParameterKind.Query;
         }
 
-        protected RequestFactory GetRequestFactory(MethodInfo action)
+        private static bool IsPossibleDto(Type type)
+        {
+            return !type.IsPrimitive
+                   && type != typeof(string)
+                   && !type.IsEnum
+                   && !type.IsValueType;
+        }
+
+        private (RequestFactory factory, HttpMethod method) GetRequestFactory(MethodInfo action)
         {
             if (action.GetCustomAttributes<HttpPutAttribute>().Any())
-                return RequestInfo.Put;
+                return (RequestInfo.Put, HttpMethod.Put);
             if (action.GetCustomAttributes<HttpPostAttribute>().Any())
-                return RequestInfo.Post;
+                return (RequestInfo.Post, HttpMethod.Post);
             if (action.GetCustomAttributes<HttpDeleteAttribute>().Any())
-                return RequestInfo.Delete;
-            return RequestInfo.Get;
+                return (RequestInfo.Delete, HttpMethod.Delete);
+            return (RequestInfo.Get, HttpMethod.Get);
         }
 
         internal static string DefaultBuildRouteStrategy(Type controller, MethodInfo action)
