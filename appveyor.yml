@@ -3,8 +3,7 @@ image: Visual Studio 2017
 branches:
   only:
   - master
-  - feat/reflective-writer
-  - feat/web-api
+  - feat/net48
 init:
   # Good practise, because Windows line endings are different from Unix/Linux ones
   - cmd: git config --global core.autocrlf true
