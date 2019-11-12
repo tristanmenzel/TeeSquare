@@ -40,7 +40,7 @@ namespace TeeSquare.WebApi.Reflection
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod)
                 .Where(a => a.IsAction()))
             {
-                var route = BuildRoute(controller, action);
+                var route = _options.BuildRouteStrategy(controller, action);
 
                 var factory = GetRequestFactory(action);
                 var requestParams = GetRequestParams(action, route);
@@ -94,7 +94,7 @@ namespace TeeSquare.WebApi.Reflection
             return RequestInfo.Get;
         }
 
-        internal static string BuildRoute(Type controller, MethodInfo action)
+        internal static string DefaultBuildRouteStrategy(Type controller, MethodInfo action)
         {
             var controllerRouteTemplate = controller.GetCustomAttributes<RouteAttribute>()
                 .Select(r => r.Template)

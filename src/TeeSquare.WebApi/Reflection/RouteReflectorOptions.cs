@@ -47,6 +47,7 @@ namespace TeeSquare.WebApi.Reflection
 
 
         public GetApiReturnType GetApiReturnTypeStrategy { get; set; } = RouteReflector.DefaultApiReturnTypeStrategy;
+        public BuildRoute BuildRouteStrategy { get; set; } = RouteReflector.DefaultBuildRouteStrategy;
         public WriteHeader WriteHeader { get; set; } = writer =>
         {
             writer.WriteComment("Generated Code");
@@ -63,4 +64,5 @@ namespace TeeSquare.WebApi.Reflection
 
     public delegate Type GetApiReturnType(Type controller, MethodInfo action);
 
+    public delegate string BuildRoute(Type controller, MethodInfo action);
 }
