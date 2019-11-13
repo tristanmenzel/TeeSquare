@@ -14,13 +14,18 @@ namespace TeeSquare.WebApi.Reflection
     {
         private readonly RouteReflectorOptions _options;
 
-        private readonly List<RequestInfo> _requests;
+        private readonly List<RequestInfo> _requests = new List<RequestInfo>();
 
+        private readonly List<Type> _additionalTypes = new List<Type>();
 
         public RouteReflector(RouteReflectorOptions options)
         {
             _options = options;
-            _requests = new List<RequestInfo>();
+        }
+
+        public void AddAdditionalTypes(Type[] types)
+        {
+            _additionalTypes.AddRange(types);
         }
 
         public void AddAssembly(Assembly assembly, Type baseController = null)
@@ -259,7 +264,8 @@ namespace TeeSquare.WebApi.Reflection
                     }
                 });
             var types = _requests.Select(r => r.ResponseType)
-                .Union(_requests.SelectMany(r => r.RequestParams.Select(p => p.Type)));
+                .Union(_requests.SelectMany(r => r.RequestParams.Select(p => p.Type)))
+                .Union(_additionalTypes);
 
             var rWriter = new ReflectiveWriter(_options.BuildWriterOptions());
             rWriter.AddTypes(types.ToArray());
