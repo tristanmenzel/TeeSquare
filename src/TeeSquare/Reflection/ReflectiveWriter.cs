@@ -24,6 +24,13 @@ namespace TeeSquare.Reflection
         {
             foreach (var type in types.OrderBy(t => t.Name))
             {
+                if (type.IsExtendedPrimitive())
+                {
+                    if (!_types.Contains(type))
+                        _types.Add(type);
+                    continue;
+                }
+
                 if (type.IsTask(out var resultType))
                 {
                     AddTypes(resultType);
@@ -48,10 +55,6 @@ namespace TeeSquare.Reflection
                     continue;
                 }
 
-                if (_namer.HasStaticMapping(type))
-                    continue;
-
-
                 if (type.IsGenericType)
                 {
                     AddTypes(type.GetGenericArguments());
@@ -71,7 +74,10 @@ namespace TeeSquare.Reflection
                     if (!type.IsEnum)
                     {
                         var dependencies = type.GetProperties().Select(p => p.PropertyType).ToArray();
-                        AddTypes(dependencies);
+                        if (dependencies.Any())
+                        {
+                            AddTypes(dependencies);
+                        }
                     }
 
                     _types.Add(type);
@@ -87,6 +93,8 @@ namespace TeeSquare.Reflection
             foreach (var type in _types)
             {
                 var typeRef = _namer.Type(type);
+
+                if (typeRef.ExistingType) continue;
 
                 if (typeRef.Enum)
                 {

@@ -7,6 +7,16 @@ namespace TeeSquare.Reflection
 {
     public static class TypeExtensions
     {
+        public static bool IsExtendedPrimitive(this Type type)
+        {
+            return type.IsEnum
+                   || type.IsPrimitive
+                   || type == typeof(Decimal)
+                   || type == typeof(DateTime)
+                   || type == typeof(DateTimeOffset)
+                   || type == typeof(String);
+        }
+
         public static bool IsNullable(this Type type, out Type underlyingType)
         {
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
@@ -21,6 +31,11 @@ namespace TeeSquare.Reflection
 
         public static bool IsCollection(this Type type, out Type itemType)
         {
+            if (type == typeof(string))
+            {
+                itemType = null;
+                return false;
+            }
             if (type.IsArray)
             {
                 itemType = type.GetElementType();
@@ -56,7 +71,7 @@ namespace TeeSquare.Reflection
             resultType = null;
             return false;
         }
-        
+
         public static bool IsDictionary(this Type type, out Type[] genericTypeParams)
         {
             if (type.IsGenericType && type.GetGenericArguments().Length == 2 && typeof(IDictionary<,>)

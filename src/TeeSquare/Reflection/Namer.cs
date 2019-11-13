@@ -29,12 +29,12 @@ namespace TeeSquare.Reflection
                 {typeof(bool), ("boolean", TsTypeFormat.None)}
             };
 
-        public virtual bool HasStaticMapping(Type type)
+        protected bool HasStaticMapping(Type type)
         {
             return _staticMappings.ContainsKey(type);
         }
 
-        public virtual bool TryGetStaticMapping(Type type, out (string tsType, TsTypeFormat format) typeMapping)
+        protected bool TryGetStaticMapping(Type type, out (string tsType, TsTypeFormat format) typeMapping)
         {
             return _staticMappings.TryGetValue(type, out typeMapping);
         }
@@ -46,7 +46,13 @@ namespace TeeSquare.Reflection
 
         public virtual ITypeReference Type(Type type, bool optional = false)
         {
-            if (TryGetStaticMapping(type, out var mapping)) return new TypeReference(mapping.tsType) {Optional = optional, Format = mapping.format};
+            if (TryGetStaticMapping(type, out var mapping))
+                return new TypeReference(mapping.tsType)
+                {
+                    Optional = optional,
+                    Format = mapping.format,
+                    ExistingType = true
+                };
             if (type.IsTask(out var resultType))
             {
                 return Type(resultType, optional);

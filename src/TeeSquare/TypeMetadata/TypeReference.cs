@@ -12,6 +12,7 @@ namespace TeeSquare.TypeMetadata
         bool Array { get; }
         TsTypeFormat Format { get; }
         string FullName { get; }
+        bool ExistingType { get; }
     }
 
     public enum TsTypeFormat
@@ -50,5 +51,7 @@ namespace TeeSquare.TypeMetadata
         public string FullName => (GenericTypeParams.Any()
             ? $"{TypeName}<{string.Join(", ", GenericTypeParams.Select(p => p.FullName))}>"
             : TypeName) + (Array ? "[]": "");
+
+        public bool ExistingType { get; set; }
     }
 }
