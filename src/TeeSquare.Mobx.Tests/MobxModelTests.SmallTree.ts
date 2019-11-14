@@ -11,7 +11,7 @@ export enum Title {
 }
 export const NameModel = types.model('NameModel',  {
   firstName: types.string,
-  title: types.enumeration<Title>("Title", [Object.values(Title)]),
+  title: types.frozen<Title>(),
   lastName: types.string,
 });
 

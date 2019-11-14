@@ -43,7 +43,7 @@ namespace TeeSquare.Mobx
         {
             if (type.Enum)
             {
-                return $"types.enumeration<{type.TypeName}>(\"{type.TypeName}\", [Object.values({type.TypeName})])";
+                return $"types.frozen<{type.TypeName}>()";
             }
 
             return type.TypeName switch
