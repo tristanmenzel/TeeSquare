@@ -63,8 +63,12 @@ namespace TeeSquare.Reflection
 
                     if (_types.Contains(genericType)) continue;
 
-                    var dependencies = type.GetProperties().Select(p => p.PropertyType).ToArray();
-                    AddTypes(dependencies);
+                    var dependencies = GetTypeDependencies(type);
+                    if (dependencies.Any())
+                    {
+                        AddTypes(dependencies);
+                    }
+
                     _types.Add(genericType);
                     continue;
                 }
@@ -73,7 +77,7 @@ namespace TeeSquare.Reflection
                 {
                     if (!type.IsEnum)
                     {
-                        var dependencies = type.GetProperties().Select(p => p.PropertyType).ToArray();
+                        var dependencies = GetTypeDependencies(type);
                         if (dependencies.Any())
                         {
                             AddTypes(dependencies);
@@ -83,6 +87,23 @@ namespace TeeSquare.Reflection
                     _types.Add(type);
                 }
             }
+        }
+
+        private Type[] GetTypeDependencies(Type type)
+        {
+            var propertyDependencies = type
+                .GetProperties(_options.PropertyFlags)
+                .Select(p => p.PropertyType)
+                .ToArray();
+            if (!_options.ReflectMethods(type)) return propertyDependencies;
+            var methodDependencies = type
+                .GetMethods(_options.MethodFlags)
+                .Where(m => !m.IsSpecialName)
+                .SelectMany(m => m.GetParameters().Select(p => p.ParameterType).Union(new[] {m.ReturnType}))
+                .Where(m => m != typeof(void))
+                .ToArray();
+
+            return propertyDependencies.Union(methodDependencies).ToArray();
         }
 
         public void WriteTo(TypeScriptWriter writer, bool includeHeader = true)
@@ -129,6 +150,23 @@ namespace TeeSquare.Reflection
                             }
 
                             i.AddProperty(_namer.PropertyName(pi), _namer.Type(pi.PropertyType));
+                        }
+
+                        if (_options.ReflectMethods(type))
+                        {
+                            foreach (var mi in type.GetMethods(_options.MethodFlags)
+                                .Where(m => !m.IsSpecialName))
+                            {
+                                i.AddMethod(mi.Name)
+                                    .WithReturnType(_namer.Type(mi.ReturnType))
+                                    .WithParams(p =>
+                                    {
+                                        foreach (var pi in mi.GetParameters())
+                                        {
+                                            p.Param(pi.Name, _namer.Type(pi.ParameterType));
+                                        }
+                                    });
+                            }
                         }
                     })
                     .Done());

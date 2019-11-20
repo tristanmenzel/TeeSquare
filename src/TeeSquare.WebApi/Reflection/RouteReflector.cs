@@ -188,7 +188,7 @@ namespace TeeSquare.WebApi.Reflection
                 .Static()
                 .WithBody(w =>
                 {
-                    w.WriteLine("let q = Object.keys(o)");
+                    w.WriteLine("const q = Object.keys(o)");
                     w.Indent();
                     w.WriteLine(".map(k => ({k, v: o[k]}))");
                     w.WriteLine(".filter(x => x.v !== undefined && x.v !== null)");
@@ -245,7 +245,7 @@ namespace TeeSquare.WebApi.Reflection
                                 var queryParams = req.RequestParams.Where(x => x.Kind == ParameterKind.Query).ToArray();
                                 if (queryParams.Any())
                                 {
-                                    w.Write("let query = toQuery({", true);
+                                    w.Write("const query = toQuery({", true);
                                     w.WriteDelimited(queryParams,
                                         (p, wr) => wr.Write(p.Name), ", ");
                                     w.WriteLine("});", false);

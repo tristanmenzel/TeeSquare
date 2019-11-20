@@ -10,6 +10,7 @@ namespace TeeSquare.Reflection
 {
     public class Namer
     {
+        public bool RemovePrefixFromInterfaces { get; set; } = true;
         private readonly NamingConventions _namingConventions;
 
         private readonly IDictionary<Type, (string tsType, TsTypeFormat format)> _staticMappings =
@@ -81,7 +82,7 @@ namespace TeeSquare.Reflection
 
             if (type.IsGenericType)
             {
-                var nonGenericName = ToCase(type.Name.Split('`').First(), _namingConventions.Types);
+                var nonGenericName = TypeName(type);
                 return new TypeReference(nonGenericName, type.GetGenericArguments()
                     .Select(t => Type(t))
                     .ToArray())
@@ -90,7 +91,7 @@ namespace TeeSquare.Reflection
                 };
             }
 
-            return new TypeReference(ToCase(type.Name, _namingConventions.Types))
+            return new TypeReference(TypeName(type))
             {
                 Optional = optional
             };
@@ -104,6 +105,17 @@ namespace TeeSquare.Reflection
         public virtual string MethodName(MethodInfo methodInfo)
         {
             return ToCase(methodInfo.Name, _namingConventions.Methods);
+        }
+
+        public virtual string TypeName(Type type)
+        {
+            var name = type.Name;
+            if(type.IsGenericType)
+                name = type.Name.Split('`').First();
+            if (type.IsInterface && RemovePrefixFromInterfaces && name.StartsWith("I"))
+                name = name.Substring(1);
+
+            return ToCase(name, _namingConventions.Types);
         }
 
 

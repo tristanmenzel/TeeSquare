@@ -11,6 +11,7 @@ namespace TeeSquare.Reflection
         {
             return type.IsEnum
                    || type.IsPrimitive
+                   || type == typeof(Guid)
                    || type == typeof(Decimal)
                    || type == typeof(DateTime)
                    || type == typeof(DateTimeOffset)

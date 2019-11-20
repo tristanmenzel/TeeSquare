@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
+using MethodInfo = System.Reflection.MethodInfo;
 using PropertyInfo = System.Reflection.PropertyInfo;
 
 namespace TeeSquare.Reflection
@@ -15,7 +16,14 @@ namespace TeeSquare.Reflection
                                                           | BindingFlags.Public
                                                           | BindingFlags.Instance;
 
+        public BindingFlags MethodFlags { get; set; } = BindingFlags.Instance
+                                                        | BindingFlags.Public
+                                                        | BindingFlags.DeclaredOnly;
+
+        public Func<Type, bool> ReflectMethods = type => false;
+
         public string IndentChars { get; set; } = "  ";
+
 
 
         public IEnumWriterFactory EnumWriterFactory { get; set; } = new EnumWriterFactory();
@@ -36,6 +44,7 @@ namespace TeeSquare.Reflection
 
         public DiscriminatorPropertyValueProvider DiscriminatorPropertyValueProvider { get; set; } =
             DefaultDiscriminatorValueProvider;
+
 
         public static bool DefaultDiscriminator(PropertyInfo property, Type parentType)
         {

@@ -19,7 +19,7 @@ export interface PutRequest<TRequest, TResponse> {
   method: 'PUT';
 }
 export const toQuery = (o: {[key: string]: any}): string => {
-  let q = Object.keys(o)
+  const q = Object.keys(o)
     .map(k => ({k, v: o[k]}))
     .filter(x => x.v !== undefined && x.v !== null)
     .map(x => `${encodeURIComponent(x.k)}=${encodeURIComponent(x.v)}`)
@@ -28,7 +28,7 @@ export const toQuery = (o: {[key: string]: any}): string => {
 };
 export abstract class RequestFactory {
   static ApiOtherImplicitQueryGet(id?: number): GetRequest<number> {
-    let query = toQuery({id});
+    const query = toQuery({id});
     return {
       method: 'GET',
       url: `api/other/implicit-query${query}`
@@ -48,7 +48,7 @@ export abstract class RequestFactory {
     };
   }
   static ApiOtherDoAThingGet(when?: string): GetRequest<number> {
-    let query = toQuery({when});
+    const query = toQuery({when});
     return {
       method: 'GET',
       url: `api/other/do-a-thing${query}`

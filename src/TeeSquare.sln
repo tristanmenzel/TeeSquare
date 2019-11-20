@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeeSquare.Mobx", "TeeSquare
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeeSquare.Mobx.Tests", "TeeSquare.Mobx.Tests\TeeSquare.Mobx.Tests.csproj", "{1CAE62DE-3FD0-49ED-8028-AA3A68D8371F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeeSquare.DemoApi.CodeGen", "TeeSquare.DemoApi.CodeGen\TeeSquare.DemoApi.CodeGen.csproj", "{D60E71F1-EE57-4292-857F-0C4EF7E1472C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,5 +56,9 @@ Global
 		{1CAE62DE-3FD0-49ED-8028-AA3A68D8371F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CAE62DE-3FD0-49ED-8028-AA3A68D8371F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1CAE62DE-3FD0-49ED-8028-AA3A68D8371F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D60E71F1-EE57-4292-857F-0C4EF7E1472C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D60E71F1-EE57-4292-857F-0C4EF7E1472C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D60E71F1-EE57-4292-857F-0C4EF7E1472C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D60E71F1-EE57-4292-857F-0C4EF7E1472C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -137,10 +137,11 @@ export abstract class RequestFactory {
     };
   }
 }
-export interface NotUsedInApiTestDto {
-  hello: string;
-  count: number;
-  createdOn: string;
+export interface ApplicationHubClient {
+  ReceiveMessage(user: string, message: string): void;
+}
+export interface ApplicationHubServer {
+  SendMessage(user: string, message: string): void;
 }
 export interface TestDto {
   hello: string;

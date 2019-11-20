@@ -21,7 +21,9 @@ namespace TeeSquare.WebApi.Reflection
                 ClassWriterFactory = ClassWriterFactory,
                 FunctionWriterFactory = FunctionWriterFactory,
                 ComplexTypeStrategy = ComplexTypeStrategy,
-                WriteHeader = WriteHeader
+                WriteHeader = WriteHeader,
+                MethodFlags = MethodFlags,
+                ReflectMethods = ReflectMethods
             };
         }
 
@@ -30,6 +32,12 @@ namespace TeeSquare.WebApi.Reflection
         public BindingFlags PropertyFlags { get; set; } = BindingFlags.GetProperty
                                                           | BindingFlags.Public
                                                           | BindingFlags.Instance;
+
+        public BindingFlags MethodFlags { get; set; } = BindingFlags.Instance
+                                                        | BindingFlags.Public
+                                                        | BindingFlags.DeclaredOnly;
+
+        public Func<Type, bool> ReflectMethods = type => false;
 
         public bool WriteEnumDescriptions { get; set; }
         public bool WriteEnumDescriptionGetters { get; set; }

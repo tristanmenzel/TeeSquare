@@ -10,6 +10,9 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.All" />
+        <PackageReference Include="Microsoft.AspNetCore.SignalR">
+          <Version>1.1.0</Version>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
@@ -17,7 +20,52 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\TeeSquare\TeeSquare.csproj" />
+      <Compile Remove="client\node_modules\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="client\node_modules\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="client\node_modules\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="client\node_modules\**" />
+      <Content Include="client\favicon.ico" />
+      <Content Include="client\index.html" />
+      <Content Include="client\main-es2015.js" />
+      <Content Include="client\main-es2015.js.map" />
+      <Content Include="client\main-es5.js" />
+      <Content Include="client\main-es5.js.map" />
+      <Content Include="client\polyfills-es2015.js" />
+      <Content Include="client\polyfills-es2015.js.map" />
+      <Content Include="client\polyfills-es5.js" />
+      <Content Include="client\polyfills-es5.js.map" />
+      <Content Include="client\runtime-es2015.js" />
+      <Content Include="client\runtime-es2015.js.map" />
+      <Content Include="client\runtime-es5.js" />
+      <Content Include="client\runtime-es5.js.map" />
+      <Content Include="client\styles-es2015.js" />
+      <Content Include="client\styles-es2015.js.map" />
+      <Content Include="client\styles-es5.js" />
+      <Content Include="client\styles-es5.js.map" />
+      <Content Include="client\vendor-es2015.js" />
+      <Content Include="client\vendor-es2015.js.map" />
+      <Content Include="client\vendor-es5.js" />
+      <Content Include="client\vendor-es5.js.map" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="client\angular.json" />
+      <_ContentIncludedByDefault Remove="client\e2e\tsconfig.json" />
+      <_ContentIncludedByDefault Remove="client\package-lock.json" />
+      <_ContentIncludedByDefault Remove="client\package.json" />
+      <_ContentIncludedByDefault Remove="client\tsconfig.app.json" />
+      <_ContentIncludedByDefault Remove="client\tsconfig.json" />
+      <_ContentIncludedByDefault Remove="client\tsconfig.spec.json" />
+      <_ContentIncludedByDefault Remove="client\tslint.json" />
     </ItemGroup>
 
 </Project>

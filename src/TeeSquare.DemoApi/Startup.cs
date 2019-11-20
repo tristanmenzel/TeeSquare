@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TeeSquare.DemoApi.Hubs;
 
 namespace TeeSquare.DemoApi
 {
@@ -17,7 +18,9 @@ namespace TeeSquare.DemoApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSpaStaticFiles(options => options.RootPath = "client");
             services.AddMvc();
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -29,6 +32,16 @@ namespace TeeSquare.DemoApi
             }
 
             app.UseMvc();
+            app.UseSignalR(builder => { builder.MapHub<ApplicationHub>("/app-hub"); });
+            app.UseSpaStaticFiles();
+
+            app.UseSpa(spa =>
+            {
+                if (env.IsDevelopment())
+                {
+                    spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
+                }
+            });
         }
     }
 }
