@@ -12,11 +12,11 @@ namespace TeeSquare.Reflection
     {
         private readonly Namer _namer;
         private readonly HashSet<Type> _types = new HashSet<Type>();
-        private readonly WriterOptions _options;
+        private readonly IReflectiveWriterOptions _options;
 
-        public ReflectiveWriter(WriterOptions options = null)
+        public ReflectiveWriter(IReflectiveWriterOptions options = null)
         {
-            _options = options ?? new WriterOptions();
+            _options = options ?? new ReflectiveWriterOptions();
             _namer = _options.Namer;
         }
 

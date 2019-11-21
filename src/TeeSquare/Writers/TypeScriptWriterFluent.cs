@@ -1,30 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using TeeSquare.Writers;
+using System.Linq;
+using TeeSquare.TypeMetadata;
 
-namespace TeeSquare.Reflection
+namespace TeeSquare.Writers
 {
-    public class ReflectiveWriterFluent
+    public class TypeScriptWriterFluent
     {
-        private readonly ReflectiveWriterOptions _options;
-        private readonly List<Type> _types;
+        private List<Action<TypeScriptWriter>> _snippets = new List<Action<TypeScriptWriter>>();
+        private TypeScriptWriterOptions _options = new TypeScriptWriterOptions();
 
-        public ReflectiveWriterFluent()
-        {
-            _options = new ReflectiveWriterOptions();
-            _types = new List<Type>();
-        }
-
-        public ReflectiveWriterFluent Configure(Action<ReflectiveWriterOptions> configure)
+        public TypeScriptWriterFluent Configure(Action<TypeScriptWriterOptions> configure)
         {
             configure(_options);
             return this;
         }
 
-        public ReflectiveWriterFluent AddTypes(params Type[] types)
+        public TypeScriptWriterFluent Add(Action<TypeScriptWriter> snippet)
         {
-            _types.AddRange(types);
+            _snippets.Add(snippet);
             return this;
         }
 
@@ -38,10 +33,10 @@ namespace TeeSquare.Reflection
 
         public void WriteToStream(Stream stream)
         {
-            var tsWriter = new TypeScriptWriter(stream,_options);
-            var rWriter = new ReflectiveWriter(_options);
-            rWriter.AddTypes(_types.ToArray());
-            rWriter.WriteTo(tsWriter);
+            var tsWriter = new TypeScriptWriter(stream,
+                _options);
+            _snippets.ForEach(s => s(tsWriter));
+            tsWriter.Flush();
         }
 
         public string WriteToString()

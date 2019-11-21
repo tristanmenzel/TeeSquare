@@ -1,4 +1,5 @@
 ﻿using TeeSquare.Reflection;
+using TeeSquare.Writers;
 
 namespace TeeSquare
 {
@@ -7,6 +8,11 @@ namespace TeeSquare
         public static ReflectiveWriterFluent ReflectiveWriter()
         {
             return new ReflectiveWriterFluent();
+        }
+
+        public static TypeScriptWriterFluent StandardWriter()
+        {
+            return new TypeScriptWriterFluent();
         }
     }
 }

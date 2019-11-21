@@ -3,12 +3,11 @@ using System.Linq;
 using System.Reflection;
 using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
-using MethodInfo = System.Reflection.MethodInfo;
 using PropertyInfo = System.Reflection.PropertyInfo;
 
 namespace TeeSquare.Reflection
 {
-    public class WriterOptions
+    public class ReflectiveWriterOptions : IReflectiveWriterOptions, ITypeScriptWriterOptions
     {
         public Namer Namer { get; set; } = new Namer();
 
@@ -22,7 +21,7 @@ namespace TeeSquare.Reflection
 
         public Func<Type, bool> ReflectMethods { get; set; } = type => false;
 
-        public string IndentChars { get; set; } = "  ";
+        public string IndentCharacters { get; set; } = "  ";
 
 
 

@@ -4,7 +4,7 @@ namespace TeeSquare.Mobx
 {
     public class TeeSquareMobx
     {
-        public static void ConfigureMobxWriter(WriterOptions options)
+        public static void ConfigureMobxWriter(ReflectiveWriterOptions options)
         {
             var mobxWriterFactory = new MobxModelWriterFactory();
             options.ComplexTypeStrategy = (writer, typeInfo) =>

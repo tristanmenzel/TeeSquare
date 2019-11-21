@@ -1,33 +1,27 @@
 using System;
 using System.Reflection;
+using Microsoft.AspNetCore.Http.Features;
 using TeeSquare.Reflection;
 using TeeSquare.Writers;
 
 namespace TeeSquare.WebApi.Reflection
 {
-    public class RouteReflectorOptions
+    public interface IRouteReflectorOptions : IReflectiveWriterOptions
     {
-        public WriterOptions BuildWriterOptions()
-        {
-            return new WriterOptions
-            {
-                Namer = Namer,
-                PropertyFlags = PropertyFlags,
-                IndentChars = IndentChars,
-                DiscriminatorPropertyPredicate = DiscriminatorPropertyPredicate,
-                DiscriminatorPropertyValueProvider = DiscriminatorPropertyValueProvider,
-                EnumWriterFactory = EnumWriterFactory,
-                InterfaceWriterFactory = InterfaceWriterFactory,
-                ClassWriterFactory = ClassWriterFactory,
-                FunctionWriterFactory = FunctionWriterFactory,
-                ComplexTypeStrategy = ComplexTypeStrategy,
-                WriteHeader = WriteHeader,
-                MethodFlags = MethodFlags,
-                ReflectMethods = ReflectMethods
-            };
-        }
+        RouteNamer Namer { get; set; }
+        bool EmitRequestTypesAndHelpers { get; set; }
+        GetApiReturnType GetApiReturnTypeStrategy { get; set; }
+        BuildRoute BuildRouteStrategy { get; set; }
+        (string[] types, string path)[] Imports { get; set; }
+    }
+
+    public class RouteReflectorOptions: IRouteReflectorOptions
+    {
+
 
         public RouteNamer Namer { get; set; } = new RouteNamer();
+
+        Namer IReflectiveWriterOptions.Namer => Namer;
 
         public BindingFlags PropertyFlags { get; set; } = BindingFlags.GetProperty
                                                           | BindingFlags.Public
@@ -38,10 +32,10 @@ namespace TeeSquare.WebApi.Reflection
                                                         | BindingFlags.DeclaredOnly;
 
         public Func<Type, bool> ReflectMethods { get; set; }= type => false;
+        public string IndentCharacters { get; set; } = "  ";
 
         public bool WriteEnumDescriptions { get; set; }
         public bool WriteEnumDescriptionGetters { get; set; }
-        public string IndentChars { get; set; } = "  ";
         public bool WriteEnumAllValuesConst { get; set; }
         public bool EmitRequestTypesAndHelpers { get; set; } = true;
 
@@ -66,10 +60,10 @@ namespace TeeSquare.WebApi.Reflection
         public (string[] types, string path)[] Imports { get; set; }
 
         public DiscriminatorPropertyPredicate DiscriminatorPropertyPredicate { get; set; } =
-            WriterOptions.DefaultDiscriminator;
+            ReflectiveWriterOptions.DefaultDiscriminator;
 
         public DiscriminatorPropertyValueProvider DiscriminatorPropertyValueProvider { get; set; } =
-            WriterOptions.DefaultDiscriminatorValueProvider;
+            ReflectiveWriterOptions.DefaultDiscriminatorValueProvider;
 
     }
 

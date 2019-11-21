@@ -49,12 +49,7 @@ namespace TeeSquare.WebApi
 
         public void WriteToStream(Stream stream)
         {
-            var tsWriter = new TypeScriptWriter(stream,
-                _options.InterfaceWriterFactory,
-                _options.ClassWriterFactory,
-                _options.EnumWriterFactory,
-                _options.FunctionWriterFactory,
-                _options.IndentChars);
+            var tsWriter = new TypeScriptWriter(stream,_options);
 
             var webApiWriter = new RouteReflector(_options);
 

@@ -1,115 +1,34 @@
 # TeeSquare
 
-A fluent API for writing formatted typescript code. 
+## TeeSquare Base Library
 
-## Writing an interface
+A fluent API for writing formatted typescript code as well as a reflective writer for emitting typescript equivalents of dotnet types.
 
-```cs
-using (var writer = new TypeScriptWriter(File.Open("demo.ts", FileMode.OpenOrCreate)))
-{
-    writer.WriteInterface("FunFunInterface", "TOne", "TTwo")
-        .With(i =>
-        {
-            i.Method("TestMethod")
-                .WithReturnType("string")
-                .WithParams(p =>
-                {
-                    p.Param("a", "number");
-                    p.Param("b", "Enumerable", "number");
-                });
-            i.Property("ValueOfTwo", "TTwo");
-            i.Property("MaybeItsOne", "Maybe", "TOne");
-        });
-}
-```
-**Output**
-```ts
-export interface FunFunInterface<TOne, TTwo> {
-  ValueOfTwo: TTwo;
-  MaybeItsOne: Maybe<TOne>;
-  TestMethod( a: number, b: Enumerable<number>): string;
-}
-```
+For documentation, see the unit tests
 
-## Writing a class
+[Code Writer](https://github.com/tristanmenzel/TeeSquare/blob/master/src/TeeSquare.Tests/CodeWriterTests/CodeWriterTests.cs)
+ - Low level writer which provides some assistance with indenting
 
-```cs
-using (var writer = new TypeScriptWriter(File.Open("demo.ts", FileMode.OpenOrCreate)))
-{
-    writer.WriteClass("AppleService")
-        .With(c =>
-        {
-            c.Property("banana", "string");
-            c.Method("getApplePie")
-                .WithReturnType("string")
-                .WithParams(p =>
-                {
-                    p.Param("numApples", "number");
-                    p.Param("typeOfApple", "string");
-                })
-                .WithBody(x => { x.WriteLine("return \"No apples here\";"); });
-            c.Method("haveFun")
-                .WithParams(p => { p.Param("amountOfFun", "number"); })
-                .Static()
-                .WithBody(x => x.WriteLine("console.log(\"Having so much fun\", amountOfFun);"));
-        });
-}
-```
+[Type Script Writer](https://github.com/tristanmenzel/TeeSquare/blob/master/src/TeeSquare.Tests/TypeScriptWriterTest/TypeScriptWriterTests.cs)
+ - Fluent abstraction for building types
+ 
+[Reflective Writer](https://github.com/tristanmenzel/TeeSquare/blob/master/src/TeeSquare.Tests/Reflection/ReflectiveWriterTests.cs)
+ - Reflects dotnet types and outputs typescript versions
+ 
+## TeeSquare WebApi
 
-**Output**
-```ts
-export class AppleService {
-  banana: string;
-  getApplePie(numApples: number, typeOfApple: string): string {
-    return "No apples here";
-  }
-  static haveFun(amountOfFun: number): void {
-    console.log("Having so much fun", amountOfFun);
-  }
-}
-```
+Additional utilities for reflecting webapi routes and outputting a `RequestFactory` with methods for each api that is discovered
 
-## Writing an enum
+[RouteReflector](https://github.com/tristanmenzel/TeeSquare/tree/master/src/TeeSquare.WebApi.Tests)
 
-You can optionally provide descriptions for enum values and they will be written as an object map such that you can access the value by going `MyEnumDesc[MyEnum.SomeValue]`
+## TeeSquare MobX
 
-```cs
-using (var writer = new TypeScriptWriter(File.Open("demo.ts", FileMode.OpenOrCreate)))
-{
-    writer.WriteEnum("Fruits")
-        .WithValues(e =>
-        {
-            e.Value("Apple", 0);
-            e.Value("Banana", 1);
-            e.Value("Cantelope", 2);
-        });
+Extensions of the base library for outputting MobX State Tree models
 
-    writer.WriteEnum("Things")
-        .WithValues(e =>
-        {
-            e.Value("ThingOne", "ValueOne", "Description of thing one");
-            e.Value("ThingTwo", "ValueTwo", "Description of thing two");
-            e.Value("ThingThree", "ValueThree", "Description of thing three");
-        });
-}
-```
-**Output**
-```ts
-export enum Fruits {
-  Apple = 0,
-  Banana = 1,
-  Cantelope = 2
-}
-export enum Things {
-  ThingOne = "ValueOne",
-  ThingTwo = "ValueTwo",
-  ThingThree = "ValueThree"
-}
-export const ThingsDesc = {
-  "ValueOne": `Description of thing one`,
-  "ValueTwo": `Description of thing two`,
-  "ValueThree": `Description of thing three`
-}
-```
+[MobX](https://github.com/tristanmenzel/TeeSquare/blob/master/src/TeeSquare.Mobx.Tests/MobxModelTests.cs)
+
+
+
+ 
 
 
