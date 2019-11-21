@@ -151,10 +151,8 @@ namespace TeeSquare.WebApi.Reflection
                 .Trim('/');
         }
 
-        public void WriteTo(TypeScriptWriter writer)
+        private void WriteRequestTypesAndHelpers(TypeScriptWriter writer)
         {
-            _options.WriteHeader(writer);
-
             writer.WriteInterface("GetRequest", new TypeReference("TResponse"))
                 .Configure(i =>
                 {
@@ -197,72 +195,95 @@ namespace TeeSquare.WebApi.Reflection
                     w.Deindent();
                     w.WriteLine("return q && `?${q}` || '';");
                 });
+        }
 
-            writer.WriteClass("RequestFactory")
-                .Configure(c =>
+        public void WriteTo(TypeScriptWriter writer)
+        {
+            if (_options.Imports != null)
+            {
+                foreach (var import in _options.Imports)
                 {
-                    c.MakeAbstract();
+                    writer.WriteLine($"import {{ {String.Join(", ", import.types)} }} from '{import.path}';");
+                }
+            }
 
+            _options.WriteHeader(writer);
 
-                    foreach (var req in _requests)
+            if (_options.EmitRequestTypesAndHelpers)
+            {
+                WriteRequestTypesAndHelpers(writer);
+            }
+
+            if (_requests.Any())
+            {
+                writer.WriteClass("RequestFactory")
+                    .Configure(c =>
                     {
-                        var methodBuilder = c.AddMethod($"{req.Name}{req.Method.GetName()}")
-                            .Static();
+                        c.MakeAbstract();
 
-                        if (req.Method.HasRequestBody())
+
+                        foreach (var req in _requests)
                         {
-                            methodBuilder
-                                .WithReturnType(new TypeReference($"{req.Method.GetName()}Request",
-                                    new[]
-                                    {
-                                        _options.Namer.Type(req.GetRequestBodyType()),
-                                        _options.Namer.Type(req.ResponseType)
-                                    }));
-                        }
-                        else
-                        {
-                            methodBuilder
-                                .WithReturnType(new TypeReference($"{req.Method.GetName()}Request",
-                                    new[]
-                                    {
-                                        _options.Namer.Type(req.ResponseType)
-                                    }));
-                        }
+                            var methodBuilder = c.AddMethod($"{req.Name}{req.Method.GetName()}")
+                                .Static();
 
-                        methodBuilder.WithParams(p =>
+                            if (req.Method.HasRequestBody())
                             {
-                                foreach (var rp in req.RequestParams.Where(x => x.Kind != ParameterKind.Body))
-
-                                {
-                                    p.Param(rp.Name, _options.Namer.Type(rp.Type, rp.Kind == ParameterKind.Query));
-                                }
-
-                                if (req.Method.HasRequestBody())
-                                    p.Param("data", _options.Namer.Type(req.GetRequestBodyType()));
-                            })
-                            .WithBody(w =>
+                                methodBuilder
+                                    .WithReturnType(new TypeReference($"{req.Method.GetName()}Request",
+                                        new[]
+                                        {
+                                            _options.Namer.Type(req.GetRequestBodyType()),
+                                            _options.Namer.Type(req.ResponseType)
+                                        }));
+                            }
+                            else
                             {
-                                var queryParams = req.RequestParams.Where(x => x.Kind == ParameterKind.Query).ToArray();
-                                if (queryParams.Any())
-                                {
-                                    w.Write("const query = toQuery({", true);
-                                    w.WriteDelimited(queryParams,
-                                        (p, wr) => wr.Write(p.Name), ", ");
-                                    w.WriteLine("});", false);
-                                }
+                                methodBuilder
+                                    .WithReturnType(new TypeReference($"{req.Method.GetName()}Request",
+                                        new[]
+                                        {
+                                            _options.Namer.Type(req.ResponseType)
+                                        }));
+                            }
 
-                                w.WriteLine("return {");
-                                w.Indent();
-                                w.WriteLine($"method: '{req.Method.GetName().ToUpper()}',");
-                                if (req.Method.HasRequestBody())
-                                    w.WriteLine("data,");
-                                w.WriteLine(
-                                    $"url: `{req.Path.Replace("{", "${")}{(queryParams.Any() ? "${query}" : "")}`");
-                                w.Deindent();
-                                w.WriteLine("};");
-                            });
-                    }
-                });
+                            methodBuilder.WithParams(p =>
+                                {
+                                    foreach (var rp in req.RequestParams.Where(x => x.Kind != ParameterKind.Body))
+
+                                    {
+                                        p.Param(rp.Name, _options.Namer.Type(rp.Type, rp.Kind == ParameterKind.Query));
+                                    }
+
+                                    if (req.Method.HasRequestBody())
+                                        p.Param("data", _options.Namer.Type(req.GetRequestBodyType()));
+                                })
+                                .WithBody(w =>
+                                {
+                                    var queryParams = req.RequestParams.Where(x => x.Kind == ParameterKind.Query)
+                                        .ToArray();
+                                    if (queryParams.Any())
+                                    {
+                                        w.Write("const query = toQuery({", true);
+                                        w.WriteDelimited(queryParams,
+                                            (p, wr) => wr.Write(p.Name), ", ");
+                                        w.WriteLine("});", false);
+                                    }
+
+                                    w.WriteLine("return {");
+                                    w.Indent();
+                                    w.WriteLine($"method: '{req.Method.GetName().ToUpper()}',");
+                                    if (req.Method.HasRequestBody())
+                                        w.WriteLine("data,");
+                                    w.WriteLine(
+                                        $"url: `{req.Path.Replace("{", "${")}{(queryParams.Any() ? "${query}" : "")}`");
+                                    w.Deindent();
+                                    w.WriteLine("};");
+                                });
+                        }
+                    });
+            }
+
             var types = _requests.Select(r => r.ResponseType)
                 .Union(_requests.SelectMany(r => r.RequestParams.Select(p => p.Type)))
                 .Union(_additionalTypes);

@@ -114,9 +114,9 @@ namespace TeeSquare.Writers
             return enumInfo;
         }
 
-        public void WriteLine()
+        public void WriteLine(string line = "")
         {
-            _parts.Add(writer => writer.WriteLine(""));
+            _parts.Add(writer => writer.WriteLine(line));
         }
     }
 }

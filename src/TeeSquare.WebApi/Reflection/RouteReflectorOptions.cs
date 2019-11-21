@@ -37,12 +37,13 @@ namespace TeeSquare.WebApi.Reflection
                                                         | BindingFlags.Public
                                                         | BindingFlags.DeclaredOnly;
 
-        public Func<Type, bool> ReflectMethods = type => false;
+        public Func<Type, bool> ReflectMethods { get; set; }= type => false;
 
         public bool WriteEnumDescriptions { get; set; }
         public bool WriteEnumDescriptionGetters { get; set; }
         public string IndentChars { get; set; } = "  ";
         public bool WriteEnumAllValuesConst { get; set; }
+        public bool EmitRequestTypesAndHelpers { get; set; } = true;
 
 
         public IEnumWriterFactory EnumWriterFactory { get; set; } = new EnumWriterFactory();
@@ -61,6 +62,8 @@ namespace TeeSquare.WebApi.Reflection
             writer.WriteComment("Generated Code");
             writer.WriteLine();
         };
+
+        public (string[] types, string path)[] Imports { get; set; }
 
         public DiscriminatorPropertyPredicate DiscriminatorPropertyPredicate { get; set; } =
             WriterOptions.DefaultDiscriminator;

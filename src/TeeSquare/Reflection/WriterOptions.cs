@@ -20,7 +20,7 @@ namespace TeeSquare.Reflection
                                                         | BindingFlags.Public
                                                         | BindingFlags.DeclaredOnly;
 
-        public Func<Type, bool> ReflectMethods = type => false;
+        public Func<Type, bool> ReflectMethods { get; set; } = type => false;
 
         public string IndentChars { get; set; } = "  ";
 
