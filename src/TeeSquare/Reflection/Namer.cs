@@ -11,7 +11,7 @@ namespace TeeSquare.Reflection
     public class Namer
     {
         public bool RemovePrefixFromInterfaces { get; set; } = true;
-        private readonly NamingConventions _namingConventions;
+        public NamingConventions NamingConventions { get; set; } = NamingConventions.Default;
 
         private readonly IDictionary<Type, (string tsType, TsTypeFormat format)> _staticMappings =
             new Dictionary<Type, (string tsType, TsTypeFormat format)>
@@ -40,11 +40,6 @@ namespace TeeSquare.Reflection
             return _staticMappings.TryGetValue(type, out typeMapping);
         }
 
-        public Namer(NamingConventions namingConventions = null)
-        {
-            _namingConventions = namingConventions ?? NamingConventions.Default;
-        }
-
         public virtual ITypeReference Type(Type type, bool optional = false)
         {
             if (TryGetStaticMapping(type, out var mapping))
@@ -61,7 +56,7 @@ namespace TeeSquare.Reflection
 
             if (type.IsEnum)
             {
-                return new TypeReference(ToCase(type.Name, _namingConventions.Types))
+                return new TypeReference(ToCase(type.Name, NamingConventions.Types))
                     {Enum = true, Optional = optional};
             }
 
@@ -99,12 +94,12 @@ namespace TeeSquare.Reflection
 
         public virtual string PropertyName(PropertyInfo propertyInfo)
         {
-            return ToCase(propertyInfo.Name, _namingConventions.Properties);
+            return ToCase(propertyInfo.Name, NamingConventions.Properties);
         }
 
         public virtual string MethodName(MethodInfo methodInfo)
         {
-            return ToCase(methodInfo.Name, _namingConventions.Methods);
+            return ToCase(methodInfo.Name, NamingConventions.Methods);
         }
 
         public virtual string TypeName(Type type)
@@ -115,15 +110,19 @@ namespace TeeSquare.Reflection
             if (type.IsInterface && RemovePrefixFromInterfaces && name.StartsWith("I"))
                 name = name.Substring(1);
 
-            return ToCase(name, _namingConventions.Types);
+            return ToCase(name, NamingConventions.Types);
         }
 
 
         protected virtual string ToCase(string name, NameConvention nameConvention)
         {
             if (string.IsNullOrEmpty(name)) return name;
-            name = new Regex(@"\-([a-z]?)", RegexOptions.IgnoreCase)
-                .Replace(name, m => m.Groups[1].Value.ToUpper());
+            if (name.Contains('-'))
+            {
+                name = new Regex(@"\-([a-z]?)", RegexOptions.IgnoreCase)
+                    .Replace(name, m => m.Groups[1].Value.ToUpper());
+            }
+
             switch (nameConvention)
             {
                 case NameConvention.CamelCase:
@@ -137,7 +136,7 @@ namespace TeeSquare.Reflection
 
         public string EnumName(string name)
         {
-            return ToCase(name, _namingConventions.EnumsMembers);
+            return ToCase(name, NamingConventions.EnumsMembers);
         }
     }
 }

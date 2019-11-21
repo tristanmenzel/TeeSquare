@@ -1,5 +1,6 @@
 ﻿using BlurkCompare;
 using NUnit.Framework;
+using TeeSquare.Reflection;
 using TeeSquare.Tests.Reflection.FakeDomain;
 using TeeSquare.Writers;
 
@@ -56,6 +57,19 @@ namespace TeeSquare.Tests.Reflection
         public void SmallTree()
         {
             var res = TeeSquareFluent.ReflectiveWriter()
+                .AddTypes(typeof(Name))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+        [Test]
+        public void OriginalCase()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .Configure(options => { options.Namer.NamingConventions.Properties = NameConvention.Original; })
                 .AddTypes(typeof(Name))
                 .WriteToString();
 
