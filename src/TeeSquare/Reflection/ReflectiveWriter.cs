@@ -203,7 +203,8 @@ namespace TeeSquare.Reflection
                         if (_options.ReflectMethods(type))
                         {
                             foreach (var mi in type.GetMethods(_options.MethodFlags)
-                                .Where(m => !m.IsSpecialName))
+                                .Where(m => !m.IsSpecialName)
+                                .Where(m => _options.ReflectMethod(type, m)))
                             {
                                 i.AddMethod(mi.Name)
                                     .WithReturnType(Namer.Type(mi.ReturnType))

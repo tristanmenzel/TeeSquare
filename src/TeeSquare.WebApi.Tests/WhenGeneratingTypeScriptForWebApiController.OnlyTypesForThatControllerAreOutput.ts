@@ -27,20 +27,20 @@ export const toQuery = (o: {[key: string]: any}): string => {
   return q && `?${q}` || '';
 };
 export abstract class RequestFactory {
-  static ApiTestByIdGet(id: number): GetRequest<TestDto> {
+  static GetApiTestById(id: number): GetRequest<TestDto> {
     return {
       method: 'GET',
       url: `api/test/${id}`
     };
   }
-  static ApiTestPost(data: TestDto): PostRequest<TestDto, number> {
+  static PostApiTest(data: TestDto): PostRequest<TestDto, number> {
     return {
       method: 'POST',
       data,
       url: `api/test`
     };
   }
-  static ApiTestByIdPut(id: number, data: TestDto): PutRequest<TestDto, unknown> {
+  static PutApiTestById(id: number, data: TestDto): PutRequest<TestDto, unknown> {
     return {
       method: 'PUT',
       data,

@@ -31,4 +31,5 @@ export interface Book {
 }
 export interface SampleApi {
   GetBook(id: number): Book;
+  SaveBook(book: Book): void;
 }

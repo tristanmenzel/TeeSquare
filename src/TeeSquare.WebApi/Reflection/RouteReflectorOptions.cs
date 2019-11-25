@@ -7,10 +7,29 @@ namespace TeeSquare.WebApi.Reflection
 {
     public interface IRouteReflectorOptions : IReflectiveWriterOptions
     {
+        /// <summary>
+        /// A namer instance used to determine the name of a dotnet Type in TypeScript
+        /// </summary>
         new RouteNamer Namer { get; }
+        /// <summary>
+        /// An optional alternative namer used to determine the name used for imports. If set,
+        /// types will be imported with ImportName as Name
+        /// </summary>
         new RouteNamer ImportNamer { get; }
+        /// <summary>
+        /// The strategy to use to determine the return type of an api method. Default is to use
+        /// the return value.
+        /// </summary>
         GetApiReturnType GetApiReturnTypeStrategy { get; }
+        /// <summary>
+        /// The strategy to use to determine the route of an api method. Default is to use
+        /// dotnetcore Route attributes.
+        /// </summary>
         BuildRoute BuildRouteStrategy { get; }
+        /// <summary>
+        /// The option for obtaining request helper types. Default is to emit them with each file.
+        /// They can alternatively be imported. 
+        /// </summary>
         RequestHelperTypeOptions RequestHelperTypeOption { get; }
     }
 
@@ -58,6 +77,7 @@ namespace TeeSquare.WebApi.Reflection
                                                         | BindingFlags.DeclaredOnly;
 
         public Func<Type, bool> ReflectMethods { get; set; } = type => false;
+        public Func<Type, MethodInfo, bool> ReflectMethod { get; set; } = (type, mi) => true;
         public string IndentCharacters { get; set; } = "  ";
 
         public bool WriteEnumDescriptions { get; set; }

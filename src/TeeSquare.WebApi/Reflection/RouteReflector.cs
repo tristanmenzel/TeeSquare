@@ -51,7 +51,7 @@ namespace TeeSquare.WebApi.Reflection
                 var requestParams = GetRequestParams(action, route, method);
 
                 var returnType = _options.GetApiReturnTypeStrategy(controller, action);
-                _requests.Add(factory(_options.Namer.RouteName(controller, action, route),
+                _requests.Add(factory(_options.Namer.RouteName(controller, action, route, method),
                     route,
                     returnType,
                     requestParams
@@ -227,7 +227,7 @@ namespace TeeSquare.WebApi.Reflection
 
                         foreach (var req in _requests)
                         {
-                            var methodBuilder = c.AddMethod($"{req.Name}{req.Method.GetName()}")
+                            var methodBuilder = c.AddMethod($"{req.Name}")
                                 .Static();
 
                             if (req.Method.HasRequestBody())

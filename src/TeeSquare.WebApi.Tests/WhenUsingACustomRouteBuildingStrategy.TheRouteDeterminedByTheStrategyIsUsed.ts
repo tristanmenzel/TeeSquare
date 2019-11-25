@@ -27,7 +27,7 @@ export const toQuery = (o: {[key: string]: any}): string => {
   return q && `?${q}` || '';
 };
 export abstract class RequestFactory {
-  static PrefixApiReturnTestGet(): GetRequest<unknown> {
+  static GetPrefixApiReturnTest(): GetRequest<unknown> {
     return {
       method: 'GET',
       url: `prefix/api/return-test`

@@ -3,24 +3,28 @@ using System.Linq;
 using System.Reflection;
 using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
+using MethodInfo = System.Reflection.MethodInfo;
 using PropertyInfo = System.Reflection.PropertyInfo;
 
 namespace TeeSquare.Reflection
 {
     public class ReflectiveWriterOptions : IReflectiveWriterOptions, ITypeScriptWriterOptions
     {
+
         public Namer Namer { get; set; } = new Namer();
         public Namer ImportNamer { get; set; } = null;
 
-        public BindingFlags PropertyFlags { get; set; } = BindingFlags.GetProperty
+         public BindingFlags PropertyFlags { get; set; } = BindingFlags.GetProperty
                                                           | BindingFlags.Public
                                                           | BindingFlags.Instance;
 
-        public BindingFlags MethodFlags { get; set; } = BindingFlags.Instance
+       public BindingFlags MethodFlags { get; set; } = BindingFlags.Instance
                                                         | BindingFlags.Public
                                                         | BindingFlags.DeclaredOnly;
 
         public Func<Type, bool> ReflectMethods { get; set; } = type => false;
+
+        public Func<Type, MethodInfo, bool> ReflectMethod { get; set; } = (type, mi) => true;
 
         public string IndentCharacters { get; set; } = "  ";
 

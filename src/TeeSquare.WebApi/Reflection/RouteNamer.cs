@@ -18,7 +18,7 @@ namespace TeeSquare.WebApi.Reflection
             return base.Type(type, optional);
         }
 
-        public virtual string RouteName(Type controller, MethodInfo action, string route)
+        public virtual string RouteName(Type controller, MethodInfo action, string route, HttpMethod method)
         {
             var parts = route.Split('/')
                 .Select(part =>
@@ -30,7 +30,7 @@ namespace TeeSquare.WebApi.Reflection
 
                     return ToCase(part, NameConvention.PascalCase);
                 });
-            return string.Join("", parts).Replace("[controller]", ControllerName(controller));
+            return method.GetName() + string.Join("", parts).Replace("[controller]", ControllerName(controller));
         }
 
         public string ControllerName(Type controller)
