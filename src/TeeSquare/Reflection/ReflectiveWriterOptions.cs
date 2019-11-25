@@ -10,6 +10,7 @@ namespace TeeSquare.Reflection
     public class ReflectiveWriterOptions : IReflectiveWriterOptions, ITypeScriptWriterOptions
     {
         public Namer Namer { get; set; } = new Namer();
+        public Namer ImportNamer { get; set; } = null;
 
         public BindingFlags PropertyFlags { get; set; } = BindingFlags.GetProperty
                                                           | BindingFlags.Public
@@ -35,7 +36,7 @@ namespace TeeSquare.Reflection
 
         public WriteHeader WriteHeader { get; set; } = writer =>
         {
-            writer.WriteComment("Generated Code");
+            writer.WriteComment("Auto-generated Code - Do Not Edit");
             writer.WriteLine();
         };
 
@@ -43,6 +44,8 @@ namespace TeeSquare.Reflection
 
         public DiscriminatorPropertyValueProvider DiscriminatorPropertyValueProvider { get; set; } =
             DefaultDiscriminatorValueProvider;
+
+        public TypeCollection Types { get; set; } = new TypeCollection();
 
 
         public static bool DefaultDiscriminator(PropertyInfo property, Type parentType)

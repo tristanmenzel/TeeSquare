@@ -1,4 +1,4 @@
-// Generated Code
+// Auto-generated Code - Do Not Edit
 
 export enum Audience {
   Children = 0,

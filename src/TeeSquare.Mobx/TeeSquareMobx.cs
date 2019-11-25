@@ -9,7 +9,9 @@ namespace TeeSquare.Mobx
             var mobxWriterFactory = new MobxModelWriterFactory();
             options.ComplexTypeStrategy = (writer, typeInfo) =>
                 writer.WriteSnippet(mobxWriterFactory.BuildModel(typeInfo));
-            options.WriteHeader = (writer => { writer.WriteSnippet(mobxWriterFactory.BuildHeader()); });
+
+            options.Types.AddLiteralImport("mobx-state-tree", "types");
+            options.Types.AddLiteralImport("mobx-state-tree", "Instance");
         }
     }
 }

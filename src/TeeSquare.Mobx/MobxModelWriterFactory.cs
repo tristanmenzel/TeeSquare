@@ -9,8 +9,6 @@ namespace TeeSquare.Mobx
     public interface IMobxModelWriterFactory
     {
         CodeSnippetWriter BuildModel(IComplexTypeInfo typeInfo);
-
-        CodeSnippetWriter BuildHeader();
     }
 
     internal static class MobxTypeExtensions{
@@ -73,14 +71,5 @@ namespace TeeSquare.Mobx
             };
         }
 
-
-        public CodeSnippetWriter BuildHeader()
-        {
-            return writer =>
-            {
-                writer.WriteLine("import { types, Instance } from 'mobx-state-tree';");
-                writer.WriteLine("");
-            };
-        }
     }
 }

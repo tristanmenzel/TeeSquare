@@ -7,6 +7,7 @@ namespace TeeSquare.Reflection
     public interface IReflectiveWriterOptions: ITypeScriptWriterOptions
     {
         Namer Namer { get;  }
+        Namer ImportNamer { get; }
         BindingFlags PropertyFlags { get;  }
         BindingFlags MethodFlags { get;  }
         Func<Type, bool> ReflectMethods { get;  }
@@ -14,5 +15,6 @@ namespace TeeSquare.Reflection
         WriteHeader WriteHeader { get;  }
         DiscriminatorPropertyPredicate DiscriminatorPropertyPredicate { get;  }
         DiscriminatorPropertyValueProvider DiscriminatorPropertyValueProvider { get;  }
+        TypeCollection Types { get; }
     }
 }

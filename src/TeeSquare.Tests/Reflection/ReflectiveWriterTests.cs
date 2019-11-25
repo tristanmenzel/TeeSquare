@@ -1,7 +1,9 @@
-﻿using BlurkCompare;
+﻿using System;
+using BlurkCompare;
 using NUnit.Framework;
 using TeeSquare.Reflection;
 using TeeSquare.Tests.Reflection.FakeDomain;
+using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
 
 namespace TeeSquare.Tests.Reflection
@@ -63,6 +65,54 @@ namespace TeeSquare.Tests.Reflection
             Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
+        }
+
+        [Test]
+        public void ImportDependencies()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .AddImportedTypes(("./ReflectiveWriterTests.SmallTree", new[] {typeof(Title)}))
+                .AddTypes(typeof(Name))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+        [Test]
+        public void RenamedImports()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .Configure(options =>
+                {
+                    options.Namer = new CustomNamer();
+                    options.ImportNamer = new Namer();
+                })
+                .AddImportedTypes(("./ReflectiveWriterTests.EntireTree", new[]
+                {
+                    typeof(Location),
+                    typeof(Book),
+                }))
+                .AddTypes(typeof(Library))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+        public class CustomNamer : Namer
+        {
+            public override string TypeName(Type type)
+            {
+                if (type == typeof(Book))
+                {
+                    return $"{base.TypeName(type)}Renamed";
+                }
+
+                return base.TypeName(type);
+            }
         }
 
         [Test]
@@ -143,10 +193,7 @@ namespace TeeSquare.Tests.Reflection
         public void ReflectMethod()
         {
             var res = TeeSquareFluent.ReflectiveWriter()
-                .Configure(options =>
-                {
-                    options.ReflectMethods = t => t.IsInterface;
-                })
+                .Configure(options => { options.ReflectMethods = t => t.IsInterface; })
                 .AddTypes(typeof(ISampleApi))
                 .WriteToString();
 

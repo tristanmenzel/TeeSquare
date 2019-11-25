@@ -1,6 +1,8 @@
 using BlurkCompare;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using TeeSquare.DemoApi.Controllers;
+using TeeSquare.WebApi.Reflection;
 
 namespace TeeSquare.WebApi.Tests
 {
@@ -13,11 +15,7 @@ namespace TeeSquare.WebApi.Tests
             var res = TeeSquareWebApi.GenerateForControllers(typeof(TestController))
                 .Configure(options =>
                 {
-                    options.EmitRequestTypesAndHelpers = false;
-                    options.Imports = new[] {
-                        (types: new[] {"GetRequest", "PutRequest", "PostRequest", "DeleteRequest"},
-                           path:  "./WhenNoControllersAreReferenced.OnlySharedTypesAreEmitted")
-                    };
+                    options.RequestHelperTypeOption = RequestHelperTypeOptions.ImportTypes("./WhenNoControllersAreReferenced.OnlySharedTypesAreEmitted");
                 })
                 .WriteToString();
 

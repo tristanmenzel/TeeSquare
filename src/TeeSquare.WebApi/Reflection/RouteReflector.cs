@@ -199,17 +199,20 @@ namespace TeeSquare.WebApi.Reflection
 
         public void WriteTo(TypeScriptWriter writer)
         {
-            if (_options.Imports != null)
-            {
-                foreach (var import in _options.Imports)
-                {
-                    writer.WriteLine($"import {{ {String.Join(", ", import.types)} }} from '{import.path}';");
-                }
-            }
-
             _options.WriteHeader(writer);
 
-            if (_options.EmitRequestTypesAndHelpers)
+            var rWriter = new ReflectiveWriter(_options);
+
+            if (!_options.RequestHelperTypeOption.ShouldEmitTypes)
+            {
+                foreach(var type in _options.RequestHelperTypeOption.Types)
+                    _options.Types.AddLiteralImport(_options.RequestHelperTypeOption.ImportFrom, type);
+            }
+
+            rWriter.WriteImports(writer);
+
+
+            if (_options.RequestHelperTypeOption.ShouldEmitTypes)
             {
                 WriteRequestTypesAndHelpers(writer);
             }
@@ -288,7 +291,6 @@ namespace TeeSquare.WebApi.Reflection
                 .Union(_requests.SelectMany(r => r.RequestParams.Select(p => p.Type)))
                 .Union(_additionalTypes);
 
-            var rWriter = new ReflectiveWriter(_options);
             rWriter.AddTypes(types.ToArray());
             rWriter.WriteTo(writer, false);
         }

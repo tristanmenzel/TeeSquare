@@ -22,6 +22,17 @@ namespace TeeSquare.Reflection
             return this;
         }
 
+
+        public ReflectiveWriterFluent AddImportedTypes(params (string path, Type[] types)[] importedTypes)
+        {
+            foreach (var (path, types) in importedTypes)
+            foreach (var type in types)
+            {
+                _options.Types.AddImported(path, type);
+            }
+            return this;
+        }
+
         public ReflectiveWriterFluent AddTypes(params Type[] types)
         {
             _types.AddRange(types);
@@ -30,7 +41,7 @@ namespace TeeSquare.Reflection
 
         public void WriteToFile(string path)
         {
-            using(var f = File.Open(path, FileMode.Create))
+            using (var f = File.Open(path, FileMode.Create))
             {
                 WriteToStream(f);
             }
@@ -38,7 +49,7 @@ namespace TeeSquare.Reflection
 
         public void WriteToStream(Stream stream)
         {
-            var tsWriter = new TypeScriptWriter(stream,_options);
+            var tsWriter = new TypeScriptWriter(stream, _options);
             var rWriter = new ReflectiveWriter(_options);
             rWriter.AddTypes(_types.ToArray());
             rWriter.WriteTo(tsWriter);

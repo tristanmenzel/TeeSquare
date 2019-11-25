@@ -1,6 +1,5 @@
 using System;
 using System.Reflection;
-using Microsoft.AspNetCore.Http.Features;
 using TeeSquare.Reflection;
 using TeeSquare.Writers;
 
@@ -8,20 +7,47 @@ namespace TeeSquare.WebApi.Reflection
 {
     public interface IRouteReflectorOptions : IReflectiveWriterOptions
     {
-        RouteNamer Namer { get; set; }
-        bool EmitRequestTypesAndHelpers { get; set; }
-        GetApiReturnType GetApiReturnTypeStrategy { get; set; }
-        BuildRoute BuildRouteStrategy { get; set; }
-        (string[] types, string path)[] Imports { get; set; }
+        new RouteNamer Namer { get; }
+        new RouteNamer ImportNamer { get; }
+        GetApiReturnType GetApiReturnTypeStrategy { get; }
+        BuildRoute BuildRouteStrategy { get; }
+        RequestHelperTypeOptions RequestHelperTypeOption { get; }
     }
 
-    public class RouteReflectorOptions: IRouteReflectorOptions
+    public class RequestHelperTypeOptions
     {
+        private RequestHelperTypeOptions(bool emitTypes, string importFrom)
+        {
+            ShouldEmitTypes = emitTypes;
+            ImportFrom = importFrom;
+        }
 
+        public string[] Types => new[]
+        {
+            "GetRequest",
+            "PutRequest",
+            "PostRequest",
+            "DeleteRequest",
+            "toQuery"
+        };
 
+        public bool ShouldEmitTypes { get; }
+
+        public string ImportFrom { get; }
+
+        public static RequestHelperTypeOptions EmitTypes => new RequestHelperTypeOptions(true, null);
+
+        public static RequestHelperTypeOptions ImportTypes(string importFrom) =>
+            new RequestHelperTypeOptions(false, importFrom);
+    }
+
+    public class RouteReflectorOptions : IRouteReflectorOptions
+    {
         public RouteNamer Namer { get; set; } = new RouteNamer();
+        public RouteNamer ImportNamer { get; set; } = null;
 
         Namer IReflectiveWriterOptions.Namer => Namer;
+        Namer IReflectiveWriterOptions.ImportNamer => ImportNamer;
 
         public BindingFlags PropertyFlags { get; set; } = BindingFlags.GetProperty
                                                           | BindingFlags.Public
@@ -31,13 +57,12 @@ namespace TeeSquare.WebApi.Reflection
                                                         | BindingFlags.Public
                                                         | BindingFlags.DeclaredOnly;
 
-        public Func<Type, bool> ReflectMethods { get; set; }= type => false;
+        public Func<Type, bool> ReflectMethods { get; set; } = type => false;
         public string IndentCharacters { get; set; } = "  ";
 
         public bool WriteEnumDescriptions { get; set; }
         public bool WriteEnumDescriptionGetters { get; set; }
         public bool WriteEnumAllValuesConst { get; set; }
-        public bool EmitRequestTypesAndHelpers { get; set; } = true;
 
 
         public IEnumWriterFactory EnumWriterFactory { get; set; } = new EnumWriterFactory();
@@ -51,13 +76,13 @@ namespace TeeSquare.WebApi.Reflection
 
         public GetApiReturnType GetApiReturnTypeStrategy { get; set; } = RouteReflector.DefaultApiReturnTypeStrategy;
         public BuildRoute BuildRouteStrategy { get; set; } = RouteReflector.DefaultBuildRouteStrategy;
+        public RequestHelperTypeOptions RequestHelperTypeOption { get; set; } = RequestHelperTypeOptions.EmitTypes;
+
         public WriteHeader WriteHeader { get; set; } = writer =>
         {
-            writer.WriteComment("Generated Code");
+            writer.WriteComment("Auto-generated Code - Do Not Edit");
             writer.WriteLine();
         };
-
-        public (string[] types, string path)[] Imports { get; set; }
 
         public DiscriminatorPropertyPredicate DiscriminatorPropertyPredicate { get; set; } =
             ReflectiveWriterOptions.DefaultDiscriminator;
@@ -65,6 +90,7 @@ namespace TeeSquare.WebApi.Reflection
         public DiscriminatorPropertyValueProvider DiscriminatorPropertyValueProvider { get; set; } =
             ReflectiveWriterOptions.DefaultDiscriminatorValueProvider;
 
+        public TypeCollection Types { get; set; } = new TypeCollection();
     }
 
     public delegate Type GetApiReturnType(Type controller, MethodInfo action);
