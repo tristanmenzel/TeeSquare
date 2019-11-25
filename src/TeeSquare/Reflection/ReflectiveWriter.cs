@@ -100,6 +100,7 @@ namespace TeeSquare.Reflection
             var methodDependencies = type
                 .GetMethods(_options.MethodFlags)
                 .Where(m => !m.IsSpecialName)
+                .Where(m => _options.ReflectMethod(type, m))
                 .SelectMany(m => m.GetParameters().Select(p => p.ParameterType).Union(new[] {m.ReturnType}))
                 .Where(m => m != typeof(void))
                 .ToArray();
