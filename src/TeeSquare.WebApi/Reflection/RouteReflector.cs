@@ -47,7 +47,7 @@ namespace TeeSquare.WebApi.Reflection
             {
                 var route = _options.BuildRouteStrategy(controller, action);
 
-                var (factory, method) = GetRequestFactory(action);
+                var (factory, method) = _options.GetHttpMethodAndRequestFactoryStrategy(controller, action);
                 var requestParams = GetRequestParams(action, route, method);
 
                 var returnType = _options.GetApiReturnTypeStrategy(controller, action);
@@ -106,7 +106,8 @@ namespace TeeSquare.WebApi.Reflection
                    && !type.IsValueType;
         }
 
-        private (RequestFactory factory, HttpMethod method) GetRequestFactory(MethodInfo action)
+        internal static (RequestFactory factory, HttpMethod method) DefaultGetHttpMethodAndRequestFactory(
+            Type controller, MethodInfo action)
         {
             if (action.GetCustomAttributes<HttpPutAttribute>().Any())
                 return (RequestInfo.Put, HttpMethod.Put);
@@ -205,7 +206,7 @@ namespace TeeSquare.WebApi.Reflection
 
             if (!_options.RequestHelperTypeOption.ShouldEmitTypes)
             {
-                foreach(var type in _options.RequestHelperTypeOption.Types)
+                foreach (var type in _options.RequestHelperTypeOption.Types)
                     _options.Types.AddLiteralImport(_options.RequestHelperTypeOption.ImportFrom, type);
             }
 

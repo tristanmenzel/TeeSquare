@@ -28,9 +28,14 @@ namespace TeeSquare.WebApi.Reflection
         BuildRoute BuildRouteStrategy { get; }
         /// <summary>
         /// The option for obtaining request helper types. Default is to emit them with each file.
-        /// They can alternatively be imported. 
+        /// They can alternatively be imported.
         /// </summary>
         RequestHelperTypeOptions RequestHelperTypeOption { get; }
+        /// <summary>
+        /// The strategy to use to determine the http method of an api method. Should return a RequestFactory
+        /// for that request type too. Default strategy looks for dotnetcore HttpGet/Put etc attributes
+        /// </summary>
+        GetHttpMethodAndRequestFactory GetHttpMethodAndRequestFactoryStrategy { get; }
     }
 
     public class RequestHelperTypeOptions
@@ -98,6 +103,9 @@ namespace TeeSquare.WebApi.Reflection
         public BuildRoute BuildRouteStrategy { get; set; } = RouteReflector.DefaultBuildRouteStrategy;
         public RequestHelperTypeOptions RequestHelperTypeOption { get; set; } = RequestHelperTypeOptions.EmitTypes;
 
+        public GetHttpMethodAndRequestFactory GetHttpMethodAndRequestFactoryStrategy { get; set; } =
+            RouteReflector.DefaultGetHttpMethodAndRequestFactory;
+
         public WriteHeader WriteHeader { get; set; } = writer =>
         {
             writer.WriteComment("Auto-generated Code - Do Not Edit");
@@ -116,4 +124,6 @@ namespace TeeSquare.WebApi.Reflection
     public delegate Type GetApiReturnType(Type controller, MethodInfo action);
 
     public delegate string BuildRoute(Type controller, MethodInfo action);
+
+    public delegate (RequestFactory factory, HttpMethod method) GetHttpMethodAndRequestFactory(Type controller, MethodInfo action);
 }
