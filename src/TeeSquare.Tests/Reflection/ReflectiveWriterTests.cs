@@ -81,6 +81,19 @@ namespace TeeSquare.Tests.Reflection
         }
 
         [Test]
+        public void UnusedImportsAreOmitted()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .AddImportedTypes(("./ReflectiveWriterTests.SmallTree", new[] {typeof(Title), typeof(Book)}))
+                .AddTypes(typeof(Name))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+        [Test]
         public void RenamedImports()
         {
             var res = TeeSquareFluent.ReflectiveWriter()

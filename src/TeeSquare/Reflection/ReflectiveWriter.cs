@@ -141,7 +141,7 @@ namespace TeeSquare.Reflection
                     $"import {{ {(string.Join(", ", importGroup.Select(g => BuildImport(g.TypeName, g.ImportAs))))} }} from '{importGroup.Key}';");
             }
 
-            foreach (var importGroup in Types.ImportedTypes.GroupBy(t => t.ImportFrom))
+            foreach (var importGroup in Types.UsedImportedTypes.GroupBy(t => t.ImportFrom))
             {
                 writer.WriteLine(
                     $"import {{ {(string.Join(", ", importGroup.Select(g => BuildImport(g.Type))))} }} from '{importGroup.Key}';");
