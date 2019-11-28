@@ -95,6 +95,7 @@ namespace TeeSquare.Reflection
             var propertyDependencies = type
                 .GetProperties(_options.PropertyFlags)
                 .Select(p => p.PropertyType)
+                .Distinct()
                 .ToArray();
             if (!_options.ReflectMethods(type)) return propertyDependencies;
             var methodDependencies = type

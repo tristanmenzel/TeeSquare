@@ -84,7 +84,7 @@ namespace TeeSquare.Tests.Reflection
         public void UnusedImportsAreOmitted()
         {
             var res = TeeSquareFluent.ReflectiveWriter()
-                .AddImportedTypes(("./ReflectiveWriterTests.SmallTree", new[] {typeof(Title), typeof(Book)}))
+                .AddImportedTypes(("./ReflectiveWriterTests.SmallTree", new[] {typeof(Title), typeof(Book), typeof(Library)}))
                 .AddTypes(typeof(Name))
                 .WriteToString();
 

@@ -210,6 +210,8 @@ namespace TeeSquare.WebApi.Reflection
                     _options.Types.AddLiteralImport(_options.RequestHelperTypeOption.ImportFrom, type);
             }
 
+            AddTypeDependencies(rWriter);
+
             rWriter.WriteImports(writer);
 
 
@@ -288,12 +290,17 @@ namespace TeeSquare.WebApi.Reflection
                     });
             }
 
+
+            rWriter.WriteTo(writer, false);
+        }
+
+        private void AddTypeDependencies(ReflectiveWriter rWriter)
+        {
             var types = _requests.Select(r => r.ResponseType)
                 .Union(_requests.SelectMany(r => r.RequestParams.Select(p => p.Type)))
                 .Union(_additionalTypes);
 
             rWriter.AddTypes(types.ToArray());
-            rWriter.WriteTo(writer, false);
         }
     }
 }
