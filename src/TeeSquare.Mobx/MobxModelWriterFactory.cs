@@ -11,11 +11,13 @@ namespace TeeSquare.Mobx
         CodeSnippetWriter BuildModel(IComplexTypeInfo typeInfo);
     }
 
-    internal static class MobxTypeExtensions{
+    internal static class MobxTypeExtensions
+    {
         internal static string MakeOptional(this string input, bool isOptional, string optionalType = "types.maybe")
         {
             return isOptional ? $"{optionalType}({input})" : input;
         }
+
         internal static string MakeCollection(this string input, bool isCollection)
         {
             return isCollection ? $"types.array({input})" : input;
@@ -31,19 +33,13 @@ namespace TeeSquare.Mobx
             _options = options;
         }
 
-        private IDictionary<string, string> _mobxTypes = new Dictionary<string, string>()
-        {
-            {"number", "types.number"},
-            {"string", "types.string"},
-            {"boolean", "types.boolean"},
-        };
-
         protected virtual string GetMobxType(ITypeReference type)
         {
             return GetMobxBaseType(type)
                 .MakeCollection(type.Array)
                 .MakeOptional(type.Optional, _options.OptionalType);
         }
+
         protected virtual string GetMobxBaseType(ITypeReference type)
         {
             if (type.Enum)
@@ -53,9 +49,9 @@ namespace TeeSquare.Mobx
 
             return type.TypeName switch
             {
-                "number" => type.Format == TsTypeFormat.Integer ? "types.integer" : "types.number",
-                "string" => type.Format == TsTypeFormat.DateTime ? "types.Date" : "types.string",
-                "boolean" => "types.boolean",
+                "number" => type.Format == TsTypeFormat.Integer ? _options.IntegerType :_options.DecimalType,
+                "string" => type.Format == TsTypeFormat.DateTime ?_options.DateType : _options.StringType,
+                "boolean" => _options.BooleanType,
                 _ => type.ExistingType ? type.TypeName : $"{type.TypeName}Model"
             };
         }
@@ -77,6 +73,5 @@ namespace TeeSquare.Mobx
                 writer.WriteLine($"export type {typeInfo.Name} = Instance<typeof {typeInfo.Name}Model>;");
             };
         }
-
     }
 }
