@@ -49,7 +49,7 @@ namespace TeeSquare.Mobx
                 "number" => type.Format == TsTypeFormat.Integer ? "types.integer" : "types.number",
                 "string" => type.Format == TsTypeFormat.DateTime ? "types.Date" : "types.string",
                 "boolean" => "types.boolean",
-                _ => $"{type.TypeName}Model"
+                _ => type.ExistingType ? type.TypeName : $"{type.TypeName}Model"
             };
         }
 
