@@ -12,9 +12,9 @@ namespace TeeSquare.Mobx
     }
 
     internal static class MobxTypeExtensions{
-        internal static string MakeOptional(this string input, bool isOptional)
+        internal static string MakeOptional(this string input, bool isOptional, string optionalType = "types.maybe")
         {
-            return isOptional ? $"types.maybe({input})" : input;
+            return isOptional ? $"{optionalType}({input})" : input;
         }
         internal static string MakeCollection(this string input, bool isCollection)
         {
@@ -24,6 +24,13 @@ namespace TeeSquare.Mobx
 
     public class MobxModelWriterFactory : IMobxModelWriterFactory
     {
+        private readonly IMobxOptions _options;
+
+        public MobxModelWriterFactory(IMobxOptions options)
+        {
+            _options = options;
+        }
+
         private IDictionary<string, string> _mobxTypes = new Dictionary<string, string>()
         {
             {"number", "types.number"},
@@ -35,7 +42,7 @@ namespace TeeSquare.Mobx
         {
             return GetMobxBaseType(type)
                 .MakeCollection(type.Array)
-                .MakeOptional(type.Optional);
+                .MakeOptional(type.Optional, _options.OptionalType);
         }
         protected virtual string GetMobxBaseType(ITypeReference type)
         {
