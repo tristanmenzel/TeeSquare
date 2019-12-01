@@ -49,8 +49,18 @@ namespace TeeSquare.Mobx
 
             return type.TypeName switch
             {
-                "number" => type.Format == TsTypeFormat.Integer ? _options.IntegerType :_options.DecimalType,
-                "string" => type.Format == TsTypeFormat.DateTime ?_options.DateType : _options.StringType,
+                "number" => type.Format switch
+                {
+                    TsTypeFormat.Integer => _options.IntegerType,
+                    TsTypeFormat.Identity => _options.IdentityType,
+                    _ => _options.DecimalType
+                },
+                "string" => type.Format switch
+                {
+                    TsTypeFormat.DateTime => _options.DateType,
+                    TsTypeFormat.Guid => _options.StringType,
+                    _ => _options.StringType
+                } ,
                 "boolean" => _options.BooleanType,
                 _ => type.ExistingType ? type.TypeName : $"{type.TypeName}Model"
             };
