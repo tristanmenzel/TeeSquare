@@ -194,6 +194,10 @@ namespace TeeSquare.Tests.Reflection
         public void DiscriminatorProperty()
         {
             var res = TeeSquareFluent.ReflectiveWriter()
+                .Configure(options =>
+                    {
+                        options.PropertyReflectionOverride = DiscriminatedUnionsHelper.DiscriminatorPropertyOverride;
+                    })
                 .AddTypes(typeof(Circle), typeof(Square), typeof(Rectangle))
                 .WriteToString();
 

@@ -44,43 +44,24 @@ namespace TeeSquare.Reflection
             writer.WriteLine();
         };
 
-        public DiscriminatorPropertyPredicate DiscriminatorPropertyPredicate { get; set; } = DefaultDiscriminator;
 
-        public DiscriminatorPropertyValueProvider DiscriminatorPropertyValueProvider { get; set; } =
-            DefaultDiscriminatorValueProvider;
 
         public TypeCollection Types { get; set; } = new TypeCollection();
 
+        public OverridePropertyReflection PropertyReflectionOverride { get; set; }
 
-        public static bool DefaultDiscriminator(PropertyInfo property, Type parentType)
-        {
-            return property.GetCustomAttributes<TypeDiscriminatorAttribute>().Any();
-        }
 
-        public static string DefaultDiscriminatorValueProvider(PropertyInfo property, Type parentType)
-        {
-            return property.GetCustomAttributes<TypeDiscriminatorAttribute>()
-                       .Select(a => a.Value)
-                       .FirstOrDefault() ?? parentType.Name;
-        }
+
+
     }
+
+    public delegate bool OverridePropertyReflection(Type parentType, PropertyInfo property,
+        Namer namer,
+        out (string propertyName, TypeReference type) propertyDescriptor);
 
     public delegate void WriteComplexType(TypeScriptWriter writer, IComplexTypeInfo complexType);
 
     public delegate void WriteHeader(TypeScriptWriter writer);
 
-    [AttributeUsage(AttributeTargets.Property)]
-    public class TypeDiscriminatorAttribute : Attribute
-    {
-        public string Value { get; }
 
-        public TypeDiscriminatorAttribute(string value = null)
-        {
-            Value = value;
-        }
-    }
-
-    public delegate bool DiscriminatorPropertyPredicate(PropertyInfo property, Type parentType);
-
-    public delegate string DiscriminatorPropertyValueProvider(PropertyInfo property, Type parentType);
 }

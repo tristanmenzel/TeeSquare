@@ -192,10 +192,10 @@ namespace TeeSquare.Reflection
                     {
                         foreach (var pi in type.GetProperties(_options.PropertyFlags))
                         {
-                            if (_options.DiscriminatorPropertyPredicate(pi, type))
+                            if (_options.PropertyReflectionOverride != null &&
+                                _options.PropertyReflectionOverride(type, pi, Namer, out var propertyMeta))
                             {
-                                var value = _options.DiscriminatorPropertyValueProvider(pi, type);
-                                i.AddProperty(Namer.PropertyName(pi), new TypeReference($"'{value}'"));
+                                i.AddProperty(propertyMeta.propertyName, propertyMeta.type);
                                 continue;
                             }
 

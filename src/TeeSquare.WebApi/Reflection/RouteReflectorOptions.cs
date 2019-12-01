@@ -112,11 +112,8 @@ namespace TeeSquare.WebApi.Reflection
             writer.WriteLine();
         };
 
-        public DiscriminatorPropertyPredicate DiscriminatorPropertyPredicate { get; set; } =
-            ReflectiveWriterOptions.DefaultDiscriminator;
+        public OverridePropertyReflection PropertyReflectionOverride { get; set; }
 
-        public DiscriminatorPropertyValueProvider DiscriminatorPropertyValueProvider { get; set; } =
-            ReflectiveWriterOptions.DefaultDiscriminatorValueProvider;
 
         public TypeCollection Types { get; set; } = new TypeCollection();
     }

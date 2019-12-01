@@ -43,16 +43,10 @@ namespace TeeSquare.Reflection
         /// </summary>
         WriteHeader WriteHeader { get;  }
         /// <summary>
-        /// Predicate for determining if a property should be treated as a union type discriminator.
-        /// Defaults to checking for a TypeDiscriminatorAttribute.
+        /// Delegate to optionally override property reflection. Return true if an override is applicable and
+        /// put meta data in the out param.
         /// </summary>
-        DiscriminatorPropertyPredicate DiscriminatorPropertyPredicate { get;  }
-        /// <summary>
-        /// For properties identified as a discriminator, this provider is used to obtain the value of
-        /// that discriminator. Defaults to the value specified in the attribute if available, then
-        /// falls back to the type name.
-        /// </summary>
-        DiscriminatorPropertyValueProvider DiscriminatorPropertyValueProvider { get;  }
+        OverridePropertyReflection PropertyReflectionOverride { get;  }
         /// <summary>
         /// Container for holding reflected and imported types.
         /// </summary>

@@ -21,7 +21,8 @@ namespace TeeSquare.TypeMetadata
         Integer,
         Decimal,
         Guid,
-        DateTime
+        DateTime,
+        Identity
     }
 
     public class TypeReference : ITypeReference
