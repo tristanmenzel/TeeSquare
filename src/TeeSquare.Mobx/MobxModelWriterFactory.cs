@@ -52,12 +52,13 @@ namespace TeeSquare.Mobx
                 "number" => type.Format switch
                 {
                     TsTypeFormat.Integer => _options.IntegerType,
-                    TsTypeFormat.Identity => _options.IdentityType,
+                    TsTypeFormat.Identity => _options.NumericIdentityType,
                     _ => _options.DecimalType
                 },
                 "string" => type.Format switch
                 {
                     TsTypeFormat.DateTime => _options.DateType,
+                    TsTypeFormat.Identity => _options.StringIdentityType,
                     TsTypeFormat.Guid => _options.StringType,
                     _ => _options.StringType
                 } ,
