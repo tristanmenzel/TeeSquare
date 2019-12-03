@@ -81,7 +81,7 @@ namespace TeeSquare.Mobx
 
                 writer.CloseBlock("});");
                 writer.WriteLine("");
-                writer.WriteLine($"export type {typeInfo.Name} = Instance<typeof {typeInfo.Name}Model>;");
+                writer.WriteLine($"export type {typeInfo.Name}Instance = Instance<typeof {typeInfo.Name}Model>;");
             };
         }
     }

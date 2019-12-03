@@ -17,7 +17,7 @@ export const NameModel = types.model('NameModel',  {
   lastName: types.string,
 });
 
-export type Name = Instance<typeof NameModel>;
+export type NameInstance = Instance<typeof NameModel>;
 export enum Audience {
   Children = 0,
   Teenagers = 1,
@@ -34,4 +34,4 @@ export const BookModel = types.model('BookModel',  {
   recommendedAudience: types.maybe(types.frozen<Audience>()),
 });
 
-export type Book = Instance<typeof BookModel>;
+export type BookInstance = Instance<typeof BookModel>;

@@ -17,7 +17,7 @@ export const NameModel = types.model('NameModel',  {
   lastName: types.string,
 });
 
-export type Name = Instance<typeof NameModel>;
+export type NameInstance = Instance<typeof NameModel>;
 export enum Audience {
   Children = 0,
   Teenagers = 1,
@@ -34,13 +34,13 @@ export const BookModel = types.model('BookModel',  {
   recommendedAudience: types.maybe(types.frozen<Audience>()),
 });
 
-export type Book = Instance<typeof BookModel>;
+export type BookInstance = Instance<typeof BookModel>;
 export const LocationModel = types.model('LocationModel',  {
   latitude: types.number,
   longitude: types.number,
 });
 
-export type Location = Instance<typeof LocationModel>;
+export type LocationInstance = Instance<typeof LocationModel>;
 export const LibraryModel = types.model('LibraryModel',  {
   name: types.string,
   location: LocationModel,
@@ -50,4 +50,4 @@ export const LibraryModel = types.model('LibraryModel',  {
   topBorrowed: types.array(BookModel),
 });
 
-export type Library = Instance<typeof LibraryModel>;
+export type LibraryInstance = Instance<typeof LibraryModel>;

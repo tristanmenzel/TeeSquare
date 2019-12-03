@@ -17,4 +17,4 @@ export const NameModel = types.model('NameModel',  {
   lastName: types.string,
 });
 
-export type Name = Instance<typeof NameModel>;
+export type NameInstance = Instance<typeof NameModel>;
