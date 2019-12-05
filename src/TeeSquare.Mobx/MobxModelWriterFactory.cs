@@ -61,9 +61,9 @@ namespace TeeSquare.Mobx
                     TsTypeFormat.Identity => _options.StringIdentityType,
                     TsTypeFormat.Guid => _options.StringType,
                     _ => _options.StringType
-                } ,
+                },
                 "boolean" => _options.BooleanType,
-                _ => type.ExistingType ? type.TypeName : $"{type.TypeName}Model"
+                _ => type.ExistingType ? type.TypeName : $"{_options.ModelName(type.TypeName)}"
             };
         }
 
@@ -71,7 +71,8 @@ namespace TeeSquare.Mobx
         {
             return writer =>
             {
-                writer.OpenBlock($"export const {typeInfo.Name}Model = types.model('{typeInfo.Name}Model', ");
+                writer.OpenBlock(
+                    $"export const {_options.ModelName(typeInfo.Name)} = types.model('{_options.ModelName(typeInfo.Name)}', ");
                 foreach (var prop in typeInfo.Properties)
                 {
                     writer.Write($"{prop.Name}: ", true);
@@ -81,7 +82,12 @@ namespace TeeSquare.Mobx
 
                 writer.CloseBlock("});");
                 writer.WriteLine("");
-                writer.WriteLine($"export type {typeInfo.Name}Instance = Instance<typeof {typeInfo.Name}Model>;");
+                if (_options.EmitInstanceType)
+                {
+                    writer.WriteLine(
+                        $"export type {_options.InstanceTypeName(typeInfo.Name)} = Instance<typeof {_options.ModelName(typeInfo.Name)}>;");
+                    writer.WriteLine("");
+                }
             };
         }
     }

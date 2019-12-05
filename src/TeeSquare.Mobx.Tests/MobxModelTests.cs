@@ -75,5 +75,22 @@ namespace TeeSquare.Mobx.Tests
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
+
+        [Test]
+        public void OverrideNames()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .Configure(TeeSquareMobx.ConfigureMobxWriter(new MobxOptions
+                    {
+                        ModelName = name => $"{name}ModelBase",
+                        EmitInstanceType = false
+                    }))
+                .AddTypes(typeof(Library))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
     }
 }

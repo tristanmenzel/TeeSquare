@@ -11,13 +11,11 @@ export enum Title {
   Sir = 5,
   Madam = 6
 }
-export const NameModel = types.model('NameModel',  {
+export const NameModelBase = types.model('NameModelBase',  {
   firstName: types.string,
   title: types.frozen<Title>(),
   lastName: types.string,
 });
-
-export type NameInstance = Instance<typeof NameModel>;
 
 export enum Audience {
   Children = 0,
@@ -25,9 +23,9 @@ export enum Audience {
   YoungAdults = 2,
   Adults = 3
 }
-export const BookModel = types.model('BookModel',  {
+export const BookModelBase = types.model('BookModelBase',  {
   title: types.string,
-  author: NameModel,
+  author: NameModelBase,
   isAvailable: types.boolean,
   firstPublished: types.Date,
   lastRevisedOn: types.maybe(types.Date),
@@ -35,22 +33,16 @@ export const BookModel = types.model('BookModel',  {
   recommendedAudience: types.maybe(types.frozen<Audience>()),
 });
 
-export type BookInstance = Instance<typeof BookModel>;
-
-export const LocationModel = types.model('LocationModel',  {
+export const LocationModelBase = types.model('LocationModelBase',  {
   latitude: types.number,
   longitude: types.number,
 });
 
-export type LocationInstance = Instance<typeof LocationModel>;
-
-export const LibraryModel = types.model('LibraryModel',  {
+export const LibraryModelBase = types.model('LibraryModelBase',  {
   name: types.string,
-  location: LocationModel,
+  location: LocationModelBase,
   squareMeters: types.integer,
   levels: types.maybe(types.integer),
-  allBooks: types.array(BookModel),
-  topBorrowed: types.array(BookModel),
+  allBooks: types.array(BookModelBase),
+  topBorrowed: types.array(BookModelBase),
 });
-
-export type LibraryInstance = Instance<typeof LibraryModel>;
