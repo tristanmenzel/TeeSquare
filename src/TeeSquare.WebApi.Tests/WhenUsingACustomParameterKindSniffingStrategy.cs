@@ -22,5 +22,23 @@ namespace TeeSquare.WebApi.Tests
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
+
+        [Test]
+        public void NullableBodyTypesAreHandledCorrectly()
+        {
+
+            var res = TeeSquareWebApi.GenerateForControllers(typeof(OtherController))
+                .Configure(options =>
+                {
+                    options.GetParameterKindStrategy = (paramInfo, route, method) => ParameterKind.Body;
+                    options.GetHttpMethodAndRequestFactoryStrategy =
+                        (controller, action) => (RequestInfo.Post, HttpMethod.Post);
+                })
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
     }
 }

@@ -235,11 +235,16 @@ namespace TeeSquare.WebApi.Reflection
 
                             if (req.Method.HasRequestBody())
                             {
+                                var requestBodyType = _options.Namer.Type(req.GetRequestBodyType());
+                                if (requestBodyType.Optional)
+                                {
+                                    requestBodyType = new TypeReference($"{requestBodyType.FullName} | undefined");
+                                }
                                 methodBuilder
                                     .WithReturnType(new TypeReference($"{req.Method.GetName()}Request",
                                         new[]
                                         {
-                                            _options.Namer.Type(req.GetRequestBodyType()),
+                                            requestBodyType,
                                             _options.Namer.Type(req.ResponseType)
                                         }));
                             }

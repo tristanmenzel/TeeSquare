@@ -44,7 +44,7 @@ namespace TeeSquare.WebApi.Reflection
 
 
     public delegate ParameterKind GetParameterKind(ParameterInfo parameterInfo, string route, HttpMethod method);
-    
+
     public class RequestHelperTypeOptions
     {
         private RequestHelperTypeOptions(bool emitTypes, string importFrom)
