@@ -64,12 +64,12 @@ namespace TeeSquare.WebApi.Reflection
             return action.ReturnType;
         }
 
-        internal static ParamInfo[] GetRequestParams(MethodInfo action, string route, HttpMethod method)
+        private ParamInfo[] GetRequestParams(MethodInfo action, string route, HttpMethod method)
         {
             return action.GetParameters()
                 .Select(p => new ParamInfo
                 {
-                    Kind = GetParameterKind(p, route, method),
+                    Kind = _options.GetParameterKindStrategy(p, route, method),
                     Name = p.Name,
                     Type = p.ParameterType
                 }).ToArray();

@@ -36,8 +36,15 @@ namespace TeeSquare.WebApi.Reflection
         /// for that request type too. Default strategy looks for dotnetcore HttpGet/Put etc attributes
         /// </summary>
         GetHttpMethodAndRequestFactory GetHttpMethodAndRequestFactoryStrategy { get; }
+        /// <summary>
+        /// The strategy to use to determine the kind of a parameter (ie. query string / route / body )
+        /// </summary>
+        GetParameterKind GetParameterKindStrategy { get; }
     }
 
+
+    public delegate ParameterKind GetParameterKind(ParameterInfo parameterInfo, string route, HttpMethod method);
+    
     public class RequestHelperTypeOptions
     {
         private RequestHelperTypeOptions(bool emitTypes, string importFrom)
@@ -105,6 +112,8 @@ namespace TeeSquare.WebApi.Reflection
 
         public GetHttpMethodAndRequestFactory GetHttpMethodAndRequestFactoryStrategy { get; set; } =
             RouteReflector.DefaultGetHttpMethodAndRequestFactory;
+
+        public GetParameterKind GetParameterKindStrategy { get; set; } = RouteReflector.GetParameterKind;
 
         public WriteHeader WriteHeader { get; set; } = writer =>
         {
