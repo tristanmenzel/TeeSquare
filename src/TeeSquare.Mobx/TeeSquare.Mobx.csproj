@@ -3,13 +3,13 @@
   <PropertyGroup>
     <Version>0.0.0</Version>
     <Authors>Tristan Menzel</Authors>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFrameworks>netcoreapp2.0;netcoreapp2.1;netcoreapp2.2;net48;</TargetFrameworks>
     <LangVersion>8</LangVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TeeSquare\TeeSquare.csproj"/>
+    <ProjectReference Include="..\TeeSquare\TeeSquare.csproj" />
   </ItemGroup>
 
 </Project>

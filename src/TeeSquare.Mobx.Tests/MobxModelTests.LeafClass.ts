@@ -1,3 +1,5 @@
+// Auto-generated Code - Do Not Edit
+
 import { types, Instance } from 'mobx-state-tree';
 
 export const LocationModel = types.model('LocationModel',  {
@@ -5,4 +7,4 @@ export const LocationModel = types.model('LocationModel',  {
   longitude: types.number,
 });
 
-export type Location = Instance<typeof LocationModel>;
+export type LocationInstance = Instance<typeof LocationModel>;

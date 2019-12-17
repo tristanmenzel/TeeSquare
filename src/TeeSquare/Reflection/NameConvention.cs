@@ -2,6 +2,7 @@
 {
     public enum NameConvention
     {
+        Original,
         PascalCase,
         CamelCase
     }

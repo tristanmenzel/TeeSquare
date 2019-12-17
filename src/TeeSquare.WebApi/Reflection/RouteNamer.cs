@@ -9,25 +9,16 @@ namespace TeeSquare.WebApi.Reflection
 {
     public class RouteNamer : Namer
     {
-        public override bool HasStaticMapping(Type type)
-        {
-            if (type == typeof(IActionResult))
-                return true;
-            return base.HasStaticMapping(type);
-        }
-
-        public override bool TryGetStaticMapping(Type type, out (string tsType, TsTypeFormat format) mapping)
+        public override ITypeReference Type(Type type, bool optional = false)
         {
             if (type == typeof(IActionResult))
             {
-                mapping = ("unknown", TsTypeFormat.None);
-                return true;
+                return new TypeReference("unknown"){ExistingType = true};
             }
-
-            return base.TryGetStaticMapping(type, out mapping);
+            return base.Type(type, optional);
         }
 
-        public virtual string RouteName(Type controller, MethodInfo action, string route)
+        public virtual string RouteName(Type controller, MethodInfo action, string route, HttpMethod method)
         {
             var parts = route.Split('/')
                 .Select(part =>
@@ -39,7 +30,7 @@ namespace TeeSquare.WebApi.Reflection
 
                     return ToCase(part, NameConvention.PascalCase);
                 });
-            return string.Join("", parts).Replace("[controller]", ControllerName(controller));
+            return method.GetName() + string.Join("", parts).Replace("[controller]", ControllerName(controller));
         }
 
         public string ControllerName(Type controller)

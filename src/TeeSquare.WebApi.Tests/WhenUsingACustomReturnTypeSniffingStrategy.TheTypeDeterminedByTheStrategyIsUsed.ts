@@ -1,4 +1,4 @@
-// Generated Code
+// Auto-generated Code - Do Not Edit
 
 export interface GetRequest<TResponse> {
   url: string;
@@ -19,7 +19,7 @@ export interface PutRequest<TRequest, TResponse> {
   method: 'PUT';
 }
 export const toQuery = (o: {[key: string]: any}): string => {
-  let q = Object.keys(o)
+  const q = Object.keys(o)
     .map(k => ({k, v: o[k]}))
     .filter(x => x.v !== undefined && x.v !== null)
     .map(x => `${encodeURIComponent(x.k)}=${encodeURIComponent(x.v)}`)
@@ -27,7 +27,7 @@ export const toQuery = (o: {[key: string]: any}): string => {
   return q && `?${q}` || '';
 };
 export abstract class RequestFactory {
-  static ApiReturnTestGet(): GetRequest<number> {
+  static GetApiReturnTest(): GetRequest<number> {
     return {
       method: 'GET',
       url: `api/return-test`

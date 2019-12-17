@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using TeeSquare.WebApi.Reflection;
@@ -9,6 +10,7 @@ namespace TeeSquare.WebApi
     public class WebApiFluent
     {
         private readonly Type[] _controllers;
+        private readonly List<Type[]> _types = new List<Type[]>();
         private readonly Assembly[] _assemblies;
         private readonly RouteReflectorOptions _options;
 
@@ -30,6 +32,12 @@ namespace TeeSquare.WebApi
             return this;
         }
 
+        public WebApiFluent AddTypes(params Type[] types)
+        {
+            _types.Add(types);
+            return this;
+        }
+
 
         public void WriteToFile(string path)
         {
@@ -41,14 +49,12 @@ namespace TeeSquare.WebApi
 
         public void WriteToStream(Stream stream)
         {
-            var tsWriter = new TypeScriptWriter(stream,
-                _options.InterfaceWriterFactory,
-                _options.ClassWriterFactory,
-                _options.EnumWriterFactory,
-                _options.FunctionWriterFactory,
-                _options.IndentChars);
+            var tsWriter = new TypeScriptWriter(stream,_options);
 
             var webApiWriter = new RouteReflector(_options);
+
+            foreach (var additionalTypes in _types)
+                webApiWriter.AddAdditionalTypes(additionalTypes);
 
             foreach (var assembly in _assemblies ?? Array.Empty<Assembly>())
                 webApiWriter.AddAssembly(assembly);

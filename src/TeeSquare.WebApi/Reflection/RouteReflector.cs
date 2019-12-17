@@ -12,21 +12,26 @@ namespace TeeSquare.WebApi.Reflection
 {
     public class RouteReflector
     {
-        private readonly RouteReflectorOptions _options;
+        private readonly IRouteReflectorOptions _options;
 
-        private readonly List<RequestInfo> _requests;
+        private readonly List<RequestInfo> _requests = new List<RequestInfo>();
 
+        private readonly List<Type> _additionalTypes = new List<Type>();
 
-        public RouteReflector(RouteReflectorOptions options)
+        public RouteReflector(IRouteReflectorOptions options)
         {
             _options = options;
-            _requests = new List<RequestInfo>();
         }
 
-        public void AddAssembly(Assembly assembly)
+        public void AddAdditionalTypes(Type[] types)
+        {
+            _additionalTypes.AddRange(types);
+        }
+
+        public void AddAssembly(Assembly assembly, Type baseController = null)
         {
             var controllers = assembly.GetExportedTypes()
-                .Where(t => typeof(Controller).IsAssignableFrom(t));
+                .Where(t => (baseController ?? typeof(Controller)).IsAssignableFrom(t));
 
             foreach (var controller in controllers)
             {
@@ -40,13 +45,13 @@ namespace TeeSquare.WebApi.Reflection
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod)
                 .Where(a => a.IsAction()))
             {
-                var route = BuildRoute(controller, action);
+                var route = _options.BuildRouteStrategy(controller, action);
 
-                var factory = GetRequestFactory(action);
-                var requestParams = GetRequestParams(action, route);
+                var (factory, method) = _options.GetHttpMethodAndRequestFactoryStrategy(controller, action);
+                var requestParams = GetRequestParams(action, route, method);
 
                 var returnType = _options.GetApiReturnTypeStrategy(controller, action);
-                _requests.Add(factory(_options.Namer.RouteName(controller, action, route),
+                _requests.Add(factory(_options.Namer.RouteName(controller, action, route, method),
                     route,
                     returnType,
                     requestParams
@@ -59,18 +64,18 @@ namespace TeeSquare.WebApi.Reflection
             return action.ReturnType;
         }
 
-        internal static ParamInfo[] GetRequestParams(MethodInfo action, string route)
+        private ParamInfo[] GetRequestParams(MethodInfo action, string route, HttpMethod method)
         {
             return action.GetParameters()
                 .Select(p => new ParamInfo
                 {
-                    Kind = GetParameterKind(p, route),
+                    Kind = _options.GetParameterKindStrategy(p, route, method),
                     Name = p.Name,
                     Type = p.ParameterType
                 }).ToArray();
         }
 
-        internal static ParameterKind GetParameterKind(ParameterInfo parameterInfo, string route)
+        internal static ParameterKind GetParameterKind(ParameterInfo parameterInfo, string route, HttpMethod method)
         {
             if (parameterInfo.GetCustomAttributes<FromBodyAttribute>().Any())
                 return ParameterKind.Body;
@@ -78,23 +83,42 @@ namespace TeeSquare.WebApi.Reflection
                 return ParameterKind.Query;
             if (parameterInfo.GetCustomAttributes<FromRouteAttribute>().Any())
                 return ParameterKind.Route;
-            return route.Contains($"{{{parameterInfo.Name}}}")
-                ? ParameterKind.Route
-                : ParameterKind.Query;
+
+            if (route.Contains($"{{{parameterInfo.Name}}}"))
+            {
+                return ParameterKind.Route;
+            }
+
+            if ((method == HttpMethod.Post || method == HttpMethod.Put)
+                && IsPossibleDto(parameterInfo.ParameterType))
+            {
+                return ParameterKind.Body;
+            }
+
+            return ParameterKind.Query;
         }
 
-        protected RequestFactory GetRequestFactory(MethodInfo action)
+        private static bool IsPossibleDto(Type type)
+        {
+            return !type.IsPrimitive
+                   && type != typeof(string)
+                   && !type.IsEnum
+                   && !type.IsValueType;
+        }
+
+        internal static (RequestFactory factory, HttpMethod method) DefaultGetHttpMethodAndRequestFactory(
+            Type controller, MethodInfo action)
         {
             if (action.GetCustomAttributes<HttpPutAttribute>().Any())
-                return RequestInfo.Put;
+                return (RequestInfo.Put, HttpMethod.Put);
             if (action.GetCustomAttributes<HttpPostAttribute>().Any())
-                return RequestInfo.Post;
+                return (RequestInfo.Post, HttpMethod.Post);
             if (action.GetCustomAttributes<HttpDeleteAttribute>().Any())
-                return RequestInfo.Delete;
-            return RequestInfo.Get;
+                return (RequestInfo.Delete, HttpMethod.Delete);
+            return (RequestInfo.Get, HttpMethod.Get);
         }
 
-        internal static string BuildRoute(Type controller, MethodInfo action)
+        internal static string DefaultBuildRouteStrategy(Type controller, MethodInfo action)
         {
             var controllerRouteTemplate = controller.GetCustomAttributes<RouteAttribute>()
                 .Select(r => r.Template)
@@ -128,15 +152,13 @@ namespace TeeSquare.WebApi.Reflection
                 .Trim('/');
         }
 
-        public void WriteTo(TypeScriptWriter writer)
+        private void WriteRequestTypesAndHelpers(TypeScriptWriter writer)
         {
-            _options.WriteHeader(writer);
-
             writer.WriteInterface("GetRequest", new TypeReference("TResponse"))
                 .Configure(i =>
                 {
                     i.AddProperty("url", new TypeReference("string"));
-                    i.AddProperty("method", new TypeReference( "'GET'"));
+                    i.AddProperty("method", new TypeReference("'GET'"));
                 });
             writer.WriteInterface("DeleteRequest", new TypeReference("TResponse"))
                 .Configure(i =>
@@ -165,7 +187,7 @@ namespace TeeSquare.WebApi.Reflection
                 .Static()
                 .WithBody(w =>
                 {
-                    w.WriteLine("let q = Object.keys(o)");
+                    w.WriteLine("const q = Object.keys(o)");
                     w.Indent();
                     w.WriteLine(".map(k => ({k, v: o[k]}))");
                     w.WriteLine(".filter(x => x.v !== undefined && x.v !== null)");
@@ -174,75 +196,116 @@ namespace TeeSquare.WebApi.Reflection
                     w.Deindent();
                     w.WriteLine("return q && `?${q}` || '';");
                 });
+        }
 
-            writer.WriteClass("RequestFactory")
-                .Configure(c =>
-                {
-                    c.MakeAbstract();
+        public void WriteTo(TypeScriptWriter writer)
+        {
+            _options.WriteHeader(writer);
+
+            var rWriter = new ReflectiveWriter(_options);
+
+            if (!_options.RequestHelperTypeOption.ShouldEmitTypes)
+            {
+                foreach (var type in _options.RequestHelperTypeOption.Types)
+                    _options.Types.AddLiteralImport(_options.RequestHelperTypeOption.ImportFrom, type);
+            }
+
+            AddTypeDependencies(rWriter);
+
+            rWriter.WriteImports(writer);
 
 
+            if (_options.RequestHelperTypeOption.ShouldEmitTypes)
+            {
+                WriteRequestTypesAndHelpers(writer);
+            }
 
-                    foreach (var req in _requests)
+            if (_requests.Any())
+            {
+                writer.WriteClass("RequestFactory")
+                    .Configure(c =>
                     {
-                        var methodBuilder = c.AddMethod($"{req.Name}{req.Method.GetName()}")
-                            .Static();
+                        c.MakeAbstract();
 
-                        if (req.Method.HasRequestBody())
+
+                        foreach (var req in _requests)
                         {
-                            methodBuilder
-                                .WithReturnType(new TypeReference($"{req.Method.GetName()}Request",
-                                    new [] {
-                                    _options.Namer.Type(req.GetRequestBodyType()),
-                                    _options.Namer.Type(req.ResponseType)}));
-                        }
-                        else
-                        {
-                            methodBuilder
-                                .WithReturnType(new TypeReference($"{req.Method.GetName()}Request",
-                                    new [] {
-                                    _options.Namer.Type(req.ResponseType)}));
-                        }
+                            var methodBuilder = c.AddMethod($"{req.Name}")
+                                .Static();
 
-                        methodBuilder.WithParams(p =>
+                            if (req.Method.HasRequestBody())
                             {
-                                foreach (var rp in req.RequestParams.Where(x => x.Kind != ParameterKind.Body))
-
+                                var requestBodyType = _options.Namer.Type(req.GetRequestBodyType());
+                                if (requestBodyType.Optional)
                                 {
-                                    p.Param(rp.Name, _options.Namer.Type(rp.Type, rp.Kind == ParameterKind.Query));
+                                    requestBodyType = new TypeReference($"{requestBodyType.FullName} | undefined");
                                 }
-
-                                if (req.Method.HasRequestBody())
-                                    p.Param("data", _options.Namer.Type(req.GetRequestBodyType()));
-                            })
-                            .WithBody(w =>
+                                methodBuilder
+                                    .WithReturnType(new TypeReference($"{req.Method.GetName()}Request",
+                                        new[]
+                                        {
+                                            requestBodyType,
+                                            _options.Namer.Type(req.ResponseType)
+                                        }));
+                            }
+                            else
                             {
-                                var queryParams = req.RequestParams.Where(x => x.Kind == ParameterKind.Query).ToArray();
-                                if (queryParams.Any())
+                                methodBuilder
+                                    .WithReturnType(new TypeReference($"{req.Method.GetName()}Request",
+                                        new[]
+                                        {
+                                            _options.Namer.Type(req.ResponseType)
+                                        }));
+                            }
+
+                            methodBuilder.WithParams(p =>
                                 {
-                                    w.Write("let query = toQuery({", true);
-                                    w.WriteDelimited(queryParams,
-                                        (p, wr) => wr.Write(p.Name), ", ");
-                                    w.WriteLine("});", false);
-                                }
+                                    foreach (var rp in req.RequestParams.Where(x => x.Kind != ParameterKind.Body))
 
-                                w.WriteLine("return {");
-                                w.Indent();
-                                w.WriteLine($"method: '{req.Method.GetName().ToUpper()}',");
-                                if (req.Method.HasRequestBody())
-                                    w.WriteLine("data,");
-                                w.WriteLine(
-                                    $"url: `{req.Path.Replace("{", "${")}{(queryParams.Any() ? "${query}" : "")}`");
-                                w.Deindent();
-                                w.WriteLine("};");
-                            });
-                    }
-                });
-            var types = _requests.Select(r => r.ResponseType)
-                .Union(_requests.SelectMany(r => r.RequestParams.Select(p => p.Type)));
+                                    {
+                                        p.Param(rp.Name, _options.Namer.Type(rp.Type, rp.Kind == ParameterKind.Query));
+                                    }
 
-            var rWriter = new ReflectiveWriter(_options.BuildWriterOptions());
-            rWriter.AddTypes(types.ToArray());
+                                    if (req.Method.HasRequestBody())
+                                        p.Param("data", _options.Namer.Type(req.GetRequestBodyType()));
+                                })
+                                .WithBody(w =>
+                                {
+                                    var queryParams = req.RequestParams.Where(x => x.Kind == ParameterKind.Query)
+                                        .ToArray();
+                                    if (queryParams.Any())
+                                    {
+                                        w.Write("const query = toQuery({", true);
+                                        w.WriteDelimited(queryParams,
+                                            (p, wr) => wr.Write(p.Name), ", ");
+                                        w.WriteLine("});", false);
+                                    }
+
+                                    w.WriteLine("return {");
+                                    w.Indent();
+                                    w.WriteLine($"method: '{req.Method.GetName().ToUpper()}',");
+                                    if (req.Method.HasRequestBody())
+                                        w.WriteLine("data,");
+                                    w.WriteLine(
+                                        $"url: `{req.Path.Replace("{", "${")}{(queryParams.Any() ? "${query}" : "")}`");
+                                    w.Deindent();
+                                    w.WriteLine("};");
+                                });
+                        }
+                    });
+            }
+
+
             rWriter.WriteTo(writer, false);
+        }
+
+        private void AddTypeDependencies(ReflectiveWriter rWriter)
+        {
+            var types = _requests.Select(r => r.ResponseType)
+                .Union(_requests.SelectMany(r => r.RequestParams.Select(p => p.Type)))
+                .Union(_additionalTypes);
+
+            rWriter.AddTypes(types.ToArray());
         }
     }
 }

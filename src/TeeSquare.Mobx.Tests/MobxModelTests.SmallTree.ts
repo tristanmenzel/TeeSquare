@@ -1,3 +1,5 @@
+// Auto-generated Code - Do Not Edit
+
 import { types, Instance } from 'mobx-state-tree';
 
 export enum Title {
@@ -9,10 +11,11 @@ export enum Title {
   Sir = 5,
   Madam = 6
 }
+
 export const NameModel = types.model('NameModel',  {
   firstName: types.string,
-  title: types.enumeration<Title>("Title", [Object.values(Title)]),
+  title: types.frozen<Title>(),
   lastName: types.string,
 });
 
-export type Name = Instance<typeof NameModel>;
+export type NameInstance = Instance<typeof NameModel>;

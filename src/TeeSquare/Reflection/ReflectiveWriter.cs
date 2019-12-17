@@ -10,20 +10,28 @@ namespace TeeSquare.Reflection
 {
     public class ReflectiveWriter
     {
-        private readonly Namer _namer;
-        private readonly HashSet<Type> _types = new HashSet<Type>();
-        private readonly WriterOptions _options;
+        private bool _importsWritten = false;
+        private Namer Namer => _options.Namer;
+        private Namer ImportNamer => _options.ImportNamer;
+        private TypeCollection Types => _options.Types;
+        private readonly IReflectiveWriterOptions _options;
 
-        public ReflectiveWriter(WriterOptions options = null)
+        public ReflectiveWriter(IReflectiveWriterOptions options = null)
         {
-            _options = options ?? new WriterOptions();
-            _namer = _options.Namer;
+            _options = options ?? new ReflectiveWriterOptions();
         }
 
         public void AddTypes(params Type[] types)
         {
             foreach (var type in types.OrderBy(t => t.Name))
             {
+                if (type.IsExtendedPrimitive())
+                {
+                    if (!Types.Contains(type))
+                        Types.AddLocal(type);
+                    continue;
+                }
+
                 if (type.IsTask(out var resultType))
                 {
                     AddTypes(resultType);
@@ -48,35 +56,99 @@ namespace TeeSquare.Reflection
                     continue;
                 }
 
-                if (_namer.HasStaticMapping(type))
-                    continue;
-
-
                 if (type.IsGenericType)
                 {
                     AddTypes(type.GetGenericArguments());
 
                     var genericType = type.GetGenericTypeDefinition();
 
-                    if (_types.Contains(genericType)) continue;
+                    if (Types.Contains(genericType)) continue;
 
-                    var dependencies = type.GetProperties().Select(p => p.PropertyType).ToArray();
-                    AddTypes(dependencies);
-                    _types.Add(genericType);
-                    continue;
-                }
-
-                if (!_types.Contains(type))
-                {
-                    if (!type.IsEnum)
+                    var dependencies = GetTypeDependencies(type);
+                    if (dependencies.Any())
                     {
-                        var dependencies = type.GetProperties().Select(p => p.PropertyType).ToArray();
                         AddTypes(dependencies);
                     }
 
-                    _types.Add(type);
+                    Types.AddLocal(genericType);
+                    continue;
+                }
+
+                if (!Types.Contains(type))
+                {
+                    if (!type.IsEnum)
+                    {
+                        var dependencies = GetTypeDependencies(type);
+                        if (dependencies.Any())
+                        {
+                            AddTypes(dependencies);
+                        }
+                    }
+
+                    Types.AddLocal(type);
                 }
             }
+        }
+
+        private Type[] GetTypeDependencies(Type type)
+        {
+            var propertyDependencies = type
+                .GetProperties(_options.PropertyFlags)
+                .Select(p => p.PropertyType)
+                .Distinct()
+                .ToArray();
+            if (!_options.ReflectMethods(type)) return propertyDependencies;
+            var methodDependencies = type
+                .GetMethods(_options.MethodFlags)
+                .Where(m => !m.IsSpecialName)
+                .Where(m => _options.ReflectMethod(type, m))
+                .SelectMany(m => m.GetParameters().Select(p => p.ParameterType).Union(new[] {m.ReturnType}))
+                .Where(m => m != typeof(void))
+                .ToArray();
+
+            return propertyDependencies.Union(methodDependencies).ToArray();
+        }
+
+        private string BuildImport(Type type)
+        {
+            if (ImportNamer != null)
+            {
+                var typeName = ImportNamer.Type(type).TypeName;
+                var importAs = Namer.Type(type).TypeName;
+
+                if (typeName != importAs)
+                    return $"{typeName} as {importAs}";
+                return typeName;
+            }
+
+            return Namer.Type(type).TypeName;
+        }
+
+        private string BuildImport(string typeName, string importAs)
+        {
+            if (importAs != null)
+            {
+                return $"{typeName} as {importAs}";
+            }
+
+            return typeName;
+        }
+
+        public void WriteImports(TypeScriptWriter writer)
+        {
+            foreach (var importGroup in Types.ImportedLiterals.GroupBy(t => t.ImportFrom))
+            {
+                writer.WriteLine(
+                    $"import {{ {(string.Join(", ", importGroup.Select(g => BuildImport(g.TypeName, g.ImportAs))))} }} from '{importGroup.Key}';");
+            }
+
+            foreach (var importGroup in Types.UsedImportedTypes.GroupBy(t => t.ImportFrom))
+            {
+                writer.WriteLine(
+                    $"import {{ {(string.Join(", ", importGroup.Select(g => BuildImport(g.Type))))} }} from '{importGroup.Key}';");
+            }
+
+            _importsWritten = true;
         }
 
         public void WriteTo(TypeScriptWriter writer, bool includeHeader = true)
@@ -84,9 +156,16 @@ namespace TeeSquare.Reflection
             if (includeHeader)
                 _options.WriteHeader(writer);
 
-            foreach (var type in _types)
+            if (!_importsWritten)
             {
-                var typeRef = _namer.Type(type);
+                WriteImports(writer);
+            }
+
+            foreach (var type in Types.LocalTypes)
+            {
+                var typeRef = Namer.Type(type);
+
+                if (typeRef.ExistingType) continue;
 
                 if (typeRef.Enum)
                 {
@@ -102,7 +181,7 @@ namespace TeeSquare.Reflection
                                     .Select(a => a.Description)
                                     .FirstOrDefault();
 
-                                e.AddValue(_namer.EnumName(field.name), field.value, description);
+                                e.AddValue(Namer.EnumName(field.name), field.value, description);
                             }
                         });
                     continue;
@@ -113,14 +192,32 @@ namespace TeeSquare.Reflection
                     {
                         foreach (var pi in type.GetProperties(_options.PropertyFlags))
                         {
-                            if (_options.DiscriminatorPropertyPredicate(pi, type))
+                            if (_options.PropertyReflectionOverride != null &&
+                                _options.PropertyReflectionOverride(type, pi, Namer, out var propertyMeta))
                             {
-                                var value = _options.DiscriminatorPropertyValueProvider(pi, type);
-                                i.AddProperty(_namer.PropertyName(pi), new TypeReference($"'{value}'"));
+                                i.AddProperty(propertyMeta.propertyName, propertyMeta.type);
                                 continue;
                             }
 
-                            i.AddProperty(_namer.PropertyName(pi), _namer.Type(pi.PropertyType));
+                            i.AddProperty(Namer.PropertyName(pi), Namer.Type(pi.PropertyType));
+                        }
+
+                        if (_options.ReflectMethods(type))
+                        {
+                            foreach (var mi in type.GetMethods(_options.MethodFlags)
+                                .Where(m => !m.IsSpecialName)
+                                .Where(m => _options.ReflectMethod(type, m)))
+                            {
+                                i.AddMethod(mi.Name)
+                                    .WithReturnType(Namer.Type(mi.ReturnType))
+                                    .WithParams(p =>
+                                    {
+                                        foreach (var pi in mi.GetParameters())
+                                        {
+                                            p.Param(pi.Name, Namer.Type(pi.ParameterType));
+                                        }
+                                    });
+                            }
                         }
                     })
                     .Done());

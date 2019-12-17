@@ -1,6 +1,9 @@
-﻿using BlurkCompare;
+﻿using System;
+using BlurkCompare;
 using NUnit.Framework;
+using TeeSquare.Reflection;
 using TeeSquare.Tests.Reflection.FakeDomain;
+using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
 
 namespace TeeSquare.Tests.Reflection
@@ -65,9 +68,96 @@ namespace TeeSquare.Tests.Reflection
         }
 
         [Test]
+        public void ImportDependencies()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .AddImportedTypes(("./ReflectiveWriterTests.SmallTree", new[] {typeof(Title)}))
+                .AddTypes(typeof(Name))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+        [Test]
+        public void UnusedImportsAreOmitted()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .AddImportedTypes(("./ReflectiveWriterTests.SmallTree", new[] {typeof(Title), typeof(Book), typeof(Library)}))
+                .AddTypes(typeof(Name))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+        [Test]
+        public void RenamedImports()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .Configure(options =>
+                {
+                    options.Namer = new CustomNamer();
+                    options.ImportNamer = new Namer();
+                })
+                .AddImportedTypes(("./ReflectiveWriterTests.EntireTree", new[]
+                {
+                    typeof(Location),
+                    typeof(Book),
+                }))
+                .AddTypes(typeof(Library))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+        public class CustomNamer : Namer
+        {
+            public override string TypeName(Type type)
+            {
+                if (type == typeof(Book))
+                {
+                    return $"{base.TypeName(type)}Renamed";
+                }
+
+                return base.TypeName(type);
+            }
+        }
+
+        [Test]
+        public void OriginalCase()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .Configure(options => { options.Namer.NamingConventions.Properties = NameConvention.Original; })
+                .AddTypes(typeof(Name))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+        [Test]
         public void NullableProperties()
         {
             var res = TeeSquareFluent.ReflectiveWriter()
+                .AddTypes(typeof(Book))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+        [Test]
+        public void NullablePropertiesAsUndefinedUnion()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .Configure(options => options.InterfaceWriterFactory = new InterfaceWriterFactory(OptionalFieldRendering.WithUndefinedUnion))
                 .AddTypes(typeof(Book))
                 .WriteToString();
 
@@ -117,7 +207,41 @@ namespace TeeSquare.Tests.Reflection
         public void DiscriminatorProperty()
         {
             var res = TeeSquareFluent.ReflectiveWriter()
+                .Configure(options =>
+                    {
+                        options.PropertyReflectionOverride = DiscriminatedUnionsHelper.DiscriminatorPropertyOverride;
+                    })
                 .AddTypes(typeof(Circle), typeof(Square), typeof(Rectangle))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+        [Test]
+        public void ReflectMethods()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .Configure(options => { options.ReflectMethods = t => t.IsInterface; })
+                .AddTypes(typeof(ISampleApi))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+        [Test]
+        public void ReflectMethod()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .Configure(options =>
+                {
+                    options.ReflectMethods = t => t.IsInterface;
+                    options.ReflectMethod = (t, mi) => mi.Name == "GetBook";
+                })
+                .AddTypes(typeof(ISampleApi))
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")

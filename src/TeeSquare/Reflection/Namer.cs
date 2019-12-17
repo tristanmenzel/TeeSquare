@@ -10,7 +10,8 @@ namespace TeeSquare.Reflection
 {
     public class Namer
     {
-        private readonly NamingConventions _namingConventions;
+        public bool RemovePrefixFromInterfaces { get; set; } = true;
+        public NamingConventions NamingConventions { get; set; } = NamingConventions.Default;
 
         private readonly IDictionary<Type, (string tsType, TsTypeFormat format)> _staticMappings =
             new Dictionary<Type, (string tsType, TsTypeFormat format)>
@@ -29,24 +30,25 @@ namespace TeeSquare.Reflection
                 {typeof(bool), ("boolean", TsTypeFormat.None)}
             };
 
-        public virtual bool HasStaticMapping(Type type)
+        protected bool HasStaticMapping(Type type)
         {
             return _staticMappings.ContainsKey(type);
         }
 
-        public virtual bool TryGetStaticMapping(Type type, out (string tsType, TsTypeFormat format) typeMapping)
+        protected bool TryGetStaticMapping(Type type, out (string tsType, TsTypeFormat format) typeMapping)
         {
             return _staticMappings.TryGetValue(type, out typeMapping);
         }
 
-        public Namer(NamingConventions namingConventions = null)
-        {
-            _namingConventions = namingConventions ?? NamingConventions.Default;
-        }
-
         public virtual ITypeReference Type(Type type, bool optional = false)
         {
-            if (TryGetStaticMapping(type, out var mapping)) return new TypeReference(mapping.tsType) {Optional = optional, Format = mapping.format};
+            if (TryGetStaticMapping(type, out var mapping))
+                return new TypeReference(mapping.tsType)
+                {
+                    Optional = optional,
+                    Format = mapping.format,
+                    ExistingType = true
+                };
             if (type.IsTask(out var resultType))
             {
                 return Type(resultType, optional);
@@ -54,7 +56,7 @@ namespace TeeSquare.Reflection
 
             if (type.IsEnum)
             {
-                return new TypeReference(ToCase(type.Name, _namingConventions.Types))
+                return new TypeReference(ToCase(type.Name, NamingConventions.Types))
                     {Enum = true, Optional = optional};
             }
 
@@ -75,7 +77,7 @@ namespace TeeSquare.Reflection
 
             if (type.IsGenericType)
             {
-                var nonGenericName = ToCase(type.Name.Split("`").First(), _namingConventions.Types);
+                var nonGenericName = TypeName(type);
                 return new TypeReference(nonGenericName, type.GetGenericArguments()
                     .Select(t => Type(t))
                     .ToArray())
@@ -84,7 +86,7 @@ namespace TeeSquare.Reflection
                 };
             }
 
-            return new TypeReference(ToCase(type.Name, _namingConventions.Types))
+            return new TypeReference(TypeName(type))
             {
                 Optional = optional
             };
@@ -92,20 +94,35 @@ namespace TeeSquare.Reflection
 
         public virtual string PropertyName(PropertyInfo propertyInfo)
         {
-            return ToCase(propertyInfo.Name, _namingConventions.Properties);
+            return ToCase(propertyInfo.Name, NamingConventions.Properties);
         }
 
         public virtual string MethodName(MethodInfo methodInfo)
         {
-            return ToCase(methodInfo.Name, _namingConventions.Methods);
+            return ToCase(methodInfo.Name, NamingConventions.Methods);
+        }
+
+        public virtual string TypeName(Type type)
+        {
+            var name = type.Name;
+            if(type.IsGenericType)
+                name = type.Name.Split('`').First();
+            if (type.IsInterface && RemovePrefixFromInterfaces && name.StartsWith("I"))
+                name = name.Substring(1);
+
+            return ToCase(name, NamingConventions.Types);
         }
 
 
         protected virtual string ToCase(string name, NameConvention nameConvention)
         {
             if (string.IsNullOrEmpty(name)) return name;
-            name = new Regex(@"\-([a-z]?)", RegexOptions.IgnoreCase)
-                .Replace(name, m => m.Groups[1].Value.ToUpper());
+            if (name.Contains('-'))
+            {
+                name = new Regex(@"\-([a-z]?)", RegexOptions.IgnoreCase)
+                    .Replace(name, m => m.Groups[1].Value.ToUpper());
+            }
+
             switch (nameConvention)
             {
                 case NameConvention.CamelCase:
@@ -119,7 +136,7 @@ namespace TeeSquare.Reflection
 
         public string EnumName(string name)
         {
-            return ToCase(name, _namingConventions.EnumsMembers);
+            return ToCase(name, NamingConventions.EnumsMembers);
         }
     }
 }
