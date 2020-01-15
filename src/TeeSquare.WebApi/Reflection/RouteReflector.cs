@@ -51,7 +51,7 @@ namespace TeeSquare.WebApi.Reflection
                 var requestParams = GetRequestParams(action, route, method);
 
                 var returnType = _options.GetApiReturnTypeStrategy(controller, action);
-                _requests.Add(factory(_options.Namer.RouteName(controller, action, route, method),
+                _requests.Add(factory(_options.RouteNamer.RouteName(controller, action, route, method),
                     route,
                     returnType,
                     requestParams
@@ -235,7 +235,7 @@ namespace TeeSquare.WebApi.Reflection
 
                             if (req.Method.HasRequestBody())
                             {
-                                var requestBodyType = _options.Namer.Type(req.GetRequestBodyType());
+                                var requestBodyType = _options.TypeConverter.Convert(req.GetRequestBodyType(), null);
                                 if (requestBodyType.Optional)
                                 {
                                     requestBodyType = new TypeReference($"{requestBodyType.FullName} | undefined");
@@ -245,7 +245,7 @@ namespace TeeSquare.WebApi.Reflection
                                         new[]
                                         {
                                             requestBodyType,
-                                            _options.Namer.Type(req.ResponseType)
+                                            _options.TypeConverter.Convert(req.ResponseType, null)
                                         }));
                             }
                             else
@@ -254,7 +254,7 @@ namespace TeeSquare.WebApi.Reflection
                                     .WithReturnType(new TypeReference($"{req.Method.GetName()}Request",
                                         new[]
                                         {
-                                            _options.Namer.Type(req.ResponseType)
+                                            _options.TypeConverter.Convert(req.ResponseType, null)
                                         }));
                             }
 
@@ -263,11 +263,11 @@ namespace TeeSquare.WebApi.Reflection
                                     foreach (var rp in req.RequestParams.Where(x => x.Kind != ParameterKind.Body))
 
                                     {
-                                        p.Param(rp.Name, _options.Namer.Type(rp.Type, rp.Kind == ParameterKind.Query));
+                                        p.Param(rp.Name, _options.TypeConverter.Convert(rp.Type).MakeOptional(rp.Kind == ParameterKind.Query));
                                     }
 
                                     if (req.Method.HasRequestBody())
-                                        p.Param("data", _options.Namer.Type(req.GetRequestBodyType()));
+                                        p.Param("data", _options.TypeConverter.Convert(req.GetRequestBodyType(), null));
                                 })
                                 .WithBody(w =>
                                 {

@@ -4,19 +4,13 @@ using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using TeeSquare.Reflection;
 using TeeSquare.TypeMetadata;
+using TeeSquare.Util;
 
 namespace TeeSquare.WebApi.Reflection
 {
-    public class RouteNamer : Namer
+    public class RouteNamer
     {
-        public override ITypeReference Type(Type type, bool optional = false)
-        {
-            if (type == typeof(IActionResult))
-            {
-                return new TypeReference("unknown"){ExistingType = true};
-            }
-            return base.Type(type, optional);
-        }
+
 
         public virtual string RouteName(Type controller, MethodInfo action, string route, HttpMethod method)
         {
@@ -25,10 +19,10 @@ namespace TeeSquare.WebApi.Reflection
                 {
                     if (part.StartsWith("{"))
                     {
-                        return $"By{ToCase(part.Substring(1, part.Length - 2), NameConvention.PascalCase)}";
+                        return $"By{CaseHelper.ToCase(part.Substring(1, part.Length - 2), NameConvention.PascalCase)}";
                     }
 
-                    return ToCase(part, NameConvention.PascalCase);
+                    return CaseHelper.ToCase(part, NameConvention.PascalCase);
                 });
             return method.GetName() + string.Join("", parts).Replace("[controller]", ControllerName(controller));
         }

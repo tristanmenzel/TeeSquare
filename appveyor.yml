@@ -1,9 +1,9 @@
-version: '2.0.{build}'
+version: '3.0.{build}-alpha'
 image: Visual Studio 2017
 branches:
   only:
   - master
-  - feat/net48
+  - feat/*
 init:
   # Good practise, because Windows line endings are different from Unix/Linux ones
   - cmd: git config --global core.autocrlf true

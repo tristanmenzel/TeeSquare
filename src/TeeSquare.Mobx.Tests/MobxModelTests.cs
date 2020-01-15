@@ -1,3 +1,4 @@
+using System;
 using BlurkCompare;
 using NUnit.Framework;
 using TeeSquare.Tests.Reflection.FakeDomain;
@@ -52,9 +53,9 @@ namespace TeeSquare.Mobx.Tests
         {
             var res = TeeSquareFluent.ReflectiveWriter()
                 .Configure(TeeSquareMobx.ConfigureMobxWriter(new MobxOptions()
-                    {
-                        OptionalType = "types.maybeNull"
-                    }))
+                {
+                    OptionalType = "types.maybeNull({0})"
+                }))
                 .AddTypes(typeof(Book))
                 .WriteToString();
 
@@ -81,16 +82,23 @@ namespace TeeSquare.Mobx.Tests
         {
             var res = TeeSquareFluent.ReflectiveWriter()
                 .Configure(TeeSquareMobx.ConfigureMobxWriter(new MobxOptions
-                    {
-                        ModelName = name => $"{name}ModelBase",
-                        EmitInstanceType = false
-                    }))
+                {
+                    EmitInstanceType = false
+                }, new CustomMobxTypeConverter()))
                 .AddTypes(typeof(Library))
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
+        }
+
+        class CustomMobxTypeConverter : MobxTypeConverter
+        {
+            public override string TypeName(Type type)
+            {
+                return base.TypeName(type) + "Base";
+            }
         }
     }
 }

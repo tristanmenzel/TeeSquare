@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -10,9 +9,9 @@ namespace TeeSquare.Reflection
 {
     public class ReflectiveWriter
     {
-        private bool _importsWritten = false;
-        private Namer Namer => _options.Namer;
-        private Namer ImportNamer => _options.ImportNamer;
+        private bool _importsWritten;
+        private TypeConverter TypeConverter => _options.TypeConverter;
+        private TypeConverter ImportTypeConverter => _options.ImportTypeConverter;
         private TypeCollection Types => _options.Types;
         private readonly IReflectiveWriterOptions _options;
 
@@ -111,17 +110,17 @@ namespace TeeSquare.Reflection
 
         private string BuildImport(Type type)
         {
-            if (ImportNamer != null)
+            if (ImportTypeConverter != null)
             {
-                var typeName = ImportNamer.Type(type).TypeName;
-                var importAs = Namer.Type(type).TypeName;
+                var typeName = ImportTypeConverter.Convert(type).TypeName;
+                var importAs = TypeConverter.Convert(type).TypeName;
 
                 if (typeName != importAs)
                     return $"{typeName} as {importAs}";
                 return typeName;
             }
 
-            return Namer.Type(type).TypeName;
+            return TypeConverter.Convert(type).TypeName;
         }
 
         private string BuildImport(string typeName, string importAs)
@@ -163,7 +162,7 @@ namespace TeeSquare.Reflection
 
             foreach (var type in Types.LocalTypes)
             {
-                var typeRef = Namer.Type(type);
+                var typeRef = TypeConverter.Convert(type);
 
                 if (typeRef.ExistingType) continue;
 
@@ -175,13 +174,12 @@ namespace TeeSquare.Reflection
                             foreach (var field in Enum.GetNames(type).Zip(Enum.GetValues(type).Cast<int>(),
                                 (name, value) => new {name, value}))
                             {
-                                string description = null;
-                                description = type.GetMember(field.name)
+                                var description = type.GetMember(field.name)
                                     .SelectMany(m => m.GetCustomAttributes<DescriptionAttribute>())
                                     .Select(a => a.Description)
                                     .FirstOrDefault();
 
-                                e.AddValue(Namer.EnumName(field.name), field.value, description);
+                                e.AddValue(TypeConverter.EnumName(field.name), field.value, description);
                             }
                         });
                     continue;
@@ -192,14 +190,7 @@ namespace TeeSquare.Reflection
                     {
                         foreach (var pi in type.GetProperties(_options.PropertyFlags))
                         {
-                            if (_options.PropertyReflectionOverride != null &&
-                                _options.PropertyReflectionOverride(type, pi, Namer, out var propertyMeta))
-                            {
-                                i.AddProperty(propertyMeta.propertyName, propertyMeta.type);
-                                continue;
-                            }
-
-                            i.AddProperty(Namer.PropertyName(pi), Namer.Type(pi.PropertyType));
+                            i.AddProperty(TypeConverter.PropertyName(pi), TypeConverter.Convert(pi.PropertyType, type, pi));
                         }
 
                         if (_options.ReflectMethods(type))
@@ -209,12 +200,12 @@ namespace TeeSquare.Reflection
                                 .Where(m => _options.ReflectMethod(type, m)))
                             {
                                 i.AddMethod(mi.Name)
-                                    .WithReturnType(Namer.Type(mi.ReturnType))
+                                    .WithReturnType(TypeConverter.Convert(mi.ReturnType, type, mi))
                                     .WithParams(p =>
                                     {
                                         foreach (var pi in mi.GetParameters())
                                         {
-                                            p.Param(pi.Name, Namer.Type(pi.ParameterType));
+                                            p.Param(pi.Name, TypeConverter.Convert(pi.ParameterType, type, mi));
                                         }
                                     });
                             }
