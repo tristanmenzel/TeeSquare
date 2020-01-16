@@ -84,21 +84,13 @@ namespace TeeSquare.Mobx.Tests
                 .Configure(TeeSquareMobx.ConfigureMobxWriter(new MobxOptions
                 {
                     EmitInstanceType = false
-                }, new CustomMobxTypeConverter()))
+                }, new MobxTypeConverter{ModelNamer = n=>$"{n}BaseModel"}))
                 .AddTypes(typeof(Library))
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
-        }
-
-        class CustomMobxTypeConverter : MobxTypeConverter
-        {
-            public override string TypeName(Type type)
-            {
-                return base.TypeName(type) + "Base";
-            }
         }
     }
 }
