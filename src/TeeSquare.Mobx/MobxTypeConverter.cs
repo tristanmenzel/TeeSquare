@@ -6,13 +6,10 @@ namespace TeeSquare.Mobx
 {
     public class MobxTypeConverter : TypeConverter
     {
-        public MobxTypeNamer ModelNamer { get; set; } = n => $"{n}Model";
-
         public MobxTypeConverter(
-
             params (Type type, string tsType)[] staticMappings
         ) : base(
-            staticMappings.Union(new[]
+            new[]
             {
                 (typeof(string), "types.string"),
                 (typeof(Guid), "types.string"),
@@ -26,13 +23,8 @@ namespace TeeSquare.Mobx
                 (typeof(DateTime), "types.Date"),
                 (typeof(DateTimeOffset), "types.Date"),
                 (typeof(bool), "types.boolean"),
-            }).ToArray())
+            }.Concat(staticMappings).ToArray())
         {
-        }
-
-        public override string TypeName(Type type)
-        {
-            return ModelNamer(base.TypeName(type));
         }
     }
 }

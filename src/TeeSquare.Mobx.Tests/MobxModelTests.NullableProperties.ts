@@ -12,13 +12,13 @@ export enum Title {
   Madam = 6
 }
 
-export const NameModel = types.model('NameModel',  {
+export const Name = types.model('Name',  {
   firstName: types.string,
   title: types.frozen<Title>(),
   lastName: types.string,
 });
 
-export type NameInstance = Instance<typeof NameModel>;
+export type NameInstance = Instance<typeof Name>;
 
 export enum Audience {
   Children = 0,
@@ -27,9 +27,9 @@ export enum Audience {
   Adults = 3
 }
 
-export const BookModel = types.model('BookModel',  {
+export const Book = types.model('Book',  {
   title: types.string,
-  author: NameModel,
+  author: Name,
   isAvailable: types.boolean,
   firstPublished: types.Date,
   lastRevisedOn: types.maybe(types.Date),
@@ -37,4 +37,4 @@ export const BookModel = types.model('BookModel',  {
   recommendedAudience: types.maybe(types.frozen<Audience>()),
 });
 
-export type BookInstance = Instance<typeof BookModel>;
+export type BookInstance = Instance<typeof Book>;
