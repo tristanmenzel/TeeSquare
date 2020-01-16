@@ -27,7 +27,7 @@ export const toQuery = (o: {[key: string]: any}): string => {
   return q && `?${q}` || '';
 };
 export abstract class RequestFactory {
-  static GetApiOtherDoAThing(when?: string): GetRequest<number> {
+  static GetApiOtherDoAThing(when: string): GetRequest<number> {
     return {
       method: 'GET',
       url: `api/other/do-a-thing`
