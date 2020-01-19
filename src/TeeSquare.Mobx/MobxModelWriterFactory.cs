@@ -13,14 +13,19 @@ namespace TeeSquare.Mobx
 
     internal static class MobxTypeExtensions
     {
-        internal static string MakeOptional(this string input, bool isOptional, string optionalType = "types.maybe")
+        internal static string MakeOptional(this string input, bool isOptional, string optionalType = "types.maybe({0})")
         {
-            return isOptional ? $"{optionalType}({input})" : input;
+            return isOptional ?  string.Format(optionalType, input) : input;
         }
 
-        internal static string MakeCollection(this string input, bool isCollection)
+        internal static string MakeCollection(this string input, bool isCollection, string collectionType = "types.array({0})")
         {
-            return isCollection ? $"types.array({input})" : input;
+            return isCollection ?  string.Format(collectionType, input): input;
+        }
+
+        internal static string MakeEnum(this string input, bool isEnum, string enumType = "types.frozen<{0}>()")
+        {
+            return isEnum ? string.Format(enumType, input) : input;
         }
     }
 
@@ -33,38 +38,12 @@ namespace TeeSquare.Mobx
             _options = options;
         }
 
-        protected virtual string GetMobxType(ITypeReference type)
+        protected virtual string WrapType(ITypeReference type)
         {
-            return GetMobxBaseType(type)
-                .MakeCollection(type.Array)
+            return type.TypeName
+                .MakeEnum(type.Enum, _options.EnumType)
+                .MakeCollection(type.Array, _options.CollectionType)
                 .MakeOptional(type.Optional, _options.OptionalType);
-        }
-
-        protected virtual string GetMobxBaseType(ITypeReference type)
-        {
-            if (type.Enum)
-            {
-                return $"types.frozen<{type.TypeName}>()";
-            }
-
-            return type.TypeName switch
-            {
-                "number" => type.Format switch
-                {
-                    TsTypeFormat.Integer => _options.IntegerType,
-                    TsTypeFormat.Identity => _options.NumericIdentityType,
-                    _ => _options.DecimalType
-                },
-                "string" => type.Format switch
-                {
-                    TsTypeFormat.DateTime => _options.DateType,
-                    TsTypeFormat.Identity => _options.StringIdentityType,
-                    TsTypeFormat.Guid => _options.StringType,
-                    _ => _options.StringType
-                },
-                "boolean" => _options.BooleanType,
-                _ => type.ExistingType ? type.TypeName : $"{_options.ModelName(type.TypeName)}"
-            };
         }
 
         public CodeSnippetWriter BuildModel(IComplexTypeInfo typeInfo)
@@ -72,11 +51,11 @@ namespace TeeSquare.Mobx
             return writer =>
             {
                 writer.OpenBlock(
-                    $"export const {_options.ModelName(typeInfo.Name)} = types.model('{_options.ModelName(typeInfo.Name)}', ");
+                    $"export const {typeInfo.Name} = types.model('{typeInfo.Name}', ");
                 foreach (var prop in typeInfo.Properties)
                 {
                     writer.Write($"{prop.Name}: ", true);
-                    writer.Write(GetMobxType(prop.Type));
+                    writer.Write(WrapType(prop.Type));
                     writer.WriteLine(",", false);
                 }
 
@@ -85,7 +64,7 @@ namespace TeeSquare.Mobx
                 if (_options.EmitInstanceType)
                 {
                     writer.WriteLine(
-                        $"export type {_options.InstanceTypeName(typeInfo.Name)} = Instance<typeof {_options.ModelName(typeInfo.Name)}>;");
+                        $"export type {_options.InstanceTypeName(typeInfo.Name)} = Instance<typeof {typeInfo.Name}>;");
                     writer.WriteLine("");
                 }
             };

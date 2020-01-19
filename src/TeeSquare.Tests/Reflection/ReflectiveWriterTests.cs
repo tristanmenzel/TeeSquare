@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using BlurkCompare;
 using NUnit.Framework;
 using TeeSquare.Reflection;
@@ -84,7 +85,8 @@ namespace TeeSquare.Tests.Reflection
         public void UnusedImportsAreOmitted()
         {
             var res = TeeSquareFluent.ReflectiveWriter()
-                .AddImportedTypes(("./ReflectiveWriterTests.SmallTree", new[] {typeof(Title), typeof(Book), typeof(Library)}))
+                .AddImportedTypes(("./ReflectiveWriterTests.SmallTree",
+                    new[] {typeof(Title), typeof(Book), typeof(Library)}))
                 .AddTypes(typeof(Name))
                 .WriteToString();
 
@@ -99,8 +101,8 @@ namespace TeeSquare.Tests.Reflection
             var res = TeeSquareFluent.ReflectiveWriter()
                 .Configure(options =>
                 {
-                    options.Namer = new CustomNamer();
-                    options.ImportNamer = new Namer();
+                    options.TypeConverter = new CustomTypeConverter();
+                    options.ImportTypeConverter = new TypeConverter();
                 })
                 .AddImportedTypes(("./ReflectiveWriterTests.EntireTree", new[]
                 {
@@ -115,7 +117,7 @@ namespace TeeSquare.Tests.Reflection
                 .AssertAreTheSame(Assert.Fail);
         }
 
-        public class CustomNamer : Namer
+        public class CustomTypeConverter : TypeConverter
         {
             public override string TypeName(Type type)
             {
@@ -132,7 +134,7 @@ namespace TeeSquare.Tests.Reflection
         public void OriginalCase()
         {
             var res = TeeSquareFluent.ReflectiveWriter()
-                .Configure(options => { options.Namer.NamingConventions.Properties = NameConvention.Original; })
+                .Configure(options => { options.TypeConverter.NamingConventions.Properties = NameConvention.Original; })
                 .AddTypes(typeof(Name))
                 .WriteToString();
 
@@ -157,7 +159,9 @@ namespace TeeSquare.Tests.Reflection
         public void NullablePropertiesAsUndefinedUnion()
         {
             var res = TeeSquareFluent.ReflectiveWriter()
-                .Configure(options => options.InterfaceWriterFactory = new InterfaceWriterFactory(OptionalFieldRendering.WithUndefinedUnion))
+                .Configure(options =>
+                    options.InterfaceWriterFactory =
+                        new InterfaceWriterFactory(OptionalFieldRendering.WithUndefinedUnion))
                 .AddTypes(typeof(Book))
                 .WriteToString();
 
@@ -208,15 +212,32 @@ namespace TeeSquare.Tests.Reflection
         {
             var res = TeeSquareFluent.ReflectiveWriter()
                 .Configure(options =>
-                    {
-                        options.PropertyReflectionOverride = DiscriminatedUnionsHelper.DiscriminatorPropertyOverride;
-                    })
+                {
+                    options.TypeConverter = new DiscriminatedUnionTypeConverter();
+                })
                 .AddTypes(typeof(Circle), typeof(Square), typeof(Rectangle))
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
+        }
+
+        class DiscriminatedUnionTypeConverter : TypeConverter
+        {
+            public override ITypeReference Convert(Type type, Type parentType = null, MemberInfo info = null)
+            {
+                if (info is PropertyInfo pi)
+                {
+                    if (DiscriminatedUnionsHelper.IsDiscriminator(parentType, pi))
+                    {
+                        var value = DiscriminatedUnionsHelper.GetDiscriminatorValue(parentType, pi);
+                        return new TypeReference($"'{value}'") {ExistingType = true};
+                    }
+                }
+
+                return base.Convert(type, parentType, info);
+            }
         }
 
         [Test]

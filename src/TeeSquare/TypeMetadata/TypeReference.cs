@@ -10,20 +10,12 @@ namespace TeeSquare.TypeMetadata
         bool Enum { get; }
         bool Optional { get; }
         bool Array { get; }
-        TsTypeFormat Format { get; }
         string FullName { get; }
         bool ExistingType { get; }
+        ITypeReference MakeOptional(bool optional = true);
+        ITypeReference MakeArray(bool array = true);
     }
 
-    public enum TsTypeFormat
-    {
-        None,
-        Integer,
-        Decimal,
-        Guid,
-        DateTime,
-        Identity
-    }
 
     public class TypeReference : ITypeReference
     {
@@ -47,12 +39,22 @@ namespace TeeSquare.TypeMetadata
         public bool Enum { get; set; }
         public bool Optional { get; set; }
         public bool Array { get; set; }
-        public TsTypeFormat Format { get; set; }
 
         public string FullName => (GenericTypeParams.Any()
             ? $"{TypeName}<{string.Join(", ", GenericTypeParams.Select(p => p.FullName))}>"
             : TypeName) + (Array ? "[]": "");
 
         public bool ExistingType { get; set; }
+        public ITypeReference MakeOptional(bool optional = true)
+        {
+            Optional = optional;
+            return this;
+        }
+
+        public ITypeReference MakeArray(bool array = true)
+        {
+            Array = array;
+            return this;
+        }
     }
 }

@@ -12,10 +12,10 @@ export enum Title {
   Madam = 6
 }
 
-export const NameModel = types.model('NameModel',  {
+export const Name = types.model('Name',  {
   firstName: types.string,
   title: types.frozen<Title>(),
   lastName: types.string,
 });
 
-export type NameInstance = Instance<typeof NameModel>;
+export type NameInstance = Instance<typeof Name>;

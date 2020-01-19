@@ -8,27 +8,22 @@ namespace TeeSquare.Reflection
 {
     public static class DiscriminatedUnionsHelper
     {
-        private static bool IsDiscriminator(PropertyInfo property, Type parentType)
+        public static bool IsDiscriminator(Type parentType, PropertyInfo property)
         {
             return property.GetCustomAttributes<TypeDiscriminatorAttribute>().Any();
         }
 
-        private static string GetDiscriminatorValue(PropertyInfo property, Type parentType)
+        public static string GetDiscriminatorValue(Type parentType, PropertyInfo property)
         {
             return property.GetCustomAttributes<TypeDiscriminatorAttribute>()
                        .Select(a => a.Value)
                        .FirstOrDefault() ?? parentType.Name;
         }
 
-        public static bool DiscriminatorPropertyOverride(Type parentType, PropertyInfo property, Namer namer,
+        public static bool DiscriminatorPropertyOverride(Type parentType, PropertyInfo property, TypeConverter typeConverter,
             out (string propertyName, TypeReference type) propertyDescriptor)
         {
-            if (IsDiscriminator(property, parentType))
-            {
-                var value = GetDiscriminatorValue(property, parentType);
-                propertyDescriptor = (namer.PropertyName(property), new TypeReference($"'{value}'") {ExistingType = true});
-                return true;
-            }
+
 
             propertyDescriptor = default;
             return false;
