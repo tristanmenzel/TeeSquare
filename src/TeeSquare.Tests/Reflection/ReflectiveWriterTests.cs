@@ -171,6 +171,21 @@ namespace TeeSquare.Tests.Reflection
         }
 
         [Test]
+        public void NullablePropertiesAsNullUnion()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .Configure(options =>
+                    options.InterfaceWriterFactory =
+                        new InterfaceWriterFactory(OptionalFieldRendering.WithNullUnion))
+                .AddTypes(typeof(Book))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+        [Test]
         public void EntireTree()
         {
             var res = TeeSquareFluent.ReflectiveWriter()

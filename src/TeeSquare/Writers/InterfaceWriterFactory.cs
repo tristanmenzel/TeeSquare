@@ -10,7 +10,8 @@ namespace TeeSquare.Writers
     public enum OptionalFieldRendering
     {
         WithQuestionMark,
-        WithUndefinedUnion
+        WithUndefinedUnion,
+        WithNullUnion
     }
 
     public class InterfaceWriterFactory : IInterfaceWriterFactory
@@ -24,6 +25,19 @@ namespace TeeSquare.Writers
 
         private bool UseQuestionMark => _optionalFieldRendering == OptionalFieldRendering.WithQuestionMark;
 
+        private string GetOptionalUnion()
+        {
+            switch (_optionalFieldRendering)
+            {
+                case OptionalFieldRendering.WithNullUnion:
+                    return $" | null";
+                case OptionalFieldRendering.WithUndefinedUnion:
+                    return $" | undefined";
+                default:
+                    return string.Empty;
+            }
+        }
+
         public CodeSnippetWriter Build(IComplexTypeInfo typeInfo)
         {
             return writer =>
@@ -35,8 +49,8 @@ namespace TeeSquare.Writers
                 {
                     writer.Write($"{prop.Name}{(prop.Type.Optional && UseQuestionMark ? "?" : "")}: ", true);
                     writer.WriteTypeRef(prop.Type);
-                    if (prop.Type.Optional && !UseQuestionMark)
-                        writer.Write(" | undefined");
+                    if (prop.Type.Optional)
+                        writer.Write(GetOptionalUnion());
                     writer.WriteLine(";", false);
                 }
 
