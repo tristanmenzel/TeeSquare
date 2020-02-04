@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package>
+    <metadata>
+        <id>TeeSquare.WebApi.Core22</id>
+        <version>$version$</version>
+        <title>TeeSquare</title>
+        <authors>Tristan Menzel</authors>
+        <owners>Tristan Menzel</owners>
+        <projectUrl>https://github.com/tristanmenzel/TeeSquare</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Configures TeeSquare.WebApi to search for DotNetCore 2.2 web api types
+        </description>
+        <tags>TypeScript CodeGen WebApi</tags>
+    </metadata>
+</package>

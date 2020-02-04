@@ -1,8 +1,6 @@
 using System;
 using System.Reflection;
-using Microsoft.AspNetCore.Mvc;
 using TeeSquare.Reflection;
-using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
 
 namespace TeeSquare.WebApi.Reflection
@@ -12,7 +10,7 @@ namespace TeeSquare.WebApi.Reflection
         /// <summary>
         /// A typeConverter instance used to determine the name of a dotnet Type in TypeScript
         /// </summary>
-        new RouteNamer RouteNamer { get; }
+        RouteNamer RouteNamer { get; }
 
         /// <summary>
         /// The strategy to use to determine the return type of an api method. Default is to use
@@ -79,7 +77,7 @@ namespace TeeSquare.WebApi.Reflection
         public RouteNamer RouteNamer { get; set; } = new RouteNamer();
 
         public TypeConverter TypeConverter { get; set; } =
-            new TypeConverter((typeof(IActionResult), "unknown"));
+            new TypeConverter(StaticConfig.DefaultStaticMappings);
 
         public TypeConverter ImportTypeConverter { get; set; } = null;
 
