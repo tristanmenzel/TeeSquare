@@ -13,7 +13,7 @@ namespace TeeSquare.WebApi.Core22
         {
             if (_configured) return;
             _configured = true;
-            StaticConfig.ControllerType = typeof(Controller);
+            StaticConfig.ControllerType = typeof(ControllerBase);
 
             StaticConfig.FromBodyAttribute = typeof(FromBodyAttribute);
             StaticConfig.FromQueryAttribute = typeof(FromQueryAttribute);
