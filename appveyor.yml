@@ -1,5 +1,5 @@
-version: '3.0.{build}'
-image: Visual Studio 2017
+version: '3.1.{build}'
+image: Visual Studio 2019
 branches:
   only:
   - master
@@ -24,10 +24,14 @@ after_build:
   # For once the build has completed
   - cmd: dotnet pack ./src/teesquare/teesquare.csproj --configuration=release --no-restore
   - cmd: dotnet pack ./src/teesquare.webapi/teesquare.webapi.csproj --configuration=release --no-restore
+  - cmd: dotnet pack ./src/teesquare.webapi.core22/teesquare.webapi.core22.csproj --configuration=release --no-restore
+  - cmd: dotnet pack ./src/teesquare.webapi.core31/teesquare.webapi.core31.csproj --configuration=release --no-restore
   - cmd: dotnet pack ./src/teesquare.mobx/teesquare.mobx.csproj --configuration=release --no-restore
 artifacts:
  - path: '\src\teesquare\bin\release\*.nupkg'
  - path: '\src\teesquare.webapi\bin\release\*.nupkg'
+ - path: '\src\teesquare.webapi.core22\bin\release\*.nupkg'
+ - path: '\src\teesquare.webapi.core31\bin\release\*.nupkg'
  - path: '\src\teesquare.mobx\bin\release\*.nupkg'
    name: Package
    type: NugetPackage

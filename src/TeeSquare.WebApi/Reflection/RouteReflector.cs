@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
 using TeeSquare.Reflection;
 using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
@@ -30,8 +28,9 @@ namespace TeeSquare.WebApi.Reflection
 
         public void AddAssembly(Assembly assembly, Type baseController = null)
         {
+            CheckConfigured();
             var controllers = assembly.GetExportedTypes()
-                .Where(t => (baseController ?? typeof(Controller)).IsAssignableFrom(t));
+                .Where(t => (baseController ?? StaticConfig.ControllerType).IsAssignableFrom(t));
 
             foreach (var controller in controllers)
             {
@@ -77,11 +76,11 @@ namespace TeeSquare.WebApi.Reflection
 
         internal static ParameterKind GetParameterKind(ParameterInfo parameterInfo, string route, HttpMethod method)
         {
-            if (parameterInfo.GetCustomAttributes<FromBodyAttribute>().Any())
+            if (parameterInfo.GetCustomAttributes(StaticConfig.FromBodyAttribute).Any())
                 return ParameterKind.Body;
-            if (parameterInfo.GetCustomAttributes<FromQueryAttribute>().Any())
+            if (parameterInfo.GetCustomAttributes(StaticConfig.FromQueryAttribute).Any())
                 return ParameterKind.Query;
-            if (parameterInfo.GetCustomAttributes<FromRouteAttribute>().Any())
+            if (parameterInfo.GetCustomAttributes(StaticConfig.FromRouteAttribute).Any())
                 return ParameterKind.Route;
 
             if (route.Contains($"{{{parameterInfo.Name}}}"))
@@ -109,26 +108,26 @@ namespace TeeSquare.WebApi.Reflection
         internal static (RequestFactory factory, HttpMethod method) DefaultGetHttpMethodAndRequestFactory(
             Type controller, MethodInfo action)
         {
-            if (action.GetCustomAttributes<HttpPutAttribute>().Any())
+            if (action.GetCustomAttributes(StaticConfig.HttpPutAttribute).Any())
                 return (RequestInfo.Put, HttpMethod.Put);
-            if (action.GetCustomAttributes<HttpPostAttribute>().Any())
+            if (action.GetCustomAttributes(StaticConfig.HttpPostAttribute).Any())
                 return (RequestInfo.Post, HttpMethod.Post);
-            if (action.GetCustomAttributes<HttpDeleteAttribute>().Any())
+            if (action.GetCustomAttributes(StaticConfig.HttpDeleteAttribute).Any())
                 return (RequestInfo.Delete, HttpMethod.Delete);
             return (RequestInfo.Get, HttpMethod.Get);
         }
 
         internal static string DefaultBuildRouteStrategy(Type controller, MethodInfo action)
         {
-            var controllerRouteTemplate = controller.GetCustomAttributes<RouteAttribute>()
-                .Select(r => r.Template)
+            var controllerRouteTemplate = controller.GetCustomAttributes(StaticConfig.RouteAttribute)
+                .Select(StaticConfig.GetTemplateFromRouteAttribute)
                 .FirstOrDefault();
-            var methodRouteTemplate = action.GetCustomAttributes<RouteAttribute>()
-                .Select(r => r.Template)
+            var methodRouteTemplate = action.GetCustomAttributes(StaticConfig.RouteAttribute)
+                .Select(StaticConfig.GetTemplateFromRouteAttribute)
                 .FirstOrDefault();
             var httpMethodTemplate = action.GetCustomAttributes()
-                .OfType<HttpMethodAttribute>()
-                .Select(r => r.Template)
+                .Where(a=>StaticConfig.HttpMethodBaseAttribute.IsInstanceOfType(a))
+                .Select(StaticConfig.GetTemplateFromHttpMethodAttribute)
                 .FirstOrDefault();
 
             var parts = new List<string>();
@@ -198,8 +197,18 @@ namespace TeeSquare.WebApi.Reflection
                 });
         }
 
+        private void CheckConfigured()
+        {
+            if (StaticConfig.ControllerType == null)
+            {
+                throw new Exception("WebApi reflector has not been configured. Please include a TeeSquare.WebApi.{Platform} library or provide a manual configuration.");
+            }
+
+        }
+
         public void WriteTo(TypeScriptWriter writer)
         {
+            CheckConfigured();
             _options.WriteHeader(writer);
 
             var rWriter = new ReflectiveWriter(_options);

@@ -3,6 +3,7 @@ using System.Linq;
 using TeeSquare.DemoApi.Controllers;
 using TeeSquare.DemoApi.Hubs;
 using TeeSquare.WebApi;
+using TeeSquare.WebApi.Core22;
 
 namespace TeeSquare.DemoApi.CodeGen
 {
@@ -10,6 +11,7 @@ namespace TeeSquare.DemoApi.CodeGen
     {
         static void Main(string[] args)
         {
+            Core22Configurator.Configure();
             var outputPath = args
                 .SkipWhile(a => a != "-o")
                 .Skip(1)
