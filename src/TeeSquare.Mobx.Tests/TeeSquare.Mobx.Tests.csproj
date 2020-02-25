@@ -7,14 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nunit" Version="3.12.0"/>
-    <PackageReference Include="NUnit3TestAdapter" Version="3.16.1"/>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0"/>
+    <PackageReference Include="nunit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TeeSquare.Mobx\TeeSquare.Mobx.csproj"/>
-    <ProjectReference Include="..\TeeSquare.Tests\TeeSquare.Tests.csproj"/>
+    <ProjectReference Include="..\TeeSquare.Mobx\TeeSquare.Mobx.csproj" />
+    <ProjectReference Include="..\TeeSquare.Tests\TeeSquare.Tests.csproj" />
   </ItemGroup>
 
 </Project>

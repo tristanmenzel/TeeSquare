@@ -51,14 +51,19 @@ namespace TeeSquare.Mobx
             return writer =>
             {
                 writer.OpenBlock(
-                    $"export const {typeInfo.Name} = types.model('{typeInfo.Name}', ");
+                    $"export const {typeInfo.Name}Props = ");
                 foreach (var prop in typeInfo.Properties)
                 {
                     writer.Write($"{prop.Name}: ", true);
                     writer.Write(WrapType(prop.Type));
                     writer.WriteLine(",", false);
                 }
+                writer.CloseBlock();
 
+
+                writer.OpenBlock(
+                    $"export const {typeInfo.Name} = types.model('{typeInfo.Name}', ");
+                writer.WriteLine($"...{typeInfo.Name}Props");
                 writer.CloseBlock("});");
                 writer.WriteLine("");
                 if (_options.EmitInstanceType)
