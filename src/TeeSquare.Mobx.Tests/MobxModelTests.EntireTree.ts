@@ -10,12 +10,12 @@ export enum Title {
   Sir = 5,
   Madam = 6
 }
-export const NameProps =  {
+export const NameProps = {
   firstName: types.string,
   title: types.frozen<Title>(),
   lastName: types.string,
 }
-export const Name = types.model('Name',  {
+export const Name = types.model('Name', {
   ...NameProps
 });
 
@@ -27,7 +27,7 @@ export enum Audience {
   YoungAdults = 2,
   Adults = 3
 }
-export const BookProps =  {
+export const BookProps = {
   title: types.string,
   author: Name,
   isAvailable: types.boolean,
@@ -36,23 +36,23 @@ export const BookProps =  {
   reviewedPositively: types.maybe(types.boolean),
   recommendedAudience: types.maybe(types.frozen<Audience>()),
 }
-export const Book = types.model('Book',  {
+export const Book = types.model('Book', {
   ...BookProps
 });
 
 export type BookInstance = Instance<typeof Book>;
 
-export const LocationProps =  {
+export const LocationProps = {
   latitude: types.number,
   longitude: types.number,
 }
-export const Location = types.model('Location',  {
+export const Location = types.model('Location', {
   ...LocationProps
 });
 
 export type LocationInstance = Instance<typeof Location>;
 
-export const LibraryProps =  {
+export const LibraryProps = {
   name: types.string,
   location: Location,
   squareMeters: types.integer,
@@ -60,7 +60,7 @@ export const LibraryProps =  {
   allBooks: types.array(Book),
   topBorrowed: types.array(Book),
 }
-export const Library = types.model('Library',  {
+export const Library = types.model('Library', {
   ...LibraryProps
 });
 

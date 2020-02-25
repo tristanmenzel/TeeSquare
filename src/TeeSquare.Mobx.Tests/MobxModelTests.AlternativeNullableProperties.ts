@@ -10,12 +10,12 @@ export enum Title {
   Sir = 5,
   Madam = 6
 }
-export const NameProps =  {
+export const NameProps = {
   firstName: types.string,
   title: types.frozen<Title>(),
   lastName: types.string,
 }
-export const Name = types.model('Name',  {
+export const Name = types.model('Name', {
   ...NameProps
 });
 
@@ -27,7 +27,7 @@ export enum Audience {
   YoungAdults = 2,
   Adults = 3
 }
-export const BookProps =  {
+export const BookProps = {
   title: types.string,
   author: Name,
   isAvailable: types.boolean,
@@ -36,7 +36,7 @@ export const BookProps =  {
   reviewedPositively: types.maybeNull(types.boolean),
   recommendedAudience: types.maybeNull(types.frozen<Audience>()),
 }
-export const Book = types.model('Book',  {
+export const Book = types.model('Book', {
   ...BookProps
 });
 

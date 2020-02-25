@@ -10,12 +10,12 @@ export enum Title {
   Sir = 5,
   Madam = 6
 }
-export const NameProps =  {
+export const NameProps = {
   firstName: types.string,
   title: types.frozen<Title>(),
   lastName: types.string,
 }
-export const Name = types.model('Name',  {
+export const Name = types.model('Name', {
   ...NameProps
 });
 
