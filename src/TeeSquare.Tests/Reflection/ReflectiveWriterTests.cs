@@ -284,5 +284,17 @@ namespace TeeSquare.Tests.Reflection
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
+
+        [Test]
+        public void ReflectFields()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .AddTypes(typeof(Audit))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
     }
 }

@@ -103,6 +103,11 @@ namespace TeeSquare.Reflection
             return ToCase(propertyInfo.Name, NamingConventions.Properties);
         }
 
+        public virtual string FieldName(FieldInfo fieldInfo)
+        {
+            return ToCase(fieldInfo.Name, NamingConventions.Properties);
+        }
+
         public virtual string MethodName(MethodInfo methodInfo)
         {
             return ToCase(methodInfo.Name, NamingConventions.Methods);

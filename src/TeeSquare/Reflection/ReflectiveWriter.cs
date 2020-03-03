@@ -96,7 +96,12 @@ namespace TeeSquare.Reflection
                 .Select(p => p.PropertyType)
                 .Distinct()
                 .ToArray();
-            if (!_options.ReflectMethods(type)) return propertyDependencies;
+            var fieldDependencies = type
+                .GetFields(_options.FieldFlags)
+                .Select(f => f.FieldType)
+                .Distinct()
+                .ToArray();
+            if (!_options.ReflectMethods(type)) return propertyDependencies.Union(fieldDependencies).ToArray();
             var methodDependencies = type
                 .GetMethods(_options.MethodFlags)
                 .Where(m => !m.IsSpecialName)
@@ -105,7 +110,10 @@ namespace TeeSquare.Reflection
                 .Where(m => m != typeof(void))
                 .ToArray();
 
-            return propertyDependencies.Union(methodDependencies).ToArray();
+            return propertyDependencies
+                .Union(fieldDependencies)
+                .Union(methodDependencies)
+                .ToArray();
         }
 
         private string BuildImport(Type type)
@@ -190,7 +198,14 @@ namespace TeeSquare.Reflection
                     {
                         foreach (var pi in type.GetProperties(_options.PropertyFlags))
                         {
-                            i.AddProperty(TypeConverter.PropertyName(pi), TypeConverter.Convert(pi.PropertyType, type, pi));
+                            i.AddProperty(TypeConverter.PropertyName(pi),
+                                TypeConverter.Convert(pi.PropertyType, type, pi));
+                        }
+
+                        foreach (var fi in type.GetFields(_options.FieldFlags))
+                        {
+                            i.AddProperty(TypeConverter.FieldName(fi),
+                                TypeConverter.Convert(fi.FieldType, type, fi));
                         }
 
                         if (_options.ReflectMethods(type))

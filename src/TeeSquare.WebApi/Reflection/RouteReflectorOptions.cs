@@ -85,6 +85,9 @@ namespace TeeSquare.WebApi.Reflection
                                                           | BindingFlags.Public
                                                           | BindingFlags.Instance;
 
+        public BindingFlags FieldFlags { get; set; } = BindingFlags.Public
+                                                       | BindingFlags.Instance;
+
         public BindingFlags MethodFlags { get; set; } = BindingFlags.Instance
                                                         | BindingFlags.Public
                                                         | BindingFlags.DeclaredOnly;
