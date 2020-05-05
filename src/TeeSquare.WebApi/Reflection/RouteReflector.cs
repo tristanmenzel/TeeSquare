@@ -190,7 +190,11 @@ namespace TeeSquare.WebApi.Reflection
                     w.Indent();
                     w.WriteLine(".map(k => ({k, v: o[k]}))");
                     w.WriteLine(".filter(x => x.v !== undefined && x.v !== null)");
-                    w.WriteLine(".map(x => `${encodeURIComponent(x.k)}=${encodeURIComponent(x.v)}`)");
+                    w.WriteLine(".map(x => Array.isArray(x.v)");
+                    w.Indent();
+                    w.WriteLine("? x.v.map(v => `${encodeURIComponent(x.k)}=${encodeURIComponent(v)}`).join('&')");
+                    w.WriteLine(": `${encodeURIComponent(x.k)}=${encodeURIComponent(x.v)}`)");
+                    w.Deindent();
                     w.WriteLine(".join('&');");
                     w.Deindent();
                     w.WriteLine("return q && `?${q}` || '';");

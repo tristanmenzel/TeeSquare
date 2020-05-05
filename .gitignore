@@ -3,3 +3,4 @@
 /src/*/obj/
 !/src/TeeSquare.DemoApi/client/.gitkeep
 /src/TeeSquare.DemoApi/client
+/src/TeeSquare.sln.DotSettings.user
