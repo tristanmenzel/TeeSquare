@@ -6,7 +6,7 @@ namespace TeeSquare.WebApi.Reflection
     {
         public static bool IsAction(this MethodInfo action)
         {
-            return !action.IsDefined(StaticConfig.IgnoreActionAttribute)
+            return !action.IsDefined(StaticConfig.Instance.IgnoreActionAttribute)
                    && !action.IsSpecialName
                    && !action.DeclaringType.Namespace.StartsWith("System")
                    && !action.DeclaringType.Namespace.StartsWith("Microsoft");

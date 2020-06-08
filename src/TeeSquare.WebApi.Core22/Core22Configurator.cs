@@ -7,39 +7,43 @@ namespace TeeSquare.WebApi.Core22
 {
     public static class Core22Configurator
     {
-        private static bool _configured = false;
-
         public static void Configure()
         {
-            if (_configured) return;
-            _configured = true;
-            StaticConfig.ControllerType = typeof(ControllerBase);
+            StaticConfig.Configure(new Core22Configuration());
+        }
 
-            StaticConfig.FromBodyAttribute = typeof(FromBodyAttribute);
-            StaticConfig.FromQueryAttribute = typeof(FromQueryAttribute);
-            StaticConfig.FromRouteAttribute = typeof(FromRouteAttribute);
-
-            StaticConfig.HttpMethodBaseAttribute = typeof(HttpMethodAttribute);
-            StaticConfig.HttpGetAttribute = typeof(HttpGetAttribute);
-            StaticConfig.HttpPutAttribute = typeof(HttpPutAttribute);
-            StaticConfig.HttpPostAttribute = typeof(HttpPostAttribute);
-            StaticConfig.HttpDeleteAttribute = typeof(HttpDeleteAttribute);
-            StaticConfig.IgnoreActionAttribute = typeof(NonActionAttribute);
-            StaticConfig.RouteAttribute = typeof(RouteAttribute);
-
-            StaticConfig.GetTemplateFromRouteAttribute = obj =>
+        class Core22Configuration : WebApiConfig
+        {
+            public Core22Configuration()
             {
-                if (obj is RouteAttribute routeAttribute)
-                    return routeAttribute.Template;
-                return null;
-            };
-            StaticConfig.GetTemplateFromHttpMethodAttribute = obj =>
-            {
-                if (obj is HttpMethodAttribute httpMethodAttribute)
-                    return httpMethodAttribute.Template;
-                return null;
-            };
-            StaticConfig.DefaultStaticMappings = new[] {(typeof(IActionResult), "unknown")};
+                ControllerType = typeof(ControllerBase);
+
+                FromBodyAttribute = typeof(FromBodyAttribute);
+                FromQueryAttribute = typeof(FromQueryAttribute);
+                FromRouteAttribute = typeof(FromRouteAttribute);
+
+                HttpMethodBaseAttribute = typeof(HttpMethodAttribute);
+                HttpGetAttribute = typeof(HttpGetAttribute);
+                HttpPutAttribute = typeof(HttpPutAttribute);
+                HttpPostAttribute = typeof(HttpPostAttribute);
+                HttpDeleteAttribute = typeof(HttpDeleteAttribute);
+                IgnoreActionAttribute = typeof(NonActionAttribute);
+                RouteAttribute = typeof(RouteAttribute);
+
+                GetTemplateFromRouteAttribute = obj =>
+                {
+                    if (obj is RouteAttribute routeAttribute)
+                        return routeAttribute.Template;
+                    return null;
+                };
+                GetTemplateFromHttpMethodAttribute = obj =>
+                {
+                    if (obj is HttpMethodAttribute httpMethodAttribute)
+                        return httpMethodAttribute.Template;
+                    return null;
+                };
+                DefaultStaticMappings = new[] {(typeof(IActionResult), "unknown")};
+            }
         }
     }
 }

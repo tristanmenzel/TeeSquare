@@ -4,5 +4,6 @@
     <Authors>Tristan Menzel</Authors>
     <TargetFrameworks>netcoreapp2.0;netcoreapp2.1;netcoreapp2.2;netcoreapp3.0;netcoreapp3.1;net48;</TargetFrameworks>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 </Project>

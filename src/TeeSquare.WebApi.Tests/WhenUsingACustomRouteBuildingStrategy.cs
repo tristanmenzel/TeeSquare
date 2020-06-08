@@ -17,8 +17,8 @@ namespace TeeSquare.WebApi.Tests
                 .Configure(options =>
                 {
                     var defaultStrategy = options.BuildRouteStrategy;
-                    options.BuildRouteStrategy = (controller, action) =>
-                        $"prefix/{defaultStrategy(controller, action)}";
+                    options.BuildRouteStrategy = (controller, action, defaultRoute) =>
+                        $"prefix/{defaultStrategy(controller, action, defaultRoute)}";
                 })
                 .WriteToString();
 

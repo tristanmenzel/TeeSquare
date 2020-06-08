@@ -8,6 +8,13 @@ namespace TeeSquare.WebApi.Reflection
     public interface IRouteReflectorOptions : IReflectiveWriterOptions
     {
         /// <summary>
+        /// The default route pattern to use in the absence of route attributes.
+        ///
+        /// eg. {controller=Home}/{action=Index}/{id?}
+        /// </summary>
+        string DefaultRoute { get; }
+
+        /// <summary>
         /// A typeConverter instance used to determine the name of a dotnet Type in TypeScript
         /// </summary>
         RouteNamer RouteNamer { get; }
@@ -74,10 +81,12 @@ namespace TeeSquare.WebApi.Reflection
 
     public class RouteReflectorOptions : IRouteReflectorOptions
     {
+        public string DefaultRoute { get; set; } = "{controller=Home}/{action=Index}/{id?}";
+
         public RouteNamer RouteNamer { get; set; } = new RouteNamer();
 
         public TypeConverter TypeConverter { get; set; } =
-            new TypeConverter(StaticConfig.DefaultStaticMappings);
+            new TypeConverter(StaticConfig.Instance.DefaultStaticMappings);
 
         public TypeConverter ImportTypeConverter { get; set; } = null;
 
@@ -130,7 +139,7 @@ namespace TeeSquare.WebApi.Reflection
 
     public delegate Type GetApiReturnType(Type controller, MethodInfo action);
 
-    public delegate string BuildRoute(Type controller, MethodInfo action);
+    public delegate string BuildRoute(Type controller, MethodInfo action, string defaultRoute);
 
     public delegate (RequestFactory factory, HttpMethod method) GetHttpMethodAndRequestFactory(Type controller,
         MethodInfo action);

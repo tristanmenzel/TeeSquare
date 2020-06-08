@@ -29,6 +29,18 @@ export const toQuery = (o: {[key: string]: any}): string => {
   return q && `?${q}` || '';
 };
 export abstract class RequestFactory {
+  static GetDefaultrouteIndex(): GetRequest<number> {
+    return {
+      method: 'GET',
+      url: `defaultroute/index`
+    };
+  }
+  static GetDefaultrouteGetnumById(id: number): GetRequest<number> {
+    return {
+      method: 'GET',
+      url: `defaultroute/getnum/${id}`
+    };
+  }
   static GetApiOtherImplicitQuery(id?: number): GetRequest<number> {
     const query = toQuery({id});
     return {

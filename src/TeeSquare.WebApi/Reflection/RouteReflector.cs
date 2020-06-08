@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using TeeSquare.Reflection;
 using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
@@ -30,7 +31,7 @@ namespace TeeSquare.WebApi.Reflection
         {
             CheckConfigured();
             var controllers = assembly.GetExportedTypes()
-                .Where(t => (baseController ?? StaticConfig.ControllerType).IsAssignableFrom(t));
+                .Where(t => (baseController ?? StaticConfig.Instance.ControllerType).IsAssignableFrom(t));
 
             foreach (var controller in controllers)
             {
@@ -44,7 +45,7 @@ namespace TeeSquare.WebApi.Reflection
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod)
                 .Where(a => a.IsAction()))
             {
-                var route = _options.BuildRouteStrategy(controller, action);
+                var route = _options.BuildRouteStrategy(controller, action, _options.DefaultRoute);
 
                 var (factory, method) = _options.GetHttpMethodAndRequestFactoryStrategy(controller, action);
                 var requestParams = GetRequestParams(action, route, method);
@@ -76,11 +77,11 @@ namespace TeeSquare.WebApi.Reflection
 
         internal static ParameterKind GetParameterKind(ParameterInfo parameterInfo, string route, HttpMethod method)
         {
-            if (parameterInfo.GetCustomAttributes(StaticConfig.FromBodyAttribute).Any())
+            if (parameterInfo.GetCustomAttributes(StaticConfig.Instance.FromBodyAttribute).Any())
                 return ParameterKind.Body;
-            if (parameterInfo.GetCustomAttributes(StaticConfig.FromQueryAttribute).Any())
+            if (parameterInfo.GetCustomAttributes(StaticConfig.Instance.FromQueryAttribute).Any())
                 return ParameterKind.Query;
-            if (parameterInfo.GetCustomAttributes(StaticConfig.FromRouteAttribute).Any())
+            if (parameterInfo.GetCustomAttributes(StaticConfig.Instance.FromRouteAttribute).Any())
                 return ParameterKind.Route;
 
             if (route.Contains($"{{{parameterInfo.Name}}}"))
@@ -108,26 +109,26 @@ namespace TeeSquare.WebApi.Reflection
         internal static (RequestFactory factory, HttpMethod method) DefaultGetHttpMethodAndRequestFactory(
             Type controller, MethodInfo action)
         {
-            if (action.GetCustomAttributes(StaticConfig.HttpPutAttribute).Any())
+            if (action.GetCustomAttributes(StaticConfig.Instance.HttpPutAttribute).Any())
                 return (RequestInfo.Put, HttpMethod.Put);
-            if (action.GetCustomAttributes(StaticConfig.HttpPostAttribute).Any())
+            if (action.GetCustomAttributes(StaticConfig.Instance.HttpPostAttribute).Any())
                 return (RequestInfo.Post, HttpMethod.Post);
-            if (action.GetCustomAttributes(StaticConfig.HttpDeleteAttribute).Any())
+            if (action.GetCustomAttributes(StaticConfig.Instance.HttpDeleteAttribute).Any())
                 return (RequestInfo.Delete, HttpMethod.Delete);
             return (RequestInfo.Get, HttpMethod.Get);
         }
 
-        internal static string DefaultBuildRouteStrategy(Type controller, MethodInfo action)
+        internal static string DefaultBuildRouteStrategy(Type controller, MethodInfo action, string defaultRoute)
         {
-            var controllerRouteTemplate = controller.GetCustomAttributes(StaticConfig.RouteAttribute)
-                .Select(StaticConfig.GetTemplateFromRouteAttribute)
+            var controllerRouteTemplate = controller.GetCustomAttributes(StaticConfig.Instance.RouteAttribute)
+                .Select(StaticConfig.Instance.GetTemplateFromRouteAttribute)
                 .FirstOrDefault();
-            var methodRouteTemplate = action.GetCustomAttributes(StaticConfig.RouteAttribute)
-                .Select(StaticConfig.GetTemplateFromRouteAttribute)
+            var methodRouteTemplate = action.GetCustomAttributes(StaticConfig.Instance.RouteAttribute)
+                .Select(StaticConfig.Instance.GetTemplateFromRouteAttribute)
                 .FirstOrDefault();
             var httpMethodTemplate = action.GetCustomAttributes()
-                .Where(a=>StaticConfig.HttpMethodBaseAttribute.IsInstanceOfType(a))
-                .Select(StaticConfig.GetTemplateFromHttpMethodAttribute)
+                .Where(a => StaticConfig.Instance.HttpMethodBaseAttribute.IsInstanceOfType(a))
+                .Select(StaticConfig.Instance.GetTemplateFromHttpMethodAttribute)
                 .FirstOrDefault();
 
             var parts = new List<string>();
@@ -145,10 +146,31 @@ namespace TeeSquare.WebApi.Reflection
                     parts.Add(httpMethodTemplate);
             }
 
+            var routeTemplate = parts.Any() ? string.Join("/", parts) : defaultRoute;
 
-            return string.Join("/", parts)
-                .Replace("[controller]", controller.Name.Replace("Controller", "").ToLower())
+
+            return ReplaceRoutePlaceholders(routeTemplate, controller, action)
                 .Trim('/');
+        }
+
+        public static string ReplaceRoutePlaceholders(string routeTemplate, Type controller, MethodInfo action)
+        {
+            var partRegexSquare = new Regex(@"\[(?<part>[^]=?]+)[?]?(=[^]]+)?\]");
+            var partRegexBraces = new Regex(@"\{(?<part>[^}=?]+)[?]?(=[^}]+)?\}");
+
+            string MatchReplacer(Match match) => match.Groups["part"].Value switch
+            {
+                "controller" => controller.Name.Replace("Controller", "").ToLower(),
+                "action" => action.Name.ToLower(),
+                _ => action.GetParameters().Any(p => p.Name.Equals(match.Groups["part"].Value))
+                    ? $"{{{match.Groups["part"].Value}}}"
+                    : ""
+            };
+
+
+            return partRegexSquare.Replace(
+                partRegexBraces.Replace(routeTemplate, MatchReplacer),
+                MatchReplacer);
         }
 
         private void WriteRequestTypesAndHelpers(TypeScriptWriter writer)
@@ -203,11 +225,11 @@ namespace TeeSquare.WebApi.Reflection
 
         private void CheckConfigured()
         {
-            if (StaticConfig.ControllerType == null)
+            if (StaticConfig.Instance.ControllerType == null)
             {
-                throw new Exception("WebApi reflector has not been configured. Please include a TeeSquare.WebApi.{Platform} library or provide a manual configuration.");
+                throw new Exception(
+                    "WebApi reflector has not been configured. Please include a TeeSquare.WebApi.{Platform} library or provide a manual configuration.");
             }
-
         }
 
         public void WriteTo(TypeScriptWriter writer)
@@ -253,6 +275,7 @@ namespace TeeSquare.WebApi.Reflection
                                 {
                                     requestBodyType = new TypeReference($"{requestBodyType.FullName} | undefined");
                                 }
+
                                 methodBuilder
                                     .WithReturnType(new TypeReference($"{req.Method.GetName()}Request",
                                         new[]
@@ -276,7 +299,9 @@ namespace TeeSquare.WebApi.Reflection
                                     foreach (var rp in req.RequestParams.Where(x => x.Kind != ParameterKind.Body))
 
                                     {
-                                        p.Param(rp.Name, _options.TypeConverter.Convert(rp.Type).MakeOptional(rp.Kind == ParameterKind.Query));
+                                        p.Param(rp.Name,
+                                            _options.TypeConverter.Convert(rp.Type)
+                                                .MakeOptional(rp.Kind == ParameterKind.Query));
                                     }
 
                                     if (req.Method.HasRequestBody())
