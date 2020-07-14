@@ -26,5 +26,5 @@ export const toQuery = (o: {[key: string]: any}): string => {
       ? x.v.map(v => `${encodeURIComponent(x.k)}=${encodeURIComponent(v)}`).join('&')
       : `${encodeURIComponent(x.k)}=${encodeURIComponent(x.v)}`)
     .join('&');
-  return q && `?${q}` || '';
+  return q ? `?${q}` : '';
 };

@@ -219,7 +219,7 @@ namespace TeeSquare.WebApi.Reflection
                     w.Deindent();
                     w.WriteLine(".join('&');");
                     w.Deindent();
-                    w.WriteLine("return q && `?${q}` || '';");
+                    w.WriteLine("return q ? `?${q}` : '';");
                 });
         }
 
