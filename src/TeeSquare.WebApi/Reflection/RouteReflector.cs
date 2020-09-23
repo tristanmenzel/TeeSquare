@@ -158,12 +158,14 @@ namespace TeeSquare.WebApi.Reflection
             var partRegexSquare = new Regex(@"\[(?<part>[^]=?]+)[?]?(=[^]]+)?\]");
             var partRegexBraces = new Regex(@"\{(?<part>[^}=?]+)[?]?(=[^}]+)?\}");
 
+            string extractParameterName(string part) => !part.Contains(':') ? part : part.Substring(0, part.IndexOf(':'));
+
             string MatchReplacer(Match match) => match.Groups["part"].Value switch
             {
                 "controller" => controller.Name.Replace("Controller", "").ToLower(),
                 "action" => action.Name.ToLower(),
-                _ => action.GetParameters().Any(p => p.Name.Equals(match.Groups["part"].Value))
-                    ? $"{{{match.Groups["part"].Value}}}"
+                _ => action.GetParameters().Any(p => p.Name.Equals(extractParameterName(match.Groups["part"].Value)))
+                    ? $"{{{extractParameterName(match.Groups["part"].Value)}}}"
                     : ""
             };
 

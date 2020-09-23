@@ -74,6 +74,32 @@ export abstract class RequestFactory {
       url: `api/return-test`
     };
   }
+  static GetApiRouteconstraintsUserById(id: number): GetRequest<string> {
+    return {
+      method: 'GET',
+      url: `api/routeconstraints/user/${id}`
+    };
+  }
+  static GetApiRouteconstraintsUserByName(name: string, limit?: number): GetRequest<string[]> {
+    const query = toQuery({limit});
+    return {
+      method: 'GET',
+      url: `api/routeconstraints/user/${name}${query}`
+    };
+  }
+  static GetApiRouteconstraintsUserByNameByPageByPageSize(name: string, page: number, pageSize: number): GetRequest<string[]> {
+    return {
+      method: 'GET',
+      url: `api/routeconstraints/user/${name}/${page}/${pageSize}`
+    };
+  }
+  static PutApiRouteconstraintsUserByAge(age: number, data: TestDto): PutRequest<TestDto, unknown> {
+    return {
+      method: 'PUT',
+      data,
+      url: `api/routeconstraints/user/${age}`
+    };
+  }
   static GetApiRouteNumberOne(): GetRequest<string> {
     return {
       method: 'GET',
