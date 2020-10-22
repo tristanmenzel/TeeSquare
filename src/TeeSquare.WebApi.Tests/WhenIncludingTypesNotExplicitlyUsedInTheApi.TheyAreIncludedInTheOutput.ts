@@ -41,6 +41,16 @@ export abstract class RequestFactory {
       url: `defaultroute/getnum/${id}`
     };
   }
+  static PostFormvaluePostsomevalues(name: string, specialFile: File): PostRequest<FormData, number> {
+    const data = new FormData();
+    data.append('name', name);
+    data.append('specialFile', specialFile);
+    return {
+      method: 'POST',
+      data,
+      url: `formvalue/postsomevalues`
+    };
+  }
   static GetApiOtherImplicitQuery(id?: number): GetRequest<number> {
     const query = toQuery({id});
     return {
@@ -68,7 +78,7 @@ export abstract class RequestFactory {
       url: `api/other/do-a-thing${query}`
     };
   }
-  static GetApiReturnTest(): GetRequest<unknown> {
+  static GetApiReturnTest(): GetRequest<ActionResult> {
     return {
       method: 'GET',
       url: `api/return-test`
@@ -93,7 +103,7 @@ export abstract class RequestFactory {
       url: `api/routeconstraints/user/${name}/${page}/${pageSize}`
     };
   }
-  static PutApiRouteconstraintsUserByAge(age: number, data: TestDto): PutRequest<TestDto, unknown> {
+  static PutApiRouteconstraintsUserByAge(age: number, data: TestDto): PutRequest<TestDto, ActionResult> {
     return {
       method: 'PUT',
       data,
@@ -118,7 +128,7 @@ export abstract class RequestFactory {
       url: `gettit`
     };
   }
-  static GetApi(): GetRequest<unknown> {
+  static GetApi(): GetRequest<ActionResult> {
     return {
       method: 'GET',
       url: `api`
@@ -137,7 +147,7 @@ export abstract class RequestFactory {
       url: `api/test`
     };
   }
-  static PutApiTestById(id: number, data: TestDto): PutRequest<TestDto, unknown> {
+  static PutApiTestById(id: number, data: TestDto): PutRequest<TestDto, ActionResult> {
     return {
       method: 'PUT',
       data,
@@ -176,6 +186,16 @@ export abstract class RequestFactory {
       url: `api/values/${id}`
     };
   }
+}
+export interface ActionResult {
+}
+export interface StringValues {
+  count: number;
+  item: string;
+}
+export interface HeaderDictionary {
+  item: StringValues;
+  contentLength?: number;
 }
 export interface NotUsedInApiTestDto {
   hello: string;

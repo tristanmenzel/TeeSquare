@@ -83,6 +83,8 @@ namespace TeeSquare.WebApi.Reflection
                 return ParameterKind.Query;
             if (parameterInfo.GetCustomAttributes(StaticConfig.Instance.FromRouteAttribute).Any())
                 return ParameterKind.Route;
+            if (parameterInfo.GetCustomAttributes(StaticConfig.Instance.FromFormAttribute).Any())
+                return ParameterKind.Form;
 
             if (route.Contains($"{{{parameterInfo.Name}}}"))
             {
@@ -272,7 +274,9 @@ namespace TeeSquare.WebApi.Reflection
 
                             if (req.Method.HasRequestBody())
                             {
-                                var requestBodyType = _options.TypeConverter.Convert(req.GetRequestBodyType(), null);
+                                var requestBodyType = req.GetRequestBodyKind() == RequestBodyKind.Json
+                                    ? _options.TypeConverter.Convert(req.GetRequestBodyType(), null)
+                                    : new TypeReference("FormData");
                                 if (requestBodyType.Optional)
                                 {
                                     requestBodyType = new TypeReference($"{requestBodyType.FullName} | undefined");
@@ -306,7 +310,7 @@ namespace TeeSquare.WebApi.Reflection
                                                 .MakeOptional(rp.Kind == ParameterKind.Query));
                                     }
 
-                                    if (req.Method.HasRequestBody())
+                                    if (req.Method.HasRequestBody() && req.GetRequestBodyKind() == RequestBodyKind.Json)
                                         p.Param("data", _options.TypeConverter.Convert(req.GetRequestBodyType(), null));
                                 })
                                 .WithBody(w =>
@@ -319,6 +323,17 @@ namespace TeeSquare.WebApi.Reflection
                                         w.WriteDelimited(queryParams,
                                             (p, wr) => wr.Write(p.Name), ", ");
                                         w.WriteLine("});", false);
+                                    }
+
+                                    var formParams = req.RequestParams.Where(x => x.Kind == ParameterKind.Form)
+                                        .ToArray();
+                                    if ((formParams.Any()))
+                                    {
+                                        w.WriteLine("const data = new FormData();");
+                                        foreach (var formParam in formParams)
+                                        {
+                                            w.WriteLine($"data.append('{formParam.Name}', {formParam.Name});");
+                                        }
                                     }
 
                                     w.WriteLine("return {");

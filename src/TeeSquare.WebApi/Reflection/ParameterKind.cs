@@ -4,6 +4,7 @@ namespace TeeSquare.WebApi.Reflection
     {
         Route,
         Query,
-        Body
+        Body,
+        Form
     }
 }

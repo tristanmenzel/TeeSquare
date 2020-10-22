@@ -29,6 +29,15 @@ namespace TeeSquare.WebApi.Reflection
                        .FirstOrDefault() ?? typeof(void);
         }
 
+        public RequestBodyKind GetRequestBodyKind()
+        {
+            if (RequestParams.Any(rp => rp.Kind == ParameterKind.Form))
+                return RequestBodyKind.FormData;
+            if (RequestParams.Any(rp => rp.Kind == ParameterKind.Body))
+                return RequestBodyKind.Json;
+            return RequestBodyKind.Empty;
+        }
+
         public static RequestInfo Post(string name, string path, Type responseType, ParamInfo[] requestParams)
         {
             return new RequestInfo(name, HttpMethod.Post, path, responseType, requestParams);

@@ -15,7 +15,7 @@ namespace TeeSquare.WebApi.Reflection
     public interface IWebApiConfig
     {
         Type ControllerType { get; }
-
+        Type FromFormAttribute { get; }
         Type FromBodyAttribute { get; }
         Type FromQueryAttribute { get; }
         Type FromRouteAttribute { get; }
@@ -37,6 +37,7 @@ namespace TeeSquare.WebApi.Reflection
     public abstract class WebApiConfig : IWebApiConfig
     {
         public Type ControllerType { get; protected set; }
+        public Type FromFormAttribute { get; protected set; }
         public Type FromBodyAttribute { get; protected set; }
         public Type FromQueryAttribute { get;protected  set; }
         public Type FromRouteAttribute { get; protected set; }
