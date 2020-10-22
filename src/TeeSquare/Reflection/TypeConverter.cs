@@ -47,6 +47,11 @@ namespace TeeSquare.Reflection
             return _staticMappings.TryGetValue(type, out tsType);
         }
 
+        public bool HasStaticMapping(Type type)
+        {
+            return _staticMappings.ContainsKey(type);
+        }
+
         /// <summary>
         /// Converts a c# type into a typescript type.
         /// </summary>

@@ -91,6 +91,9 @@ namespace TeeSquare.Reflection
 
         private Type[] GetTypeDependencies(Type type)
         {
+            // Don't reflect dependencies on statically mapped types
+            if (TypeConverter.HasStaticMapping(type))
+                return new Type[0];
             var propertyDependencies = type
                 .GetProperties(_options.PropertyFlags)
                 .Select(p => p.PropertyType)
