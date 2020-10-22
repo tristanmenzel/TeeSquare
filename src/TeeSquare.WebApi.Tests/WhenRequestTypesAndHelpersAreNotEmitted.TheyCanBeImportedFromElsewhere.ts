@@ -1,7 +1,6 @@
 // Auto-generated Code - Do Not Edit
 
 import { GetRequest, PutRequest, PostRequest, DeleteRequest, toQuery } from './WhenNoControllersAreReferenced.OnlySharedTypesAreEmitted';
-
 export abstract class RequestFactory {
   static GetApiTestById(id: number): GetRequest<TestDto> {
     return {

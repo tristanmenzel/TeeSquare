@@ -189,13 +189,13 @@ export abstract class RequestFactory {
 }
 export interface ActionResult {
 }
-export interface StringValues {
-  count: number;
-  item: string;
-}
 export interface HeaderDictionary {
   item: StringValues;
   contentLength?: number;
+}
+export interface StringValues {
+  count: number;
+  item: string;
 }
 export interface TestDto {
   hello: string;

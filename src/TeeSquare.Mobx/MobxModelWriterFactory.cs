@@ -51,7 +51,7 @@ namespace TeeSquare.Mobx
             return writer =>
             {
                 writer.OpenBlock(
-                    $"export const {typeInfo.Name}Props =");
+                    $"export var {typeInfo.Name}Props =");
                 foreach (var prop in typeInfo.Properties)
                 {
                     writer.Write($"{prop.Name}: ", true);
@@ -62,7 +62,7 @@ namespace TeeSquare.Mobx
 
 
                 writer.OpenBlock(
-                    $"export const {typeInfo.Name} = types.model('{typeInfo.Name}',");
+                    $"export var {typeInfo.Name} = types.model('{typeInfo.Name}',");
                 writer.WriteLine($"...{typeInfo.Name}Props");
                 writer.CloseBlock("});");
                 writer.WriteLine("");

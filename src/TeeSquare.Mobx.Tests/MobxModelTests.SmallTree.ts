@@ -1,6 +1,17 @@
 // Auto-generated Code - Do Not Edit
 
 import { types, Instance } from 'mobx-state-tree';
+export var NameProps = {
+  firstName: types.string,
+  title: types.frozen<Title>(),
+  lastName: types.string,
+}
+export var Name = types.model('Name', {
+  ...NameProps
+});
+
+export type NameInstance = Instance<typeof Name>;
+
 export enum Title {
   Unknown = 0,
   Mr = 1,
@@ -10,14 +21,3 @@ export enum Title {
   Sir = 5,
   Madam = 6
 }
-export const NameProps = {
-  firstName: types.string,
-  title: types.frozen<Title>(),
-  lastName: types.string,
-}
-export const Name = types.model('Name', {
-  ...NameProps
-});
-
-export type NameInstance = Instance<typeof Name>;
-

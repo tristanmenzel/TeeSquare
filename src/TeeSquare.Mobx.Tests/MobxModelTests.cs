@@ -8,7 +8,6 @@ namespace TeeSquare.Mobx.Tests
     [TestFixture]
     public class MobxModelTests
     {
-        private const bool CreateFileForActual = false;
 
         [Test]
         public void LeafClass()
@@ -19,7 +18,7 @@ namespace TeeSquare.Mobx.Tests
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")
-                .To(res, CreateFileForActual)
+                .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
 
@@ -33,7 +32,7 @@ namespace TeeSquare.Mobx.Tests
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")
-                .To(res, CreateFileForActual)
+                .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
 
@@ -46,7 +45,7 @@ namespace TeeSquare.Mobx.Tests
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")
-                .To(res, CreateFileForActual)
+                .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
 
@@ -62,7 +61,7 @@ namespace TeeSquare.Mobx.Tests
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")
-                .To(res, CreateFileForActual)
+                .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
 
@@ -75,7 +74,7 @@ namespace TeeSquare.Mobx.Tests
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")
-                .To(res, CreateFileForActual)
+                .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
 
@@ -91,7 +90,7 @@ namespace TeeSquare.Mobx.Tests
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")
-                .To(res, CreateFileForActual)
+                .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
 
