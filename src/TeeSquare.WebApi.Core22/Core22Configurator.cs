@@ -18,6 +18,7 @@ namespace TeeSquare.WebApi.Core22
             {
                 ControllerType = typeof(ControllerBase);
 
+                FromFormAttribute = typeof(FromFormAttribute);
                 FromBodyAttribute = typeof(FromBodyAttribute);
                 FromQueryAttribute = typeof(FromQueryAttribute);
                 FromRouteAttribute = typeof(FromRouteAttribute);

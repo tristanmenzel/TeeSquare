@@ -22,7 +22,7 @@ namespace TeeSquare.Reflection
 
         public void AddTypes(params Type[] types)
         {
-            foreach (var type in types.OrderBy(t => t.Name))
+            foreach (var type in types)
             {
                 if (type.IsExtendedPrimitive())
                 {
@@ -75,6 +75,8 @@ namespace TeeSquare.Reflection
 
                 if (!Types.Contains(type))
                 {
+                    Types.AddLocal(type);
+
                     if (!type.IsEnum)
                     {
                         var dependencies = GetTypeDependencies(type);
@@ -83,8 +85,6 @@ namespace TeeSquare.Reflection
                             AddTypes(dependencies);
                         }
                     }
-
-                    Types.AddLocal(type);
                 }
             }
         }
@@ -101,7 +101,10 @@ namespace TeeSquare.Reflection
                 .Select(f => f.FieldType)
                 .Distinct()
                 .ToArray();
-            if (!_options.ReflectMethods(type)) return propertyDependencies.Union(fieldDependencies).ToArray();
+            if (!_options.ReflectMethods(type))
+                return propertyDependencies
+                    .Union(fieldDependencies)
+                    .ToArray();
             var methodDependencies = type
                 .GetMethods(_options.MethodFlags)
                 .Where(m => !m.IsSpecialName)
@@ -168,7 +171,7 @@ namespace TeeSquare.Reflection
                 WriteImports(writer);
             }
 
-            foreach (var type in Types.LocalTypes)
+            foreach (var type in Types.LocalTypes.OrderBy(t => t.Name))
             {
                 var typeRef = TypeConverter.Convert(type);
 

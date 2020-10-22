@@ -1,19 +1,5 @@
 // Auto-generated Code - Do Not Edit
 
-export enum Title {
-  Unknown = 0,
-  Mr = 1,
-  Mrs = 2,
-  Miss = 3,
-  Doctor = 4,
-  Sir = 5,
-  Madam = 6
-}
-export interface Name {
-  firstName: string;
-  title: Title;
-  lastName: string;
-}
 export enum Audience {
   Children = 0,
   Teenagers = 1,
@@ -38,4 +24,18 @@ export interface Member {
   previouslyBorrowedBooks: Book[];
   currentBooks: { [key: string]: Book };
   ratings: KeyValuePair<string, number>[];
+}
+export interface Name {
+  firstName: string;
+  title: Title;
+  lastName: string;
+}
+export enum Title {
+  Unknown = 0,
+  Mr = 1,
+  Mrs = 2,
+  Miss = 3,
+  Doctor = 4,
+  Sir = 5,
+  Madam = 6
 }

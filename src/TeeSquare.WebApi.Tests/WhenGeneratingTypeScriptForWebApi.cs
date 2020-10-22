@@ -1,7 +1,9 @@
 ﻿using System.Reflection;
 using BlurkCompare;
+using Microsoft.AspNetCore.Http;
 using NUnit.Framework;
 using TeeSquare.DemoApi.Controllers;
+using TeeSquare.Reflection;
 
 namespace TeeSquare.WebApi.Tests
 {
@@ -15,6 +17,10 @@ namespace TeeSquare.WebApi.Tests
         public void AllRoutesAndDtosAreOutput()
         {
             var res = TeeSquareWebApi.GenerateForAssemblies(WebApiAssembly)
+                .Configure(options =>
+                {
+                    options.TypeConverter = new TypeConverter((typeof(IFormFile), "File"));
+                })
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")

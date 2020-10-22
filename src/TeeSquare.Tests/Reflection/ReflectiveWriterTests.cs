@@ -4,6 +4,7 @@ using BlurkCompare;
 using NUnit.Framework;
 using TeeSquare.Reflection;
 using TeeSquare.Tests.Reflection.FakeDomain;
+using TeeSquare.Tests.Reflection.TreeDomain;
 using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
 
@@ -294,6 +295,18 @@ namespace TeeSquare.Tests.Reflection
 
             Blurk.CompareImplicitFile("ts")
                 .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+        [Test]
+        public void ReflectRecursiveTree()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .AddTypes(typeof(TreeNode))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res, true)
                 .AssertAreTheSame(Assert.Fail);
         }
     }
