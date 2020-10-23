@@ -4,6 +4,7 @@ using BlurkCompare;
 using NUnit.Framework;
 using TeeSquare.Reflection;
 using TeeSquare.Tests.Reflection.FakeDomain;
+using TeeSquare.Tests.Reflection.NullableReferenceTypes;
 using TeeSquare.Tests.Reflection.TreeDomain;
 using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
@@ -306,7 +307,20 @@ namespace TeeSquare.Tests.Reflection
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")
-                .To(res, true)
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+
+        [Test]
+        public void NullableReferenceTypes()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .AddTypes(typeof(TypeWithNullableReference))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
     }

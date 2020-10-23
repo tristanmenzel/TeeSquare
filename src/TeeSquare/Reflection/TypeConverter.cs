@@ -61,11 +61,12 @@ namespace TeeSquare.Reflection
         /// <returns></returns>
         public virtual ITypeReference Convert(Type type, Type parentType = null, MemberInfo info = null)
         {
+            var isNullableReference = (info as PropertyInfo)?.IsNullableReference() ?? false;
             if (TryGetStaticMapping(type, out var mapping))
                 return new TypeReference(mapping)
                 {
                     ExistingType = true
-                };
+                }.MakeOptional(isNullableReference);
             if (type.IsTask(out var resultType))
             {
                 return Convert(resultType, parentType, info);
@@ -85,11 +86,11 @@ namespace TeeSquare.Reflection
             if (type.IsDictionary(out var genericTypeParams))
                 return new TypeReference(
                         $"{{ [key: {Convert(genericTypeParams[0], parentType, info).FullName}]: {Convert(genericTypeParams[1], parentType, info).FullName} }}")
-                    ;
+                        .MakeOptional(isNullableReference)                    ;
 
             if (type.IsCollection(out var itemType))
             {
-                return Convert(itemType, parentType, info).MakeArray();
+                return Convert(itemType, parentType, info).MakeArray().MakeOptional(isNullableReference);
             }
 
             if (type.IsGenericType)
@@ -97,10 +98,11 @@ namespace TeeSquare.Reflection
                 var nonGenericName = TypeName(type);
                 return new TypeReference(nonGenericName, type.GetGenericArguments()
                     .Select(t => Convert(t, parentType, info))
-                    .ToArray());
+                    .ToArray())
+                    .MakeOptional(isNullableReference);
             }
 
-            return new TypeReference(TypeName(type));
+            return new TypeReference(TypeName(type)).MakeOptional(isNullableReference);
         }
 
         public virtual string PropertyName(PropertyInfo propertyInfo)
