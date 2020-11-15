@@ -31,7 +31,8 @@ namespace TeeSquare.WebApi.Reflection
         {
             CheckConfigured();
             var controllers = assembly.GetExportedTypes()
-                .Where(t => StaticConfig.Instance.ControllerType.IsAssignableFrom(t));
+                .Where(t => StaticConfig.Instance.ControllerType.IsAssignableFrom(t))
+                .Where(controllerFilter);
 
             foreach (var controller in controllers)
             {
