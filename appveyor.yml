@@ -1,4 +1,4 @@
-version: '4.1.{build}'
+version: '5.0.{build}'
 image: Visual Studio 2019
 branches:
   only:
@@ -16,29 +16,27 @@ before_build:
   # Display .NET Core version
   - cmd: dotnet --version
   # Display minimal restore text
-  - cmd: dotnet restore ./src/ --verbosity m
+  - cmd: dotnet restore ./src/TeeSquare.sln --verbosity m
 build_script:
   # Build lib
-  - cmd: dotnet build ./src/teesquare.sln --configuration=release --no-restore
+  - cmd: dotnet build ./src/TeeSquare.sln --configuration=release --no-restore
 after_build:
   # For once the build has completed
   - cmd: dotnet pack ./src/teesquare/teesquare.csproj --configuration=release --no-restore
   - cmd: dotnet pack ./src/teesquare.webapi/teesquare.webapi.csproj --configuration=release --no-restore
-  - cmd: dotnet pack ./src/teesquare.webapi.core22/teesquare.webapi.core22.csproj --configuration=release --no-restore
   - cmd: dotnet pack ./src/teesquare.webapi.core31/teesquare.webapi.core31.csproj --configuration=release --no-restore
+  - cmd: dotnet pack ./src/teesquare.webapi.net50/teesquare.webapi.net50.csproj --configuration=release --no-restore
   - cmd: dotnet pack ./src/teesquare.mobx/teesquare.mobx.csproj --configuration=release --no-restore
 artifacts:
  - path: '\src\teesquare\bin\release\*.nupkg'
  - path: '\src\teesquare.webapi\bin\release\*.nupkg'
- - path: '\src\teesquare.webapi.core22\bin\release\*.nupkg'
  - path: '\src\teesquare.webapi.core31\bin\release\*.nupkg'
+ - path: '\src\teesquare.webapi.net50\bin\release\*.nupkg'
  - path: '\src\teesquare.mobx\bin\release\*.nupkg'
    name: Package
    type: NugetPackage
 clone_depth: 1
 test_script:
-  # restore packages for our unit tests
-  - cmd: dotnet restore ./src/ --verbosity m
   # run the unit tests
   - cmd: dotnet test ./src/teesquare.tests/teesquare.tests.csproj
   - cmd: dotnet test ./src/teesquare.webapi.tests/teesquare.webapi.tests.csproj
@@ -48,6 +46,6 @@ on_finish :
 deploy: 
   provider: NuGet
   api_key: 
-    secure: g7T/PUgacy6zYmJTVFpYow2U4d62R8q0X4KKpNxWj6ieQPUvHi1U2LOECMPr+fNE
+    secure: 3sOAqCtVsd+ffNnUnIJPt/PbphRu5+bKf2W682d7qfoPYWL9pprr3JGZaxTqtegw
   skip_symbols: true
   artifact: /.*\.nupkg/

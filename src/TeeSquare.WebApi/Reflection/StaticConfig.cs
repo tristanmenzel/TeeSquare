@@ -32,6 +32,8 @@ namespace TeeSquare.WebApi.Reflection
         Func<Object, string> GetTemplateFromHttpMethodAttribute { get; }
 
         (Type type, string tsType)[] DefaultStaticMappings { get; }
+        Type HttpPatchAttribute { get; }
+        Type HttpOptionsAttribute { get; }
     }
 
     public abstract class WebApiConfig : IWebApiConfig
@@ -39,17 +41,19 @@ namespace TeeSquare.WebApi.Reflection
         public Type ControllerType { get; protected set; }
         public Type FromFormAttribute { get; protected set; }
         public Type FromBodyAttribute { get; protected set; }
-        public Type FromQueryAttribute { get;protected  set; }
+        public Type FromQueryAttribute { get; protected set; }
         public Type FromRouteAttribute { get; protected set; }
         public Type HttpMethodBaseAttribute { get; protected set; }
-        public Type HttpGetAttribute { get;protected  set; }
-        public Type HttpPutAttribute { get;protected  set; }
+        public Type HttpGetAttribute { get; protected set; }
+        public Type HttpPutAttribute { get; protected set; }
         public Type HttpPostAttribute { get; protected set; }
-        public Type HttpDeleteAttribute { get;protected  set; }
-        public Type IgnoreActionAttribute { get;protected  set; }
-        public Type RouteAttribute { get;protected  set; }
+        public Type HttpDeleteAttribute { get; protected set; }
+        public Type IgnoreActionAttribute { get; protected set; }
+        public Type RouteAttribute { get; protected set; }
         public Func<object, string> GetTemplateFromRouteAttribute { get; protected set; }
-        public Func<object, string> GetTemplateFromHttpMethodAttribute { get;protected  set; }
+        public Func<object, string> GetTemplateFromHttpMethodAttribute { get; protected set; }
         public (Type type, string tsType)[] DefaultStaticMappings { get; protected set; }
+        public Type HttpPatchAttribute { get; protected set; }
+        public Type HttpOptionsAttribute { get; protected set; }
     }
 }

@@ -19,6 +19,18 @@ namespace TeeSquare.DemoApi.Controllers
             return 1;
         }
 
+        [HttpPatch]
+        public int Patch([FromBody]TestDto dto)
+        {
+            return 1;
+        }
+
+        [HttpOptions]
+        public int Options()
+        {
+            return 1;
+        }
+
         [HttpPut("{id}")]
         public IActionResult Put(int id, [FromBody] TestDto dto)
         {

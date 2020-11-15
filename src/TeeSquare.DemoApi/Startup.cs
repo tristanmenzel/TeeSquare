@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TeeSquare.DemoApi.Hubs;
+using Microsoft.Extensions.Hosting;
 
 namespace TeeSquare.DemoApi
 {
@@ -24,15 +24,15 @@ namespace TeeSquare.DemoApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc();
-            app.UseSignalR(builder => { builder.MapHub<ApplicationHub>("/app-hub"); });
+            app.UseRouting();
+
             app.UseSpaStaticFiles();
 
             app.UseSpa(spa =>

@@ -9,6 +9,7 @@ namespace TeeSquare.WebApi
 {
     public class WebApiFluent
     {
+        private Func<Type, bool> _controllerFilter = controller => true;
         private readonly Type[] _controllers;
         private readonly List<Type[]> _types = new List<Type[]>();
         private readonly Assembly[] _assemblies;
@@ -24,6 +25,12 @@ namespace TeeSquare.WebApi
         {
             _controllers = controllers;
             _options = new RouteReflectorOptions();
+        }
+
+        public WebApiFluent WithControllerFilter(Func<Type, bool> predicate)
+        {
+            _controllerFilter = predicate;
+            return this;
         }
 
         public WebApiFluent Configure(Action<RouteReflectorOptions> configure)
@@ -49,7 +56,7 @@ namespace TeeSquare.WebApi
 
         public void WriteToStream(Stream stream)
         {
-            var tsWriter = new TypeScriptWriter(stream,_options);
+            var tsWriter = new TypeScriptWriter(stream, _options);
 
             var webApiWriter = new RouteReflector(_options);
 
@@ -57,7 +64,7 @@ namespace TeeSquare.WebApi
                 webApiWriter.AddAdditionalTypes(additionalTypes);
 
             foreach (var assembly in _assemblies ?? Array.Empty<Assembly>())
-                webApiWriter.AddAssembly(assembly);
+                webApiWriter.AddAssembly(assembly, _controllerFilter);
             foreach (var controller in _controllers ?? Array.Empty<Type>())
                 webApiWriter.AddController(controller);
 

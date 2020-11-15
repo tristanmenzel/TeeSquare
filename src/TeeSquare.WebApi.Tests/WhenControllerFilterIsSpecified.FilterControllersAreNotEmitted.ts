@@ -50,16 +50,6 @@ export abstract class RequestFactory {
       url: `defaultroute/getnum/${id}`
     };
   }
-  static PostFormvaluePostsomevalues(name: string, specialFile: File): PostRequest<FormData, number> {
-    const data = new FormData();
-    data.append('name', name);
-    data.append('specialFile', specialFile);
-    return {
-      method: 'POST',
-      data,
-      url: `formvalue/postsomevalues`
-    };
-  }
   static GetApiOtherImplicitQuery(id?: number): GetRequest<number> {
     const query = toQuery({id});
     return {
@@ -87,7 +77,7 @@ export abstract class RequestFactory {
       url: `api/other/do-a-thing${query}`
     };
   }
-  static GetApiReturnTest(): GetRequest<ActionResult> {
+  static GetApiReturnTest(): GetRequest<unknown> {
     return {
       method: 'GET',
       url: `api/return-test`
@@ -112,7 +102,7 @@ export abstract class RequestFactory {
       url: `api/routeconstraints/user/${name}/${page}/${pageSize}`
     };
   }
-  static PutApiRouteconstraintsUserByAge(age: number, data: TestDto): PutRequest<TestDto, ActionResult> {
+  static PutApiRouteconstraintsUserByAge(age: number, data: TestDto): PutRequest<TestDto, unknown> {
     return {
       method: 'PUT',
       data,
@@ -137,7 +127,7 @@ export abstract class RequestFactory {
       url: `gettit`
     };
   }
-  static GetApi(): GetRequest<ActionResult> {
+  static GetApi(): GetRequest<unknown> {
     return {
       method: 'GET',
       url: `api`
@@ -169,7 +159,7 @@ export abstract class RequestFactory {
       url: `api/test`
     };
   }
-  static PutApiTestById(id: number, data: TestDto): PutRequest<TestDto, ActionResult> {
+  static PutApiTestById(id: number, data: TestDto): PutRequest<TestDto, unknown> {
     return {
       method: 'PUT',
       data,
@@ -208,8 +198,6 @@ export abstract class RequestFactory {
       url: `api/values/${id}`
     };
   }
-}
-export interface ActionResult {
 }
 export interface TestDto {
   hello: string;

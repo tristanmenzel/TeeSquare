@@ -42,7 +42,14 @@ namespace TeeSquare.WebApi.Reflection
         {
             return new RequestInfo(name, HttpMethod.Post, path, responseType, requestParams);
         }
-
+        public static RequestInfo Patch(string name, string path, Type responseType, ParamInfo[] requestParams)
+        {
+            return new RequestInfo(name, HttpMethod.Patch, path, responseType, requestParams);
+        }
+        public static RequestInfo Options(string name, string path, Type responseType, ParamInfo[] requestParams)
+        {
+            return new RequestInfo(name, HttpMethod.Options, path, responseType, requestParams);
+        }
         public static RequestInfo Get(string name, string path, Type responseType, ParamInfo[] requestParams)
         {
             return new RequestInfo(name, HttpMethod.Get, path, responseType, requestParams);

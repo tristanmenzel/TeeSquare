@@ -3,18 +3,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using TeeSquare.WebApi.Reflection;
 
-namespace TeeSquare.WebApi.Core22
+namespace TeeSquare.WebApi.Net50
 {
-    public static class Core22Configurator
+    public static class Net50Configurator
     {
+        static Net50Configurator()
+        {
+            StaticConfig.Configure(new Net50Configuration());
+        }
         public static void Configure()
         {
-            StaticConfig.Configure(new Core22Configuration());
+            StaticConfig.Configure(new Net50Configuration());
         }
 
-        class Core22Configuration : WebApiConfig
+        class Net50Configuration : WebApiConfig
         {
-            public Core22Configuration()
+            public Net50Configuration()
             {
                 ControllerType = typeof(ControllerBase);
 
@@ -25,6 +29,8 @@ namespace TeeSquare.WebApi.Core22
 
                 HttpMethodBaseAttribute = typeof(HttpMethodAttribute);
                 HttpGetAttribute = typeof(HttpGetAttribute);
+                HttpPatchAttribute = typeof(HttpPatchAttribute);
+                HttpOptionsAttribute = typeof(HttpOptionsAttribute);
                 HttpPutAttribute = typeof(HttpPutAttribute);
                 HttpPostAttribute = typeof(HttpPostAttribute);
                 HttpDeleteAttribute = typeof(HttpDeleteAttribute);

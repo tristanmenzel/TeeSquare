@@ -1,6 +1,6 @@
 // Auto-generated Code - Do Not Edit
 
-import { GetRequest, PutRequest, PostRequest, DeleteRequest, toQuery } from './WhenNoControllersAreReferenced.OnlySharedTypesAreEmitted';
+import { GetRequest, PutRequest, PostRequest, PatchRequest, OptionsRequest, DeleteRequest, toQuery } from './WhenNoControllersAreReferenced.OnlySharedTypesAreEmitted';
 export abstract class RequestFactory {
   static GetApiTestById(id: number): GetRequest<TestDto> {
     return {
@@ -12,6 +12,19 @@ export abstract class RequestFactory {
     return {
       method: 'POST',
       data,
+      url: `api/test`
+    };
+  }
+  static PatchApiTest(data: TestDto): PatchRequest<TestDto, number> {
+    return {
+      method: 'PATCH',
+      data,
+      url: `api/test`
+    };
+  }
+  static OptionsApiTest(): OptionsRequest<number> {
+    return {
+      method: 'OPTIONS',
       url: `api/test`
     };
   }
