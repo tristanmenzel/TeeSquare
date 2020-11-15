@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using TeeSquare.WebApi.Reflection;
 
@@ -6,6 +7,10 @@ namespace TeeSquare.WebApi.Core31
 {
     public static class Core31Configurator
     {
+        static Core31Configurator()
+        {
+            StaticConfig.Configure(new Core31Configuration());
+        }
         public static void Configure()
         {
             StaticConfig.Configure(new Core31Configuration());

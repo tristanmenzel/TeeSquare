@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TeeSquare.DemoApi\TeeSquare.DemoApi.csproj" />
-    <ProjectReference Include="..\TeeSquare.WebApi.Core22\TeeSquare.WebApi.Core22.csproj" />
+    <ProjectReference Include="..\TeeSquare.WebApi.Core31\TeeSquare.WebApi.Core31.csproj" />
     <ProjectReference Include="..\TeeSquare.WebApi\TeeSquare.WebApi.csproj" />
     <ProjectReference Include="..\TeeSquare\TeeSquare.csproj" />
   </ItemGroup>

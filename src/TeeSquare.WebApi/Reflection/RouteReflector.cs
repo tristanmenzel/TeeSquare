@@ -27,11 +27,11 @@ namespace TeeSquare.WebApi.Reflection
             _additionalTypes.AddRange(types);
         }
 
-        public void AddAssembly(Assembly assembly, Type baseController = null)
+        public void AddAssembly(Assembly assembly, Func<Type, bool> controllerFilter)
         {
             CheckConfigured();
             var controllers = assembly.GetExportedTypes()
-                .Where(t => (baseController ?? StaticConfig.Instance.ControllerType).IsAssignableFrom(t));
+                .Where(t => StaticConfig.Instance.ControllerType.IsAssignableFrom(t));
 
             foreach (var controller in controllers)
             {

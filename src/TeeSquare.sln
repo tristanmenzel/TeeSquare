@@ -9,6 +9,7 @@ ProjectSection(SolutionItems) = preProject
 	..\appveyor.yml = ..\appveyor.yml
 	..\readme.md = ..\readme.md
 	..\.gitignore = ..\.gitignore
+	Targets.csproj = Targets.csproj
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeeSquare.DemoApi", "TeeSquare.DemoApi\TeeSquare.DemoApi.csproj", "{6388E521-B877-4A85-8616-C39CB1B8BDC5}"
@@ -22,8 +23,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeeSquare.Mobx.Tests", "TeeSquare.Mobx.Tests\TeeSquare.Mobx.Tests.csproj", "{1CAE62DE-3FD0-49ED-8028-AA3A68D8371F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeeSquare.DemoApi.CodeGen", "TeeSquare.DemoApi.CodeGen\TeeSquare.DemoApi.CodeGen.csproj", "{D60E71F1-EE57-4292-857F-0C4EF7E1472C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeeSquare.WebApi.Core22", "TeeSquare.WebApi.Core22\TeeSquare.WebApi.Core22.csproj", "{BC65A8D9-15E6-4FDC-9D34-77D13F4F6E96}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeeSquare.WebApi.Core31", "TeeSquare.WebApi.Core31\TeeSquare.WebApi.Core31.csproj", "{5369994B-9A88-42B1-9B86-C340848CF0BA}"
 EndProject
@@ -65,10 +64,6 @@ Global
 		{D60E71F1-EE57-4292-857F-0C4EF7E1472C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D60E71F1-EE57-4292-857F-0C4EF7E1472C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D60E71F1-EE57-4292-857F-0C4EF7E1472C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BC65A8D9-15E6-4FDC-9D34-77D13F4F6E96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BC65A8D9-15E6-4FDC-9D34-77D13F4F6E96}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BC65A8D9-15E6-4FDC-9D34-77D13F4F6E96}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BC65A8D9-15E6-4FDC-9D34-77D13F4F6E96}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5369994B-9A88-42B1-9B86-C340848CF0BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5369994B-9A88-42B1-9B86-C340848CF0BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5369994B-9A88-42B1-9B86-C340848CF0BA}.Release|Any CPU.ActiveCfg = Release|Any CPU

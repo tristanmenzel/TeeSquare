@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <Version>0.0.0</Version>
+    <Authors>Tristan Menzel</Authors>
+    <TargetFrameworks>netcoreapp3.1;net48;</TargetFrameworks>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+</Project>

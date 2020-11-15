@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using TeeSquare.WebApi.Core22;
+using TeeSquare.WebApi.Core31;
 
 namespace TeeSquare.WebApi.Tests
 {
@@ -9,7 +9,7 @@ namespace TeeSquare.WebApi.Tests
         [OneTimeSetUp]
         public void GlobalSetup()
         {
-            Core22Configurator.Configure();
+            Core31Configurator.Configure();
         }
     }
 }
