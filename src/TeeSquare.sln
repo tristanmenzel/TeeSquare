@@ -10,6 +10,7 @@ ProjectSection(SolutionItems) = preProject
 	..\readme.md = ..\readme.md
 	..\.gitignore = ..\.gitignore
 	Targets.csproj = Targets.csproj
+	..\appveyor.branch.yml = ..\appveyor.branch.yml
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeeSquare.DemoApi", "TeeSquare.DemoApi\TeeSquare.DemoApi.csproj", "{6388E521-B877-4A85-8616-C39CB1B8BDC5}"

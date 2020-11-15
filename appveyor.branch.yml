@@ -1,7 +1,7 @@
 version: '5.0.{build}'
 image: Visual Studio 2019
 branches:
-  only:
+  except:
   - master
 init:
   # Good practise, because Windows line endings are different from Unix/Linux ones
@@ -45,9 +45,3 @@ test_script:
   - cmd: dotnet test ./src/teesquare.mobx.tests/teesquare.mobx.tests.csproj
 on_finish :
   # any cleanup in here
-deploy: 
-  provider: NuGet
-  api_key: 
-    secure: 3sOAqCtVsd+ffNnUnIJPt/PbphRu5+bKf2W682d7qfoPYWL9pprr3JGZaxTqtegw
-  skip_symbols: true
-  artifact: /.*\.nupkg/
