@@ -25,11 +25,13 @@ after_build:
   - cmd: dotnet pack ./src/teesquare/teesquare.csproj --configuration=release --no-restore
   - cmd: dotnet pack ./src/teesquare.webapi/teesquare.webapi.csproj --configuration=release --no-restore
   - cmd: dotnet pack ./src/teesquare.webapi.core31/teesquare.webapi.core31.csproj --configuration=release --no-restore
+  - cmd: dotnet pack ./src/teesquare.webapi.net50/teesquare.webapi.net50.csproj --configuration=release --no-restore
   - cmd: dotnet pack ./src/teesquare.mobx/teesquare.mobx.csproj --configuration=release --no-restore
 artifacts:
  - path: '\src\teesquare\bin\release\*.nupkg'
  - path: '\src\teesquare.webapi\bin\release\*.nupkg'
  - path: '\src\teesquare.webapi.core31\bin\release\*.nupkg'
+ - path: '\src\teesquare.webapi.net50\bin\release\*.nupkg'
  - path: '\src\teesquare.mobx\bin\release\*.nupkg'
    name: Package
    type: NugetPackage
