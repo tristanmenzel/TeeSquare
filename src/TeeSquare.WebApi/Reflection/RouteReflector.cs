@@ -92,7 +92,7 @@ namespace TeeSquare.WebApi.Reflection
                 return ParameterKind.Route;
             }
 
-            if ((method == HttpMethod.Post || method == HttpMethod.Put)
+            if ((method == HttpMethod.Post || method == HttpMethod.Put || method == HttpMethod.Patch)
                 && IsPossibleDto(parameterInfo.ParameterType))
             {
                 return ParameterKind.Body;
@@ -116,6 +116,10 @@ namespace TeeSquare.WebApi.Reflection
                 return (RequestInfo.Put, HttpMethod.Put);
             if (action.GetCustomAttributes(StaticConfig.Instance.HttpPostAttribute).Any())
                 return (RequestInfo.Post, HttpMethod.Post);
+            if (action.GetCustomAttributes(StaticConfig.Instance.HttpPatchAttribute).Any())
+                return (RequestInfo.Patch, HttpMethod.Patch);
+            if (action.GetCustomAttributes(StaticConfig.Instance.HttpOptionsAttribute).Any())
+                return (RequestInfo.Options, HttpMethod.Options);
             if (action.GetCustomAttributes(StaticConfig.Instance.HttpDeleteAttribute).Any())
                 return (RequestInfo.Delete, HttpMethod.Delete);
             return (RequestInfo.Get, HttpMethod.Get);
@@ -186,19 +190,31 @@ namespace TeeSquare.WebApi.Reflection
                     i.AddProperty("url", new TypeReference("string"));
                     i.AddProperty("method", new TypeReference("'GET'"));
                 });
+            writer.WriteInterface("OptionsRequest", new TypeReference("TResponse"))
+                .Configure(i =>
+                {
+                    i.AddProperty("url", new TypeReference("string"));
+                    i.AddProperty("method", new TypeReference("'OPTIONS'"));
+                });
             writer.WriteInterface("DeleteRequest", new TypeReference("TResponse"))
                 .Configure(i =>
                 {
                     i.AddProperty("url", new TypeReference("string"));
                     i.AddProperty("method", new TypeReference("'DELETE'"));
                 });
-
             writer.WriteInterface("PostRequest", new TypeReference("TRequest"), new TypeReference("TResponse"))
                 .Configure(i =>
                 {
                     i.AddProperty("data", new TypeReference("TRequest"));
                     i.AddProperty("url", new TypeReference("string"));
                     i.AddProperty("method", new TypeReference("'POST'"));
+                });
+            writer.WriteInterface("PatchRequest", new TypeReference("TRequest"), new TypeReference("TResponse"))
+                .Configure(i =>
+                {
+                    i.AddProperty("data", new TypeReference("TRequest"));
+                    i.AddProperty("url", new TypeReference("string"));
+                    i.AddProperty("method", new TypeReference("'PATCH'"));
                 });
             writer.WriteInterface("PutRequest", new TypeReference("TRequest"), new TypeReference("TResponse"))
                 .Configure(i =>

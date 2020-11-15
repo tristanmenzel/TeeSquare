@@ -29,6 +29,8 @@ namespace TeeSquare.WebApi.Core31
 
                 HttpMethodBaseAttribute = typeof(HttpMethodAttribute);
                 HttpGetAttribute = typeof(HttpGetAttribute);
+                HttpPatchAttribute = typeof(HttpPatchAttribute);
+                HttpOptionsAttribute = typeof(HttpOptionsAttribute);
                 HttpPutAttribute = typeof(HttpPutAttribute);
                 HttpPostAttribute = typeof(HttpPostAttribute);
                 HttpDeleteAttribute = typeof(HttpDeleteAttribute);

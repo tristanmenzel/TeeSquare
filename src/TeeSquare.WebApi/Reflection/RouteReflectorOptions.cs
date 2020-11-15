@@ -65,6 +65,8 @@ namespace TeeSquare.WebApi.Reflection
             "GetRequest",
             "PutRequest",
             "PostRequest",
+            "PatchRequest",
+            "OptionsRequest",
             "DeleteRequest",
             "toQuery"
         };

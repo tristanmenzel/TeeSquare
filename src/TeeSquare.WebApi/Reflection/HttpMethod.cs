@@ -14,11 +14,12 @@ namespace TeeSquare.WebApi.Reflection
         public static HttpMethod Put => new HttpMethod("PUT");
         public static HttpMethod Delete => new HttpMethod("DELETE");
         public static HttpMethod Post => new HttpMethod("POST");
+        public static HttpMethod Patch => new HttpMethod("PATCH");
         public static HttpMethod Options => new HttpMethod("OPTIONS");
 
         public bool HasRequestBody()
         {
-            return this == Put || this == Post;
+            return this == Put || this == Post || this == Patch;
         }
 
         public override bool Equals(object obj)
@@ -60,6 +61,8 @@ namespace TeeSquare.WebApi.Reflection
                     return "Delete";
                 case "OPTIONS":
                     return "Options";
+                case "PATCH":
+                    return "Patch";
                 default:
                     return string.Empty;
             }

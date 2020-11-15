@@ -4,6 +4,10 @@ export interface GetRequest<TResponse> {
   url: string;
   method: 'GET';
 }
+export interface OptionsRequest<TResponse> {
+  url: string;
+  method: 'OPTIONS';
+}
 export interface DeleteRequest<TResponse> {
   url: string;
   method: 'DELETE';
@@ -12,6 +16,11 @@ export interface PostRequest<TRequest, TResponse> {
   data: TRequest;
   url: string;
   method: 'POST';
+}
+export interface PatchRequest<TRequest, TResponse> {
+  data: TRequest;
+  url: string;
+  method: 'PATCH';
 }
 export interface PutRequest<TRequest, TResponse> {
   data: TRequest;
@@ -144,6 +153,19 @@ export abstract class RequestFactory {
     return {
       method: 'POST',
       data,
+      url: `api/test`
+    };
+  }
+  static PatchApiTest(data: TestDto): PatchRequest<TestDto, number> {
+    return {
+      method: 'PATCH',
+      data,
+      url: `api/test`
+    };
+  }
+  static OptionsApiTest(): OptionsRequest<number> {
+    return {
+      method: 'OPTIONS',
       url: `api/test`
     };
   }
