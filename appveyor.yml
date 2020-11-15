@@ -37,8 +37,6 @@ artifacts:
    type: NugetPackage
 clone_depth: 1
 test_script:
-  # restore packages for our unit tests
-  - cmd: dotnet restore ./src/ --verbosity m
   # run the unit tests
   - cmd: dotnet test ./src/teesquare.tests/teesquare.tests.csproj
   - cmd: dotnet test ./src/teesquare.webapi.tests/teesquare.webapi.tests.csproj
