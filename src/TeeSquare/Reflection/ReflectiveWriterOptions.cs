@@ -30,6 +30,8 @@ namespace TeeSquare.Reflection
 
         public string IndentCharacters { get; set; } = "  ";
 
+        public EnumValueType EnumValueType { get; set; } = EnumValueType.Number;
+
         public IEnumWriterFactory EnumWriterFactory { get; set; } = new EnumWriterFactory();
         public IInterfaceWriterFactory InterfaceWriterFactory { get; set; } = new InterfaceWriterFactory();
         public IClassWriterFactory ClassWriterFactory { get; set; } = new ClassWriterFactory();
