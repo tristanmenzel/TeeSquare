@@ -117,6 +117,7 @@ namespace TeeSquare.WebApi.Reflection
         public bool WriteEnumDescriptionGetters { get; set; }
         public bool WriteEnumAllValuesConst { get; set; }
 
+        public EnumValueType EnumValueType { get; set; } = EnumValueType.Number;
 
         public IEnumWriterFactory EnumWriterFactory { get; set; } = new EnumWriterFactory();
         public IInterfaceWriterFactory InterfaceWriterFactory { get; set; } = new InterfaceWriterFactory();

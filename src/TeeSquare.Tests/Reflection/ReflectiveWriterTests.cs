@@ -39,6 +39,22 @@ namespace TeeSquare.Tests.Reflection
         }
 
         [Test]
+        public void EnumAsStrings()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .Configure(options =>
+                {
+                    options.EnumValueType = EnumValueType.String;
+                })
+                .AddTypes(typeof(Title))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+        [Test]
         public void EnumDescriptions()
         {
             var res = TeeSquareFluent.ReflectiveWriter()

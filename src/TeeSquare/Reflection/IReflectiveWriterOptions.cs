@@ -1,6 +1,8 @@
 using System;
 using System.Reflection;
+using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
+using MethodInfo = System.Reflection.MethodInfo;
 
 namespace TeeSquare.Reflection
 {
@@ -59,5 +61,10 @@ namespace TeeSquare.Reflection
         /// Container for holding reflected and imported types.
         /// </summary>
         TypeCollection Types { get; }
+
+        /// <summary>
+        /// Determines whether enums are reflected to numeric types, or strings (using the member name as the value)
+        /// </summary>
+        EnumValueType EnumValueType { get; }
     }
 }
