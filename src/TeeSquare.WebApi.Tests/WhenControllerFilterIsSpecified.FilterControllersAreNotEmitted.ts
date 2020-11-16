@@ -166,24 +166,24 @@ export abstract class RequestFactory {
       url: `api/test/${id}`
     };
   }
-  static PostApiTestBySomeId(someId: number): PostRequest<null, unknown> {
+  static PostApiTestBySomeId(someId: number): PostRequest<undefined, unknown> {
     return {
       method: 'POST',
-      data: null,
+      data: undefined,
       url: `api/test/${someId}`
     };
   }
-  static PatchApiTestBySomeId(someId: number): PatchRequest<null, unknown> {
+  static PatchApiTestBySomeId(someId: number): PatchRequest<undefined, unknown> {
     return {
       method: 'PATCH',
-      data: null,
+      data: undefined,
       url: `api/test/${someId}`
     };
   }
-  static PutApiTestBySomeId(someId: number): PutRequest<null, unknown> {
+  static PutApiTestBySomeId(someId: number): PutRequest<undefined, unknown> {
     return {
       method: 'PUT',
-      data: null,
+      data: undefined,
       url: `api/test/${someId}`
     };
   }
