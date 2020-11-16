@@ -71,6 +71,27 @@ export abstract class RequestFactory {
       url: `api/test/${id}`
     };
   }
+  static PostApiTestBySomeId(someId: number): PostRequest<null, unknown> {
+    return {
+      method: 'POST',
+      data: null,
+      url: `api/test/${someId}`
+    };
+  }
+  static PatchApiTestBySomeId(someId: number): PatchRequest<null, unknown> {
+    return {
+      method: 'PATCH',
+      data: null,
+      url: `api/test/${someId}`
+    };
+  }
+  static PutApiTestBySomeId(someId: number): PutRequest<null, unknown> {
+    return {
+      method: 'PUT',
+      data: null,
+      url: `api/test/${someId}`
+    };
+  }
 }
 export interface TestDto {
   hello: string;

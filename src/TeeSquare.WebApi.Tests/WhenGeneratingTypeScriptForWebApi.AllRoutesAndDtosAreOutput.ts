@@ -176,6 +176,27 @@ export abstract class RequestFactory {
       url: `api/test/${id}`
     };
   }
+  static PostApiTestBySomeId(someId: number): PostRequest<null, ActionResult> {
+    return {
+      method: 'POST',
+      data: null,
+      url: `api/test/${someId}`
+    };
+  }
+  static PatchApiTestBySomeId(someId: number): PatchRequest<null, ActionResult> {
+    return {
+      method: 'PATCH',
+      data: null,
+      url: `api/test/${someId}`
+    };
+  }
+  static PutApiTestBySomeId(someId: number): PutRequest<null, ActionResult> {
+    return {
+      method: 'PUT',
+      data: null,
+      url: `api/test/${someId}`
+    };
+  }
   static GetApiValues(): GetRequest<string[]> {
     return {
       method: 'GET',

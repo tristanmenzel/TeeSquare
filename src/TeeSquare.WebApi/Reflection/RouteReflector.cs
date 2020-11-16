@@ -293,7 +293,7 @@ namespace TeeSquare.WebApi.Reflection
                             {
                                 var requestBodyType = req.GetRequestBodyKind() == RequestBodyKind.Json
                                     ? _options.TypeConverter.Convert(req.GetRequestBodyType(), null)
-                                    : new TypeReference("FormData");
+                                    : (req.GetRequestBodyKind() == RequestBodyKind.FormData ? new TypeReference("FormData") : new TypeReference("null"));
                                 if (requestBodyType.Optional)
                                 {
                                     requestBodyType = new TypeReference($"{requestBodyType.FullName} | undefined");
@@ -356,8 +356,10 @@ namespace TeeSquare.WebApi.Reflection
                                     w.WriteLine("return {");
                                     w.Indent();
                                     w.WriteLine($"method: '{req.Method.GetName().ToUpper()}',");
-                                    if (req.Method.HasRequestBody())
+                                    if (req.Method.HasRequestBody() && req.GetRequestBodyKind() != RequestBodyKind.Empty)
                                         w.WriteLine("data,");
+                                    else if (req.Method.HasRequestBody())
+                                        w.WriteLine("data: null,");
                                     w.WriteLine(
                                         $"url: `{req.Path.Replace("{", "${")}{(queryParams.Any() ? "${query}" : "")}`");
                                     w.Deindent();
