@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using TeeSquare.Reflection;
+using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
 
 namespace TeeSquare.WebApi.Reflection
@@ -47,6 +48,11 @@ namespace TeeSquare.WebApi.Reflection
         /// The strategy to use to determine the kind of a parameter (ie. query string / route / body )
         /// </summary>
         GetParameterKind GetParameterKindStrategy { get; }
+
+        /// <summary>
+        /// The <see cref="TypeReference"/> to use to represent an empty body type (ie undefined, null, any)
+        /// </summary>
+        TypeReference EmptyRequestBodyType { get; }
     }
 
 
@@ -137,6 +143,8 @@ namespace TeeSquare.WebApi.Reflection
         };
 
         public TypeCollection Types { get; set; } = new TypeCollection();
+
+        public TypeReference EmptyRequestBodyType { get; set; } = new TypeReference("undefined");
     }
 
     public delegate Type GetApiReturnType(Type controller, MethodInfo action);

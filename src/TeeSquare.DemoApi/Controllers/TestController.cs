@@ -36,5 +36,23 @@ namespace TeeSquare.DemoApi.Controllers
         {
             return Ok();
         }
+
+        [HttpPost("{someId}")]
+        public IActionResult PostWithoutBody(int someId)
+        {
+            return Ok();
+        }
+
+        [HttpPatch("{someId}")]
+        public IActionResult PatchWithoutBody(int someId)
+        {
+            return Ok();
+        }
+
+        [HttpPut("{someId}")]
+        public IActionResult PutWithoutBody(int someId)
+        {
+            return Ok();
+        }
     }
 }
