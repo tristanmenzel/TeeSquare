@@ -293,7 +293,7 @@ namespace TeeSquare.WebApi.Reflection
                             {
                                 var requestBodyType = req.GetRequestBodyKind() == RequestBodyKind.Json
                                     ? _options.TypeConverter.Convert(req.GetRequestBodyType(), null)
-                                    : (req.GetRequestBodyKind() == RequestBodyKind.FormData ? new TypeReference("FormData") : new TypeReference("undefined"));
+                                    : (req.GetRequestBodyKind() == RequestBodyKind.FormData ? new TypeReference("FormData") : _options.EmptyRequestBodyType);
                                 if (requestBodyType.Optional)
                                 {
                                     requestBodyType = new TypeReference($"{requestBodyType.FullName} | undefined");
