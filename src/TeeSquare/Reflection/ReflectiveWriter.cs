@@ -24,6 +24,15 @@ namespace TeeSquare.Reflection
         {
             foreach (var type in types)
             {
+                #if !NET48
+                // This property doesn't exist in net48. As a result, a dummy interface will
+                // be written to the output. eg. export interface T { }
+                if (type.IsGenericTypeParameter)
+                {
+                    continue;
+                }
+                #endif
+
                 if (type.IsExtendedPrimitive())
                 {
                     if (!Types.Contains(type))
@@ -52,6 +61,20 @@ namespace TeeSquare.Reflection
                 if (type.IsDictionary(out var keyValueTypes))
                 {
                     AddTypes(keyValueTypes);
+                    continue;
+                }
+
+                if (type.IsGenericTypeDefinition)
+                {
+                    if (Types.Contains(type)) continue;
+
+                    var dependencies = GetTypeDependencies(type);
+                    if (dependencies.Any())
+                    {
+                        AddTypes(dependencies);
+                    }
+
+                    Types.AddLocal(type);
                     continue;
                 }
 
