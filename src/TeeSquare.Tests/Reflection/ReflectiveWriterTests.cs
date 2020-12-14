@@ -5,6 +5,7 @@ using NUnit.Framework;
 using TeeSquare.Reflection;
 using TeeSquare.Tests.Reflection.FakeDomain;
 using TeeSquare.Tests.Reflection.NullableReferenceTypes;
+using TeeSquare.Tests.Reflection.OpenGenerics;
 using TeeSquare.Tests.Reflection.TreeDomain;
 using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
@@ -238,6 +239,19 @@ namespace TeeSquare.Tests.Reflection
             Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
+        }
+
+        [Test]
+        public void OpenGenerics()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .AddTypes(typeof(Result<>), typeof(Result<int>))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+
         }
 
         [Test]
