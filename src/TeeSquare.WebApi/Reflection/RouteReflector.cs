@@ -336,7 +336,7 @@ namespace TeeSquare.WebApi.Reflection
                                         .ToArray();
                                     if (queryParams.Any())
                                     {
-                                        w.Write("const query = toQuery({", true);
+                                        w.Write($"const {_options.QueryVariableName} = toQuery({{", true);
                                         w.WriteDelimited(queryParams,
                                             (p, wr) => wr.Write(p.Name), ", ");
                                         w.WriteLine("});", false);
@@ -361,7 +361,7 @@ namespace TeeSquare.WebApi.Reflection
                                     else if (req.Method.HasRequestBody())
                                         w.WriteLine("data: undefined,");
                                     w.WriteLine(
-                                        $"url: `{req.Path.Replace("{", "${")}{(queryParams.Any() ? "${query}" : "")}`");
+                                        $"url: `{req.Path.Replace("{", "${")}{(queryParams.Any() ? $"${{{_options.QueryVariableName}}}" : "")}`");
                                     w.Deindent();
                                     w.WriteLine("};");
                                 });

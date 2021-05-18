@@ -53,6 +53,12 @@ namespace TeeSquare.WebApi.Reflection
         /// The <see cref="TypeReference"/> to use to represent an empty body type (ie undefined, null, any)
         /// </summary>
         TypeReference EmptyRequestBodyType { get; }
+
+        /// <summary>
+        /// The name of the variable used inside request factory methods for storing the query data. Can be
+        /// renamed from the default to avoid name clashes
+        /// </summary>
+        string QueryVariableName { get; }
     }
 
 
@@ -146,6 +152,7 @@ namespace TeeSquare.WebApi.Reflection
         public TypeCollection Types { get; set; } = new TypeCollection();
 
         public TypeReference EmptyRequestBodyType { get; set; } = new TypeReference("undefined");
+        public string QueryVariableName { get; set; } = "query";
     }
 
     public delegate Type GetApiReturnType(Type controller, MethodInfo action);
