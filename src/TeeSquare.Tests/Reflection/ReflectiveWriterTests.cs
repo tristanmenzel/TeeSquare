@@ -3,6 +3,7 @@ using System.Reflection;
 using BlurkCompare;
 using NUnit.Framework;
 using TeeSquare.Reflection;
+using TeeSquare.Tests.Reflection.Enums;
 using TeeSquare.Tests.Reflection.FakeDomain;
 using TeeSquare.Tests.Reflection.NullableReferenceTypes;
 using TeeSquare.Tests.Reflection.OpenGenerics;
@@ -32,6 +33,18 @@ namespace TeeSquare.Tests.Reflection
         {
             var res = TeeSquareFluent.ReflectiveWriter()
                 .AddTypes(typeof(Title))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+        [Test]
+        public void EnumAlternativeSizes()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .AddTypes(typeof(ByteEnum), typeof(LongEnum), typeof(UnsignedLongEnum))
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")

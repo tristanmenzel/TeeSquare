@@ -208,7 +208,9 @@ namespace TeeSquare.Reflection
                     writer.WriteEnum(typeRef.TypeName, _options.EnumValueType)
                         .Configure(e =>
                         {
-                            foreach (var field in Enum.GetNames(type).Zip(Enum.GetValues(type).Cast<int>(),
+                            foreach (var field in Enum.GetNames(type).Zip(Enum.GetValues(type)
+                                    .Cast<object>()
+                                    .Select(x => Convert.ChangeType(x, Enum.GetUnderlyingType(type))),
                                 (name, value) => new {name, value}))
                             {
                                 var description = type.GetMember(field.name)

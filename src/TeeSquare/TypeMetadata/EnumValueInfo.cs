@@ -9,7 +9,7 @@
 
     class EnumValueInfo : IEnumValueInfo
     {
-        public EnumValueInfo(string name, int value, string description)
+        public EnumValueInfo(string name, object value, string description)
         {
             Name = name;
             Description = description;
