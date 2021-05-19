@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using TeeSquare.Reflection;
 using TeeSquare.TypeMetadata;
+using TeeSquare.Util;
 using TeeSquare.Writers;
 
 namespace TeeSquare.WebApi.Reflection
@@ -52,7 +53,8 @@ namespace TeeSquare.WebApi.Reflection
                 var requestParams = GetRequestParams(action, route, method);
 
                 var returnType = _options.GetApiReturnTypeStrategy(controller, action);
-                _requests.Add(factory(_options.RouteNamer.RouteName(controller, action, route, method),
+                _requests.Add(factory( _options.FactoryNameStrategy(controller, action, route),
+                    _options.NameRouteStrategy(controller, action, route, method),
                     route,
                     returnType,
                     requestParams
@@ -123,6 +125,21 @@ namespace TeeSquare.WebApi.Reflection
             if (action.GetCustomAttributes(StaticConfig.Instance.HttpDeleteAttribute).Any())
                 return (RequestInfo.Delete, HttpMethod.Delete);
             return (RequestInfo.Get, HttpMethod.Get);
+        }
+
+        internal static string DefaultNameRouteStrategy(Type controller, MethodInfo action, string route, HttpMethod method)
+        {
+            var parts = route.Split('/')
+                .Select(part =>
+                {
+                    if (part.StartsWith("{"))
+                    {
+                        return $"By{CaseHelper.ToCase(part.Substring(1, part.Length - 2), NameConvention.PascalCase)}";
+                    }
+
+                    return CaseHelper.ToCase(part, NameConvention.PascalCase);
+                });
+            return method.GetName() + string.Join("", parts);
         }
 
         internal static string DefaultBuildRouteStrategy(Type controller, MethodInfo action, string defaultRoute)
@@ -276,15 +293,15 @@ namespace TeeSquare.WebApi.Reflection
                 WriteRequestTypesAndHelpers(writer);
             }
 
-            if (_requests.Any())
+            foreach (var factory in _requests.GroupBy(r => r.FactoryName))
             {
-                writer.WriteClass("RequestFactory")
+                writer.WriteClass(factory.Key)
                     .Configure(c =>
                     {
                         c.MakeAbstract();
 
 
-                        foreach (var req in _requests)
+                        foreach (var req in factory)
                         {
                             var methodBuilder = c.AddMethod($"{req.Name}")
                                 .Static();
@@ -380,6 +397,11 @@ namespace TeeSquare.WebApi.Reflection
                 .Union(_additionalTypes);
 
             rWriter.AddTypes(types.ToArray());
+        }
+
+        public static string DefaultFactoryNameStrategy(Type controller, MethodInfo action, string route)
+        {
+            return "RequestFactory";
         }
     }
 }
