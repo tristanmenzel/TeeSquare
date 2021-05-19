@@ -21,8 +21,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeeSquare.Mobx", "TeeSquare
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeeSquare.Mobx.Tests", "TeeSquare.Mobx.Tests\TeeSquare.Mobx.Tests.csproj", "{1CAE62DE-3FD0-49ED-8028-AA3A68D8371F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeeSquare.DemoApi.CodeGen", "TeeSquare.DemoApi.CodeGen\TeeSquare.DemoApi.CodeGen.csproj", "{D60E71F1-EE57-4292-857F-0C4EF7E1472C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeeSquare.WebApi.Core31", "TeeSquare.WebApi.Core31\TeeSquare.WebApi.Core31.csproj", "{5369994B-9A88-42B1-9B86-C340848CF0BA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeeSquare.WebApi.Net50", "TeeSquare.WebApi.Net50\TeeSquare.WebApi.Net50.csproj", "{2D345473-3611-4090-B9CC-D991A892B7E1}"
@@ -61,10 +59,6 @@ Global
 		{1CAE62DE-3FD0-49ED-8028-AA3A68D8371F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CAE62DE-3FD0-49ED-8028-AA3A68D8371F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1CAE62DE-3FD0-49ED-8028-AA3A68D8371F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D60E71F1-EE57-4292-857F-0C4EF7E1472C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D60E71F1-EE57-4292-857F-0C4EF7E1472C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D60E71F1-EE57-4292-857F-0C4EF7E1472C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D60E71F1-EE57-4292-857F-0C4EF7E1472C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5369994B-9A88-42B1-9B86-C340848CF0BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5369994B-9A88-42B1-9B86-C340848CF0BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5369994B-9A88-42B1-9B86-C340848CF0BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
