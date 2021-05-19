@@ -19,6 +19,8 @@ namespace TeeSquare.WebApi.Tests
                     var defaultStrategy = options.BuildRouteStrategy;
                     options.BuildRouteStrategy = (controller, action, defaultRoute) =>
                         $"prefix/{defaultStrategy(controller, action, defaultRoute)}";
+                    options.NameRouteStrategy = (controller, action, uri, method) =>
+                        $"{controller.Name.Replace("Controller", "")}_{action.Name}";
                 })
                 .WriteToString();
 

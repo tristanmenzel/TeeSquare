@@ -7,6 +7,6 @@
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TeeSquare\TeeSquare.csproj"/>
+    <ProjectReference Include="..\TeeSquare\TeeSquare.csproj" />
   </ItemGroup>
 </Project>

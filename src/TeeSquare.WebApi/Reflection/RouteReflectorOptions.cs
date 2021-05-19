@@ -16,9 +16,10 @@ namespace TeeSquare.WebApi.Reflection
         string DefaultRoute { get; }
 
         /// <summary>
-        /// A typeConverter instance used to determine the name of a dotnet Type in TypeScript
+        /// Determines the name of the request factory for a given route. Default is all routes into
+        /// a factory named 'RequestFactory'.
         /// </summary>
-        RouteNamer RouteNamer { get; }
+        FactoryNameStrategy FactoryNameStrategy { get; }
 
         /// <summary>
         /// The strategy to use to determine the return type of an api method. Default is to use
@@ -28,9 +29,14 @@ namespace TeeSquare.WebApi.Reflection
 
         /// <summary>
         /// The strategy to use to determine the route of an api method. Default is to use
-        /// dotnetcore Route attributes.
+        /// Route attributes.
         /// </summary>
         BuildRoute BuildRouteStrategy { get; }
+        /// <summary>
+        /// The strategy to use to determine the name of the route on the request factory. Default is to use
+        /// the pascal cased route string.
+        /// </summary>
+        NameRoute NameRouteStrategy { get; }
 
         /// <summary>
         /// The option for obtaining request helper types. Default is to emit them with each file.
@@ -40,7 +46,7 @@ namespace TeeSquare.WebApi.Reflection
 
         /// <summary>
         /// The strategy to use to determine the http method of an api method. Should return a RequestFactory
-        /// for that request type too. Default strategy looks for dotnetcore HttpGet/Put etc attributes
+        /// for that request type too. Default strategy looks for HttpGet/Put etc attributes
         /// </summary>
         GetHttpMethodAndRequestFactory GetHttpMethodAndRequestFactoryStrategy { get; }
 
@@ -97,7 +103,9 @@ namespace TeeSquare.WebApi.Reflection
     {
         public string DefaultRoute { get; set; } = "{controller=Home}/{action=Index}/{id?}";
 
-        public RouteNamer RouteNamer { get; set; } = new RouteNamer();
+
+        public FactoryNameStrategy FactoryNameStrategy { get; set; } = RouteReflector.DefaultFactoryNameStrategy;
+
 
         public TypeConverter TypeConverter { get; set; } =
             new TypeConverter(StaticConfig.Instance.DefaultStaticMappings);
@@ -136,6 +144,7 @@ namespace TeeSquare.WebApi.Reflection
 
         public GetApiReturnType GetApiReturnTypeStrategy { get; set; } = RouteReflector.DefaultApiReturnTypeStrategy;
         public BuildRoute BuildRouteStrategy { get; set; } = RouteReflector.DefaultBuildRouteStrategy;
+        public NameRoute NameRouteStrategy { get; set; } = RouteReflector.DefaultNameRouteStrategy;
         public RequestHelperTypeOptions RequestHelperTypeOption { get; set; } = RequestHelperTypeOptions.EmitTypes;
 
         public GetHttpMethodAndRequestFactory GetHttpMethodAndRequestFactoryStrategy { get; set; } =
@@ -158,6 +167,10 @@ namespace TeeSquare.WebApi.Reflection
     public delegate Type GetApiReturnType(Type controller, MethodInfo action);
 
     public delegate string BuildRoute(Type controller, MethodInfo action, string defaultRoute);
+
+    public delegate string NameRoute(Type controller, MethodInfo action, string route, HttpMethod method);
+
+    public delegate string FactoryNameStrategy(Type controller, MethodInfo action, string route);
 
     public delegate (RequestFactory factory, HttpMethod method) GetHttpMethodAndRequestFactory(Type controller,
         MethodInfo action);
