@@ -10,12 +10,10 @@ namespace TeeSquare.WebApi.Tests
     [TestFixture]
     public class WhenUsingRequestFactoryNameStrategy
     {
-        public Assembly WebApiAssembly => typeof(ValuesController).Assembly;
-
         [Test]
         public void RoutesAreSplitAcrossAllocatedClassesWhichMatchTheRequestFactoryName()
         {
-            var res = TeeSquareWebApi.GenerateForAssemblies(WebApiAssembly)
+            var res = TeeSquareWebApi.GenerateForControllers(TestConstants.SimpleControllers)
                 .Configure(options =>
                 {
                     options.TypeConverter = new TypeConverter((typeof(IFormFile), "File"));

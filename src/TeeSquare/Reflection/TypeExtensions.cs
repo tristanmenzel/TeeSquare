@@ -7,8 +7,12 @@ namespace TeeSquare.Reflection
 {
     public static class TypeExtensions
     {
-        public static bool IsExtendedPrimitive(this Type type)
+        public static bool IsExtendedPrimitive(this Type type, bool unwrapNullable = false)
         {
+            if (unwrapNullable && type.IsNullable(out var underlyingType))
+            {
+                return underlyingType.IsExtendedPrimitive();
+            }
             return type.IsEnum
                    || type.IsPrimitive
                    || type == typeof(Guid)

@@ -50,6 +50,19 @@ export abstract class RequestFactory {
       url: `defaultroute/getnum/${id}`
     };
   }
+  static GetFromRouteByIdByName({ id, name }: TestObject): GetRequest<TestObject> {
+    return {
+      method: 'GET',
+      url: `from-route/${id}/${name}`
+    };
+  }
+  static GetFromQuery(obj: Partial<TestObject>): GetRequest<TestObject> {
+    const query = toQuery({ ...obj });
+    return {
+      method: 'GET',
+      url: `from-query${query}`
+    };
+  }
   static PostFormvaluePostsomevalues(name: string, specialFile: File): PostRequest<FormData, number> {
     const data = new FormData();
     data.append('name', name);
@@ -61,7 +74,7 @@ export abstract class RequestFactory {
     };
   }
   static GetApiOtherImplicitQuery(id?: number): GetRequest<number> {
-    const query = toQuery({id});
+    const query = toQuery({ id });
     return {
       method: 'GET',
       url: `api/other/implicit-query${query}`
@@ -81,7 +94,7 @@ export abstract class RequestFactory {
     };
   }
   static GetApiOtherDoAThing(when?: string): GetRequest<number> {
-    const query = toQuery({when});
+    const query = toQuery({ when });
     return {
       method: 'GET',
       url: `api/other/do-a-thing${query}`
@@ -100,7 +113,7 @@ export abstract class RequestFactory {
     };
   }
   static GetApiRouteconstraintsUserByName(name: string, limit?: number): GetRequest<string[]> {
-    const query = toQuery({limit});
+    const query = toQuery({ limit });
     return {
       method: 'GET',
       url: `api/routeconstraints/user/${name}${query}`
@@ -236,4 +249,8 @@ export interface TestDto {
   hello: string;
   count: number;
   createdOn: string;
+}
+export interface TestObject {
+  id: number;
+  name: string;
 }

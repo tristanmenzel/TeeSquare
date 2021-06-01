@@ -5,13 +5,12 @@ using TeeSquare.DemoApi.Controllers;
 namespace TeeSquare.WebApi.Tests
 {
     [TestFixture]
-    public class WhenControllerFilterIsSpecified
+    public class WhenUsingDtosBoundToRouteOrQuery
     {
         [Test]
-        public void FilterControllersAreNotEmitted()
+        public void TheRequestFactoryDestructuresTheDtoIntoTheRouteOrQuery()
         {
-            var res = TeeSquareWebApi.GenerateForControllers(TestConstants.SimpleControllers)
-                .WithControllerFilter(c => c != typeof(FormValueController))
+            var res = TeeSquareWebApi.GenerateForControllers(typeof(DtoFromRouteOrQueryController))
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")
