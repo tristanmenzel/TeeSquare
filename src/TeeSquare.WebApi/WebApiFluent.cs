@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using TeeSquare.WebApi.Reflection;
 using TeeSquare.Writers;
@@ -65,7 +66,7 @@ namespace TeeSquare.WebApi
 
             foreach (var assembly in _assemblies ?? Array.Empty<Assembly>())
                 webApiWriter.AddAssembly(assembly, _controllerFilter);
-            foreach (var controller in _controllers ?? Array.Empty<Type>())
+            foreach (var controller in _controllers?.Where(_controllerFilter) ?? Array.Empty<Type>())
                 webApiWriter.AddController(controller);
 
             webApiWriter.WriteTo(tsWriter);

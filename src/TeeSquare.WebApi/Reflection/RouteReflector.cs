@@ -53,7 +53,7 @@ namespace TeeSquare.WebApi.Reflection
                 var requestParams = GetRequestParams(action, route, method);
 
                 var returnType = _options.GetApiReturnTypeStrategy(controller, action);
-                _requests.Add(factory( _options.FactoryNameStrategy(controller, action, route),
+                _requests.Add(factory(_options.FactoryNameStrategy(controller, action, route),
                     _options.NameRouteStrategy(controller, action, route, method),
                     route,
                     returnType,
@@ -70,12 +70,49 @@ namespace TeeSquare.WebApi.Reflection
         private ParamInfo[] GetRequestParams(MethodInfo action, string route, HttpMethod method)
         {
             return action.GetParameters()
-                .Select(p => new ParamInfo
+                .Select(p =>
                 {
-                    Kind = _options.GetParameterKindStrategy(p, route, method),
-                    Name = p.Name,
-                    Type = p.ParameterType
+                    var kind = _options.GetParameterKindStrategy(p, route, method);
+                    return new ParamInfo
+                    {
+                        Kind = kind,
+                        Name = p.Name,
+                        Type = p.ParameterType,
+                        DestructuredProperties = kind == ParameterKind.Route
+                            ? GetDestructuredProperties(p, route)
+                            : Array.Empty<DestructuredPropertyInfo>()
+                    };
                 }).ToArray();
+        }
+
+        private DestructuredPropertyInfo[] GetDestructuredProperties(ParameterInfo parameterInfo, string route)
+        {
+            if (parameterInfo.ParameterType.IsExtendedPrimitive())
+            {
+                return Array.Empty<DestructuredPropertyInfo>();
+            }
+
+            var props = parameterInfo.ParameterType.GetProperties()
+                .Select(p => _options.TypeConverter.PropertyName(p))
+                .ToArray();
+            var routeParams = new Regex("{([^}]+)}").Matches(route).Cast<Match>()
+                .Select(m => m.Groups[1].Value).ToArray();
+            return props
+                .SelectMany(p =>
+                {
+                    var matchedRouteParam =
+                        routeParams.FirstOrDefault(rp => rp.Equals(p, StringComparison.InvariantCultureIgnoreCase));
+                    if (matchedRouteParam != default)
+                    {
+                        return new[]
+                        {
+                            new DestructuredPropertyInfo {DestructureAs = matchedRouteParam, PropertyName = p}
+                        };
+                    }
+
+                    return Array.Empty<DestructuredPropertyInfo>();
+                })
+                .ToArray();
         }
 
         internal static ParameterKind GetParameterKind(ParameterInfo parameterInfo, string route, HttpMethod method)
@@ -127,7 +164,8 @@ namespace TeeSquare.WebApi.Reflection
             return (RequestInfo.Get, HttpMethod.Get);
         }
 
-        internal static string DefaultNameRouteStrategy(Type controller, MethodInfo action, string route, HttpMethod method)
+        internal static string DefaultNameRouteStrategy(Type controller, MethodInfo action, string route,
+            HttpMethod method)
         {
             var parts = route.Split('/')
                 .Select(part =>
@@ -182,13 +220,28 @@ namespace TeeSquare.WebApi.Reflection
             var partRegexSquare = new Regex(@"\[(?<part>[^]=?]+)[?]?(=[^]]+)?\]");
             var partRegexBraces = new Regex(@"\{(?<part>[^}=?]+)[?]?(=[^}]+)?\}");
 
-            string extractParameterName(string part) => !part.Contains(':') ? part : part.Substring(0, part.IndexOf(':'));
+            string extractParameterName(string part) =>
+                !part.Contains(':') ? part : part.Substring(0, part.IndexOf(':'));
+
+            bool doesRouteParamExist(string paramName, MethodInfo action)
+            {
+                if (action.GetParameters()
+                    .Any(p => p.Name.Equals(paramName, StringComparison.InvariantCultureIgnoreCase)))
+                    return true;
+                if (action.GetParameters()
+                    .Where(p => !p.ParameterType.IsExtendedPrimitive()
+                                && p.GetCustomAttributes(StaticConfig.Instance.FromRouteAttribute).Any())
+                    .Any(p => p.ParameterType.GetProperties().Any(p =>
+                        p.Name.Equals(paramName, StringComparison.InvariantCultureIgnoreCase))))
+                    return true;
+                return false;
+            }
 
             string MatchReplacer(Match match) => match.Groups["part"].Value switch
             {
                 "controller" => controller.Name.Replace("Controller", "").ToLower(),
                 "action" => action.Name.ToLower(),
-                _ => action.GetParameters().Any(p => p.Name.Equals(extractParameterName(match.Groups["part"].Value)))
+                _ => doesRouteParamExist(extractParameterName(match.Groups["part"].Value), action)
                     ? $"{{{extractParameterName(match.Groups["part"].Value)}}}"
                     : ""
             };
@@ -198,6 +251,7 @@ namespace TeeSquare.WebApi.Reflection
                 partRegexBraces.Replace(routeTemplate, MatchReplacer),
                 MatchReplacer);
         }
+
 
         private void WriteRequestTypesAndHelpers(TypeScriptWriter writer)
         {
@@ -310,7 +364,9 @@ namespace TeeSquare.WebApi.Reflection
                             {
                                 var requestBodyType = req.GetRequestBodyKind() == RequestBodyKind.Json
                                     ? _options.TypeConverter.Convert(req.GetRequestBodyType(), null)
-                                    : (req.GetRequestBodyKind() == RequestBodyKind.FormData ? new TypeReference("FormData") : _options.EmptyRequestBodyType);
+                                    : (req.GetRequestBodyKind() == RequestBodyKind.FormData
+                                        ? new TypeReference("FormData")
+                                        : _options.EmptyRequestBodyType);
                                 if (requestBodyType.Optional)
                                 {
                                     requestBodyType = new TypeReference($"{requestBodyType.FullName} | undefined");
@@ -339,9 +395,12 @@ namespace TeeSquare.WebApi.Reflection
                                     foreach (var rp in req.RequestParams.Where(x => x.Kind != ParameterKind.Body))
 
                                     {
-                                        p.Param(rp.Name,
+                                        p.Param(rp.NameOrDestructureExpression,
                                             _options.TypeConverter.Convert(rp.Type)
-                                                .MakeOptional(rp.Kind == ParameterKind.Query));
+                                                .MakeOptional(rp.Kind == ParameterKind.Query &&
+                                                              rp.Type.IsExtendedPrimitive(true))
+                                                .MakePartial(rp.Kind == ParameterKind.Query &&
+                                                             !rp.Type.IsExtendedPrimitive(true)));
                                     }
 
                                     if (req.Method.HasRequestBody() && req.GetRequestBodyKind() == RequestBodyKind.Json)
@@ -353,10 +412,11 @@ namespace TeeSquare.WebApi.Reflection
                                         .ToArray();
                                     if (queryParams.Any())
                                     {
-                                        w.Write($"const {_options.QueryVariableName} = toQuery({{", true);
+                                        w.Write($"const {_options.QueryVariableName} = toQuery({{ ", true);
                                         w.WriteDelimited(queryParams,
-                                            (p, wr) => wr.Write(p.Name), ", ");
-                                        w.WriteLine("});", false);
+                                            (p, wr) => wr.Write(p.Type.IsExtendedPrimitive(true) ? p.Name : $"...{p.Name}"),
+                                            ", ");
+                                        w.WriteLine(" });", false);
                                     }
 
                                     var formParams = req.RequestParams.Where(x => x.Kind == ParameterKind.Form)
@@ -373,7 +433,8 @@ namespace TeeSquare.WebApi.Reflection
                                     w.WriteLine("return {");
                                     w.Indent();
                                     w.WriteLine($"method: '{req.Method.GetName().ToUpper()}',");
-                                    if (req.Method.HasRequestBody() && req.GetRequestBodyKind() != RequestBodyKind.Empty)
+                                    if (req.Method.HasRequestBody() &&
+                                        req.GetRequestBodyKind() != RequestBodyKind.Empty)
                                         w.WriteLine("data,");
                                     else if (req.Method.HasRequestBody())
                                         w.WriteLine("data: undefined,");

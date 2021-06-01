@@ -65,7 +65,7 @@ export abstract class FormValueRequestFactory {
 }
 export abstract class ImplicitParametersRequestFactory {
   static GetApiOtherImplicitQuery(id?: number): GetRequest<number> {
-    const query = toQuery({id});
+    const query = toQuery({ id });
     return {
       method: 'GET',
       url: `api/other/implicit-query${query}`
@@ -87,7 +87,7 @@ export abstract class ImplicitParametersRequestFactory {
 }
 export abstract class OtherRequestFactory {
   static GetApiOtherDoAThing(when?: string): GetRequest<number> {
-    const query = toQuery({when});
+    const query = toQuery({ when });
     return {
       method: 'GET',
       url: `api/other/do-a-thing${query}`
@@ -110,7 +110,7 @@ export abstract class RouteConstraintsRequestFactory {
     };
   }
   static GetApiRouteconstraintsUserByName(name: string, limit?: number): GetRequest<string[]> {
-    const query = toQuery({limit});
+    const query = toQuery({ limit });
     return {
       method: 'GET',
       url: `api/routeconstraints/user/${name}${query}`
