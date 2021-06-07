@@ -127,10 +127,6 @@ namespace TeeSquare.WebApi.Reflection
         public Func<Type, MethodInfo, bool> ReflectMethod { get; set; } = (type, mi) => true;
         public string IndentCharacters { get; set; } = "  ";
 
-        public bool WriteEnumDescriptions { get; set; }
-        public bool WriteEnumDescriptionGetters { get; set; }
-        public bool WriteEnumAllValuesConst { get; set; }
-
         public EnumValueType EnumValueType { get; set; } = EnumValueType.Number;
 
         public IEnumWriterFactory EnumWriterFactory { get; set; } = new EnumWriterFactory();
