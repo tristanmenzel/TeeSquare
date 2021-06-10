@@ -65,6 +65,11 @@ namespace TeeSquare.WebApi.Reflection
         /// renamed from the default to avoid name clashes
         /// </summary>
         string QueryVariableName { get; }
+
+        /// <summary>
+        /// A prefix prepended to all route urls
+        /// </summary>
+        string RoutePrefix { get; }
     }
 
 
@@ -103,6 +108,7 @@ namespace TeeSquare.WebApi.Reflection
     {
         public string DefaultRoute { get; set; } = "{controller=Home}/{action=Index}/{id?}";
 
+        public string RoutePrefix { get; set; } = "/";
 
         public FactoryNameStrategy FactoryNameStrategy { get; set; } = RouteReflector.DefaultFactoryNameStrategy;
 

@@ -41,7 +41,7 @@ export abstract class RequestFactory {
   static GetApiOtherDoAThing(when: string): GetRequest<number> {
     return {
       method: 'GET',
-      url: `api/other/do-a-thing`
+      url: `/api/other/do-a-thing`
     };
   }
 }

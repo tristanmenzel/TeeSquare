@@ -42,7 +42,7 @@ export abstract class RequestFactory {
     return {
       method: 'POST',
       data,
-      url: `api/other/do-a-thing`
+      url: `/api/other/do-a-thing`
     };
   }
 }

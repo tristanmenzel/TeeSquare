@@ -41,7 +41,7 @@ export abstract class RequestFactory {
   static ReturnValueAttribute_Test(): GetRequest<unknown> {
     return {
       method: 'GET',
-      url: `prefix/api/return-test`
+      url: `/prefix/api/return-test`
     };
   }
 }
