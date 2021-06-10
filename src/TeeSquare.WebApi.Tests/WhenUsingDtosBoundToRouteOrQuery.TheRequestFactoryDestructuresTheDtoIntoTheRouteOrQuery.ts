@@ -41,14 +41,14 @@ export abstract class RequestFactory {
   static GetFromRouteByIdByName({ id, name }: TestObject): GetRequest<TestObject> {
     return {
       method: 'GET',
-      url: `from-route/${id}/${name}`
+      url: `/from-route/${id}/${name}`
     };
   }
   static GetFromQuery(obj: Partial<TestObject>): GetRequest<TestObject> {
     const query = toQuery({ ...obj });
     return {
       method: 'GET',
-      url: `from-query${query}`
+      url: `/from-query${query}`
     };
   }
 }

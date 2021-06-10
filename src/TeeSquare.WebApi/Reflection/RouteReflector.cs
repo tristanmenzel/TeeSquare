@@ -47,7 +47,8 @@ namespace TeeSquare.WebApi.Reflection
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod)
                 .Where(a => a.IsAction()))
             {
-                var route = _options.BuildRouteStrategy(controller, action, _options.DefaultRoute);
+                var route =
+                    $"{_options.RoutePrefix}{_options.BuildRouteStrategy(controller, action, _options.DefaultRoute)}";
 
                 var (factory, method) = _options.GetHttpMethodAndRequestFactoryStrategy(controller, action);
                 var requestParams = GetRequestParams(action, route, method);

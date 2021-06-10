@@ -41,7 +41,7 @@ export abstract class RequestFactory {
   static GetApiReturnTest(): GetRequest<number> {
     return {
       method: 'GET',
-      url: `api/return-test`
+      url: `/api/return-test`
     };
   }
 }
