@@ -30,7 +30,7 @@ namespace TeeSquare.Reflection
 
         public string IndentCharacters { get; set; } = "  ";
 
-        public EnumValueType EnumValueType { get; set; } = EnumValueType.Number;
+        public EnumValueTypeStrategy EnumValueTypeStrategy { get; set; } = EnumValueTypeStrategies.AllNumber;
 
         public IEnumWriterFactory EnumWriterFactory { get; set; } = new EnumWriterFactory();
         public IInterfaceWriterFactory InterfaceWriterFactory { get; set; } = new InterfaceWriterFactory();
@@ -50,6 +50,8 @@ namespace TeeSquare.Reflection
     }
 
     public delegate void WriteComplexType(TypeScriptWriter writer, IComplexTypeInfo complexType);
+
+    public delegate EnumValueType EnumValueTypeStrategy(Type type);
 
     public delegate void WriteHeader(TypeScriptWriter writer);
 }

@@ -133,8 +133,6 @@ namespace TeeSquare.WebApi.Reflection
         public Func<Type, MethodInfo, bool> ReflectMethod { get; set; } = (type, mi) => true;
         public string IndentCharacters { get; set; } = "  ";
 
-        public EnumValueType EnumValueType { get; set; } = EnumValueType.Number;
-
         public IEnumWriterFactory EnumWriterFactory { get; set; } = new EnumWriterFactory();
         public IInterfaceWriterFactory InterfaceWriterFactory { get; set; } = new InterfaceWriterFactory();
         public IClassWriterFactory ClassWriterFactory { get; set; } = new ClassWriterFactory();
@@ -161,6 +159,7 @@ namespace TeeSquare.WebApi.Reflection
         };
 
         public TypeCollection Types { get; set; } = new TypeCollection();
+        public EnumValueTypeStrategy EnumValueTypeStrategy { get; set; } = EnumValueTypeStrategies.AllNumber;
 
         public TypeReference EmptyRequestBodyType { get; set; } = new TypeReference("undefined");
         public string QueryVariableName { get; set; } = "query";
