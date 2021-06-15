@@ -65,6 +65,6 @@ namespace TeeSquare.Reflection
         /// <summary>
         /// Determines whether enums are reflected to numeric types, or strings (using the member name as the value)
         /// </summary>
-        EnumValueType EnumValueType { get; }
+        public EnumValueTypeStrategy EnumValueTypeStrategy { get; }
     }
 }

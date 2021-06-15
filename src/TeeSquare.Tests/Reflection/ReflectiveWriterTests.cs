@@ -56,11 +56,25 @@ namespace TeeSquare.Tests.Reflection
         public void EnumAsStrings()
         {
             var res = TeeSquareFluent.ReflectiveWriter()
+                .Configure(options => { options.EnumValueTypeStrategy = EnumValueTypeStrategies.AllString; })
+                .AddTypes(typeof(Title))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+        [Test]
+        public void MixedEnums()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
                 .Configure(options =>
                 {
-                    options.EnumValueType = EnumValueType.String;
+                    options.EnumValueTypeStrategy = type =>
+                        type == typeof(ByteEnum) ? EnumValueType.Number : EnumValueType.String;
                 })
-                .AddTypes(typeof(Title))
+                .AddTypes(typeof(Title), typeof(ByteEnum))
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")
@@ -264,17 +278,13 @@ namespace TeeSquare.Tests.Reflection
             Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
-
         }
 
         [Test]
         public void DiscriminatorProperty()
         {
             var res = TeeSquareFluent.ReflectiveWriter()
-                .Configure(options =>
-                {
-                    options.TypeConverter = new DiscriminatedUnionTypeConverter();
-                })
+                .Configure(options => { options.TypeConverter = new DiscriminatedUnionTypeConverter(); })
                 .AddTypes(typeof(Circle), typeof(Square), typeof(Rectangle))
                 .WriteToString();
 

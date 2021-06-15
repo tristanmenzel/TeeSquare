@@ -205,7 +205,8 @@ namespace TeeSquare.Reflection
 
                 if (typeRef.Enum)
                 {
-                    writer.WriteEnum(typeRef.TypeName, _options.EnumValueType)
+                    var enumValueType = _options.EnumValueTypeStrategy(type);
+                    writer.WriteEnum(typeRef.TypeName, enumValueType)
                         .Configure(e =>
                         {
                             foreach (var field in Enum.GetNames(type).Zip(Enum.GetValues(type)
@@ -217,7 +218,7 @@ namespace TeeSquare.Reflection
                                     .SelectMany(m => m.GetCustomAttributes<DescriptionAttribute>())
                                     .Select(a => a.Description)
                                     .FirstOrDefault();
-                                if (_options.EnumValueType == EnumValueType.Number)
+                                if (enumValueType == EnumValueType.Number)
                                 {
                                     e.AddValue(TypeConverter.EnumName(field.name), field.value, description);
                                 }
