@@ -123,7 +123,8 @@ namespace TeeSquare.WebApi.Reflection
                                                           | BindingFlags.Instance;
 
         public BindingFlags FieldFlags { get; set; } = BindingFlags.Public
-                                                       | BindingFlags.Instance;
+                                                       | BindingFlags.Instance
+                                                       | BindingFlags.Static;
 
         public BindingFlags MethodFlags { get; set; } = BindingFlags.Instance
                                                         | BindingFlags.Public
@@ -138,8 +139,8 @@ namespace TeeSquare.WebApi.Reflection
         public IClassWriterFactory ClassWriterFactory { get; set; } = new ClassWriterFactory();
         public IFunctionWriterFactory FunctionWriterFactory { get; set; } = new FunctionWriterFactory();
 
-        public WriteComplexType ComplexTypeStrategy { get; set; } =
-            (writer, typeInfo) => writer.WriteInterface(typeInfo);
+        public ComplexTypeStrategy ComplexTypeStrategy { get; set; } =
+            (writer, typeInfo, type) => writer.WriteInterface(typeInfo);
 
 
         public GetApiReturnType GetApiReturnTypeStrategy { get; set; } = RouteReflector.DefaultApiReturnTypeStrategy;

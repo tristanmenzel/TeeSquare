@@ -2,18 +2,20 @@
 
 namespace TeeSquare.Tests.Reflection.FakeDomain
 {
-    public class Square
+    public class Square : Shape
     {
         public int Side { get; set; }
-        [TypeDiscriminator]
-        public string Kind => nameof(Square);
+        public const bool IsRound = false;
+        public const int Sides = 4;
+        public const string Kind = nameof(Square);
     }
 
-    public class Rectangle
+    public class Rectangle : Shape
     {
         public int Width { get; set; }
         public int Height { get; set; }
-        [TypeDiscriminator("SpecialRectangle")]
-        public string Kind => "SpecialRectangle";
+        public const int Sides = 4;
+        public const bool IsRound = false;
+        public const string Kind = nameof(Rectangle);
     }
 }

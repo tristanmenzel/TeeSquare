@@ -52,6 +52,15 @@ namespace TeeSquare.Reflection
             return _staticMappings.ContainsKey(type);
         }
 
+        public string ConvertCsLiteralToJsLiteral(object obj)
+        {
+            if (obj is Boolean b)
+                return b ? "true" : "false";
+            if (obj is String s)
+                return $"'{s}'";
+            return obj.ToString();
+        }
+
         /// <summary>
         /// Converts a c# type into a typescript type.
         /// </summary>
@@ -61,6 +70,13 @@ namespace TeeSquare.Reflection
         /// <returns></returns>
         public virtual ITypeReference Convert(Type type, Type parentType = null, MemberInfo info = null)
         {
+            if (info is FieldInfo {IsLiteral: true, IsInitOnly: false} fi)
+            {
+                return new TypeReference(ConvertCsLiteralToJsLiteral(fi.GetRawConstantValue()))
+                {
+                    ExistingType = true
+                };
+            }
             var isNullableReference = (info as PropertyInfo)?.IsNullableReference() ?? false;
             if (TryGetStaticMapping(type, out var mapping))
                 return new TypeReference(mapping)

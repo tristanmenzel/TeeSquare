@@ -18,7 +18,8 @@ namespace TeeSquare.Reflection
                                                           | BindingFlags.Instance;
 
         public BindingFlags FieldFlags { get; set; } = BindingFlags.Public
-                                                       | BindingFlags.Instance;
+                                                       | BindingFlags.Instance
+                                                       | BindingFlags.Static;
 
         public BindingFlags MethodFlags { get; set; } = BindingFlags.Instance
                                                         | BindingFlags.Public
@@ -37,8 +38,8 @@ namespace TeeSquare.Reflection
         public IClassWriterFactory ClassWriterFactory { get; set; } = new ClassWriterFactory();
         public IFunctionWriterFactory FunctionWriterFactory { get; set; } = new FunctionWriterFactory();
 
-        public WriteComplexType ComplexTypeStrategy { get; set; } =
-            (writer, typeInfo) => writer.WriteInterface(typeInfo);
+        public ComplexTypeStrategy ComplexTypeStrategy { get; set; } =
+            (writer, typeInfo, type) => writer.WriteInterface(typeInfo);
 
         public WriteHeader WriteHeader { get; set; } = writer =>
         {
@@ -49,9 +50,10 @@ namespace TeeSquare.Reflection
         public TypeCollection Types { get; set; } = new TypeCollection();
     }
 
-    public delegate void WriteComplexType(TypeScriptWriter writer, IComplexTypeInfo complexType);
+    public delegate void ComplexTypeStrategy(TypeScriptWriter writer, IComplexTypeInfo complexType, Type originalType);
 
     public delegate EnumValueType EnumValueTypeStrategy(Type type);
+
 
     public delegate void WriteHeader(TypeScriptWriter writer);
 }

@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
 using BlurkCompare;
 using NUnit.Framework;
+using TeeSquare.Configuration;
 using TeeSquare.Reflection;
 using TeeSquare.Tests.Reflection.Enums;
 using TeeSquare.Tests.Reflection.FakeDomain;
@@ -247,7 +250,10 @@ namespace TeeSquare.Tests.Reflection
         public void OutputClassStrategy()
         {
             var res = TeeSquareFluent.ReflectiveWriter()
-                .Configure(options => { options.ComplexTypeStrategy = (writer, type) => writer.WriteClass(type); })
+                .Configure(options =>
+                {
+                    options.ComplexTypeStrategy = (writer, typeInfo, type) => writer.WriteClass(typeInfo);
+                })
                 .AddTypes(typeof(Library))
                 .WriteToString();
 
@@ -281,33 +287,38 @@ namespace TeeSquare.Tests.Reflection
         }
 
         [Test]
-        public void DiscriminatorProperty()
+        public void ConstProperties()
         {
+            Type[] GetSubTypes(Type type)
+            {
+                return type.Assembly.GetTypes()
+                    .Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && type != t)
+                    .ToArray();
+            }
+
             var res = TeeSquareFluent.ReflectiveWriter()
-                .Configure(options => { options.TypeConverter = new DiscriminatedUnionTypeConverter(); })
-                .AddTypes(typeof(Circle), typeof(Square), typeof(Rectangle))
+                .Configure(options => options.ComplexTypeStrategy = options.ComplexTypeStrategy.ExtendStrategy(
+                    original =>
+                        (writer, info, originalType) =>
+                        {
+                            if (originalType == typeof(Shape))
+                            {
+                                var unionDefinition = String.Join(" | ",
+                                    GetSubTypes(originalType).Select(options.TypeConverter.TypeName));
+                                writer.WriteLine(
+                                    $"export type {info.TypeReference.TypeName} = {unionDefinition};");
+                            }
+                            else
+                            {
+                                original(writer, info, originalType);
+                            }
+                        }))
+                .AddTypes(typeof(Circle), typeof(Square), typeof(Rectangle), typeof(Shape))
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")
-                .To(res)
+                .To(res, true)
                 .AssertAreTheSame(Assert.Fail);
-        }
-
-        class DiscriminatedUnionTypeConverter : TypeConverter
-        {
-            public override ITypeReference Convert(Type type, Type parentType = null, MemberInfo info = null)
-            {
-                if (info is PropertyInfo pi)
-                {
-                    if (DiscriminatedUnionsHelper.IsDiscriminator(parentType, pi))
-                    {
-                        var value = DiscriminatedUnionsHelper.GetDiscriminatorValue(parentType, pi);
-                        return new TypeReference($"'{value}'") {ExistingType = true};
-                    }
-                }
-
-                return base.Convert(type, parentType, info);
-            }
         }
 
         [Test]

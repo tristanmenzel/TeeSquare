@@ -264,7 +264,7 @@ namespace TeeSquare.Reflection
                             }
                         }
                     })
-                    .Done());
+                    .Done(), type);
             }
 
             writer.Flush();
