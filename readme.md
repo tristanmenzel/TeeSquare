@@ -27,6 +27,12 @@ Extensions of the base library for outputting MobX State Tree models
 
 [MobX](https://github.com/tristanmenzel/TeeSquare/blob/master/src/TeeSquare.Mobx.Tests/MobxModelTests.cs)
 
+## TeeSquare UnionTypes
+
+Adds ability for TeeSquare to generate union types from dotnet types when decorated with the provided attribute
+
+[UnionTypes](https://github.com/tristanmenzel/TeeSquare/blob/master/src/TeeSquare.UnionTypes.Tests/UnionTypesTests.cs)
+
 
 
  

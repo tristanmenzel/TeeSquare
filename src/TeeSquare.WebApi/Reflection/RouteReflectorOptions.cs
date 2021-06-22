@@ -135,6 +135,9 @@ namespace TeeSquare.WebApi.Reflection
         public Func<Type, (bool reflect, Assembly[] additionalAssemblies)> ReflectSubTypes { get; set; }
             = type => (false, Array.Empty<Assembly>());
         public Func<Type, MethodInfo, bool> ReflectMethod { get; set; } = (type, mi) => true;
+
+        public GetTypeDependenciesStrategy GetTypeDependenciesStrategy { get; set; } =
+            ReflectiveWriter.GetTypeDependencies;
         public string IndentCharacters { get; set; } = "  ";
 
         public IEnumWriterFactory EnumWriterFactory { get; set; } = new EnumWriterFactory();

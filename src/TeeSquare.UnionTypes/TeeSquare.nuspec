@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package>
+    <metadata>
+        <id>TeeSquare.UnionTypes</id>
+        <version>$version$</version>
+        <title>TeeSquare.UnionTypes</title>
+        <authors>Tristan Menzel</authors>
+        <owners>Tristan Menzel</owners>
+        <projectUrl>https://github.com/tristanmenzel/TeeSquare</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>
+          Adds ability for TeeSquare to generate union types from dotnet types when decorated with the provided attribute
+        </description>
+        <tags>TypeScript CodeGen</tags>
+    </metadata>
+</package>

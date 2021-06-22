@@ -27,12 +27,14 @@ after_build:
   - cmd: dotnet pack ./src/teesquare.webapi.core31/teesquare.webapi.core31.csproj --configuration=release --no-restore
   - cmd: dotnet pack ./src/teesquare.webapi.net50/teesquare.webapi.net50.csproj --configuration=release --no-restore
   - cmd: dotnet pack ./src/teesquare.mobx/teesquare.mobx.csproj --configuration=release --no-restore
+  - cmd: dotnet pack ./src/teesquare.uniontypes/teesquare.uniontypes.csproj --configuration=release --no-restore
 artifacts:
  - path: '\src\teesquare\bin\release\*.nupkg'
  - path: '\src\teesquare.webapi\bin\release\*.nupkg'
  - path: '\src\teesquare.webapi.core31\bin\release\*.nupkg'
  - path: '\src\teesquare.webapi.net50\bin\release\*.nupkg'
  - path: '\src\teesquare.mobx\bin\release\*.nupkg'
+ - path: '\src\teesquare.uniontypes\bin\release\*.nupkg'
    name: Package
    type: NugetPackage
 clone_depth: 1
@@ -41,6 +43,7 @@ test_script:
   - cmd: dotnet test ./src/teesquare.tests/teesquare.tests.csproj
   - cmd: dotnet test ./src/teesquare.webapi.tests/teesquare.webapi.tests.csproj
   - cmd: dotnet test ./src/teesquare.mobx.tests/teesquare.mobx.tests.csproj
+  - cmd: dotnet test ./src/teesquare.uniontypes.tests/teesquare.uniontypes.tests.csproj
 on_finish :
   # any cleanup in here
 deploy: 

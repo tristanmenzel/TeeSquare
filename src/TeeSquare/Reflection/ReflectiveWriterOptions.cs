@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Linq;
 using System.Reflection;
 using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
 using MethodInfo = System.Reflection.MethodInfo;
-using PropertyInfo = System.Reflection.PropertyInfo;
 
 namespace TeeSquare.Reflection
 {
@@ -27,10 +25,9 @@ namespace TeeSquare.Reflection
 
         public Func<Type, bool> ReflectMethods { get; set; } = type => false;
 
-        public Func<Type, (bool reflect, Assembly[] additionalAssemblies)> ReflectSubTypes { get; set; }
-            = type => (false, Array.Empty<Assembly>());
-
         public Func<Type, MethodInfo, bool> ReflectMethod { get; set; } = (type, mi) => true;
+
+        public GetTypeDependenciesStrategy GetTypeDependenciesStrategy { get; set; } = ReflectiveWriter.GetTypeDependencies;
 
         public string IndentCharacters { get; set; } = "  ";
 
@@ -57,6 +54,7 @@ namespace TeeSquare.Reflection
 
     public delegate EnumValueType EnumValueTypeStrategy(Type type);
 
+    public delegate Type[] GetTypeDependenciesStrategy(Type type, IReflectiveWriterOptions options);
 
     public delegate void WriteHeader(TypeScriptWriter writer);
 }

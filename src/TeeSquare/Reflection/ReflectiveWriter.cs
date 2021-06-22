@@ -68,7 +68,7 @@ namespace TeeSquare.Reflection
                 {
                     if (Types.Contains(type)) continue;
 
-                    var dependencies = GetTypeDependencies(type);
+                    var dependencies =  _options.GetTypeDependenciesStrategy(type, _options);
                     if (dependencies.Any())
                     {
                         AddTypes(dependencies);
@@ -86,7 +86,7 @@ namespace TeeSquare.Reflection
 
                     if (Types.Contains(genericType)) continue;
 
-                    var dependencies = GetTypeDependencies(type);
+                    var dependencies = _options.GetTypeDependenciesStrategy(type, _options);
                     if (dependencies.Any())
                     {
                         AddTypes(dependencies);
@@ -102,7 +102,7 @@ namespace TeeSquare.Reflection
 
                     if (!type.IsEnum)
                     {
-                        var dependencies = GetTypeDependencies(type);
+                        var dependencies = _options.GetTypeDependenciesStrategy(type, _options);
                         if (dependencies.Any())
                         {
                             AddTypes(dependencies);
@@ -112,36 +112,27 @@ namespace TeeSquare.Reflection
             }
         }
 
-        private Type[] GetTypeDependencies(Type type)
+        public static Type[] GetTypeDependencies(Type type, IReflectiveWriterOptions options)
         {
             // Don't reflect dependencies on statically mapped types
-            if (TypeConverter.HasStaticMapping(type))
+            if (options.TypeConverter.HasStaticMapping(type))
                 return new Type[0];
             var propertyDependencies = type
-                .GetProperties(_options.PropertyFlags)
+                .GetProperties(options.PropertyFlags)
                 .Select(p => p.PropertyType)
                 .Distinct()
                 .ToArray();
             var fieldDependencies = type
-                .GetFields(_options.FieldFlags)
+                .GetFields(options.FieldFlags)
                 .Select(f => f.FieldType)
                 .Distinct()
                 .ToArray();
 
-
-            var (reflectSubTypes, additionalAssemblies) = _options.ReflectSubTypes(type);
-            var subTypes = reflectSubTypes
-                ? additionalAssemblies.Union(new[] {type.Assembly})
-                    .SelectMany(a => a.GetExportedTypes())
-                    .Where(t => type.IsAssignableFrom(t) && t != type)
-                    .ToArray()
-                : Array.Empty<Type>();
-
-            var methodDependencies = _options.ReflectMethods(type)
+            var methodDependencies = options.ReflectMethods(type)
                 ? type
-                    .GetMethods(_options.MethodFlags)
+                    .GetMethods(options.MethodFlags)
                     .Where(m => !m.IsSpecialName)
-                    .Where(m => _options.ReflectMethod(type, m))
+                    .Where(m => options.ReflectMethod(type, m))
                     .SelectMany(m => m.GetParameters().Select(p => p.ParameterType).Union(new[] {m.ReturnType}))
                     .Where(m => m != typeof(void))
                     .ToArray()
@@ -150,7 +141,6 @@ namespace TeeSquare.Reflection
             return propertyDependencies
                 .Union(fieldDependencies)
                 .Union(methodDependencies)
-                .Union(subTypes)
                 .ToArray();
         }
 

@@ -294,20 +294,7 @@ namespace TeeSquare.Tests.Reflection
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")
-                .To(res, true)
-                .AssertAreTheSame(Assert.Fail);
-        }
-
-        [Test]
-        public void ReflectSubTypes()
-        {
-            var res = TeeSquareFluent.ReflectiveWriter()
-                .Configure(options => options.ReflectSubTypes = type => (type == typeof(Shape), Array.Empty<Assembly>()))
-                .AddTypes(typeof(Shape))
-                .WriteToString();
-
-            Blurk.CompareImplicitFile("ts")
-                .To(res, true)
+                .To(res)
                 .AssertAreTheSame(Assert.Fail);
         }
 
