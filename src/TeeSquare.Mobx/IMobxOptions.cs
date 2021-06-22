@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-
 namespace TeeSquare.Mobx
 {
     public interface IMobxOptions

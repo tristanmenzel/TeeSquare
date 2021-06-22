@@ -1,6 +1,4 @@
 ﻿
-using System.Security.Cryptography;
-
 namespace TeeSquare.Tests.Reflection.FakeDomain
 {
     public class Circle : Shape

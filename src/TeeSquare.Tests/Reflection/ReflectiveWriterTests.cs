@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Metadata;
 using BlurkCompare;
 using NUnit.Framework;
-using TeeSquare.Configuration;
 using TeeSquare.Reflection;
 using TeeSquare.Tests.Reflection.Enums;
 using TeeSquare.Tests.Reflection.FakeDomain;

@@ -1,6 +1,4 @@
-﻿using TeeSquare.Reflection;
-
-namespace TeeSquare.Tests.Reflection.FakeDomain
+﻿namespace TeeSquare.Tests.Reflection.FakeDomain
 {
     public class Square : Shape
     {

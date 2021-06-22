@@ -1,6 +1,5 @@
 using System;
 using System.Reflection;
-using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
 using MethodInfo = System.Reflection.MethodInfo;
 

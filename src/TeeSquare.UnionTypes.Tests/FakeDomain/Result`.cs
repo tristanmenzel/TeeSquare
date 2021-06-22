@@ -1,5 +1,4 @@
-﻿using System;
-using TeeSquare.UnionTypes;
+﻿using TeeSquare.UnionTypes;
 
 namespace RPS.myProjects.Infrastructure.Util
 {

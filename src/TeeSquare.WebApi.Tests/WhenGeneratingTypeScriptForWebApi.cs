@@ -1,8 +1,6 @@
-﻿using System.Reflection;
-using BlurkCompare;
+﻿using BlurkCompare;
 using Microsoft.AspNetCore.Http;
 using NUnit.Framework;
-using TeeSquare.DemoApi.Controllers;
 using TeeSquare.Reflection;
 
 namespace TeeSquare.WebApi.Tests

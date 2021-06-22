@@ -1,5 +1,3 @@
-using TeeSquare.UnionTypes;
-
 namespace RPS.myProjects.Infrastructure.Util
 {
     public abstract class Result
