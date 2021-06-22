@@ -31,6 +31,10 @@ Extensions of the base library for outputting MobX State Tree models
 
 Adds ability for TeeSquare to generate union types from dotnet types when decorated with the provided attribute
 
+ - Union types should be expressed with a common base type in c#
+ - The base type should be decorated with the `[UnionType]` attribute and include the types of every possible value in the constructor
+ - Types from a union should have a discriminator property which can be defined with a `public const` field. Eg. `public const string Kind = "Banana";` 
+
 [UnionTypes](https://github.com/tristanmenzel/TeeSquare/blob/master/src/TeeSquare.UnionTypes.Tests/UnionTypesTests.cs)
 
 

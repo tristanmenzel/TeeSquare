@@ -2,10 +2,10 @@
 
 export interface FailResult<TSuccess> {
   message: string;
-  isSuccess: boolean;
+  isSuccess: false;
 }
 export type Result<TSuccess> = SuccessResult<TSuccess> | FailResult<TSuccess>;
 export interface SuccessResult<TSuccess> {
   value: TSuccess;
-  isSuccess: boolean;
+  isSuccess: true;
 }

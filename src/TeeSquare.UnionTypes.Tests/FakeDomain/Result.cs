@@ -2,8 +2,6 @@ namespace RPS.myProjects.Infrastructure.Util
 {
     public abstract class Result
     {
-        public bool IsSuccess { get; protected init; }
-
         public static SuccessResult<T> Success<T>(T val)
         {
             return new(val);
