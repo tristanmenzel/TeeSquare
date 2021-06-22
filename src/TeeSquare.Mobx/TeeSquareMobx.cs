@@ -12,7 +12,7 @@ namespace TeeSquare.Mobx
             (options) =>
             {
                 var mobxWriterFactory = new MobxModelWriterFactory(mobxOptions);
-                options.ComplexTypeStrategy = (writer, typeInfo) =>
+                options.ComplexTypeStrategy = (writer, typeInfo, type) =>
                     writer.WriteSnippet(mobxWriterFactory.BuildModel(typeInfo));
                 options.TypeConverter =  typeConverter?? new MobxTypeConverter();
                 options.Types.AddLiteralImport("mobx-state-tree", "types");

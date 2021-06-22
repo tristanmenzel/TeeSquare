@@ -123,14 +123,21 @@ namespace TeeSquare.WebApi.Reflection
                                                           | BindingFlags.Instance;
 
         public BindingFlags FieldFlags { get; set; } = BindingFlags.Public
-                                                       | BindingFlags.Instance;
+                                                       | BindingFlags.Instance
+                                                       | BindingFlags.Static;
 
         public BindingFlags MethodFlags { get; set; } = BindingFlags.Instance
                                                         | BindingFlags.Public
                                                         | BindingFlags.DeclaredOnly;
 
         public Func<Type, bool> ReflectMethods { get; set; } = type => false;
+
+        public Func<Type, (bool reflect, Assembly[] additionalAssemblies)> ReflectSubTypes { get; set; }
+            = type => (false, Array.Empty<Assembly>());
         public Func<Type, MethodInfo, bool> ReflectMethod { get; set; } = (type, mi) => true;
+
+        public GetTypeDependenciesStrategy GetTypeDependenciesStrategy { get; set; } =
+            ReflectiveWriter.GetTypeDependencies;
         public string IndentCharacters { get; set; } = "  ";
 
         public IEnumWriterFactory EnumWriterFactory { get; set; } = new EnumWriterFactory();
@@ -138,8 +145,8 @@ namespace TeeSquare.WebApi.Reflection
         public IClassWriterFactory ClassWriterFactory { get; set; } = new ClassWriterFactory();
         public IFunctionWriterFactory FunctionWriterFactory { get; set; } = new FunctionWriterFactory();
 
-        public WriteComplexType ComplexTypeStrategy { get; set; } =
-            (writer, typeInfo) => writer.WriteInterface(typeInfo);
+        public ComplexTypeStrategy ComplexTypeStrategy { get; set; } =
+            (writer, typeInfo, type) => writer.WriteInterface(typeInfo);
 
 
         public GetApiReturnType GetApiReturnTypeStrategy { get; set; } = RouteReflector.DefaultApiReturnTypeStrategy;

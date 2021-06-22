@@ -1,4 +1,4 @@
-version: '6.3.{build}'
+version: '6.4.{build}'
 image: Visual Studio 2019
 branches:
   only:
@@ -20,27 +20,17 @@ before_build:
 build_script:
   # Build lib
   - cmd: dotnet build ./src/TeeSquare.sln --configuration=release --no-restore
+test_script:
+  # run the unit tests
+  - cmd: dotnet test ./src/TeeSquare.sln --no-restore --configuration=release --no-build
 after_build:
   # For once the build has completed
-  - cmd: dotnet pack ./src/teesquare/teesquare.csproj --configuration=release --no-restore
-  - cmd: dotnet pack ./src/teesquare.webapi/teesquare.webapi.csproj --configuration=release --no-restore
-  - cmd: dotnet pack ./src/teesquare.webapi.core31/teesquare.webapi.core31.csproj --configuration=release --no-restore
-  - cmd: dotnet pack ./src/teesquare.webapi.net50/teesquare.webapi.net50.csproj --configuration=release --no-restore
-  - cmd: dotnet pack ./src/teesquare.mobx/teesquare.mobx.csproj --configuration=release --no-restore
+  - cmd: dotnet pack ./src/TeeSquare.sln --configuration=release --no-restore --no-build
 artifacts:
- - path: '\src\teesquare\bin\release\*.nupkg'
- - path: '\src\teesquare.webapi\bin\release\*.nupkg'
- - path: '\src\teesquare.webapi.core31\bin\release\*.nupkg'
- - path: '\src\teesquare.webapi.net50\bin\release\*.nupkg'
- - path: '\src\teesquare.mobx\bin\release\*.nupkg'
+ - path: '\src\*\bin\release\*.nupkg'
    name: Package
    type: NugetPackage
 clone_depth: 1
-test_script:
-  # run the unit tests
-  - cmd: dotnet test ./src/teesquare.tests/teesquare.tests.csproj
-  - cmd: dotnet test ./src/teesquare.webapi.tests/teesquare.webapi.tests.csproj
-  - cmd: dotnet test ./src/teesquare.mobx.tests/teesquare.mobx.tests.csproj
 on_finish :
   # any cleanup in here
 deploy: 

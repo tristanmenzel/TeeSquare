@@ -24,14 +24,14 @@ namespace TeeSquare.Reflection
         {
             foreach (var type in types)
             {
-                #if !NET48
+#if !NET48
                 // This property doesn't exist in net48. As a result, a dummy interface will
                 // be written to the output. eg. export interface T { }
                 if (type.IsGenericTypeParameter)
                 {
                     continue;
                 }
-                #endif
+#endif
 
                 if (type.IsExtendedPrimitive())
                 {
@@ -68,7 +68,7 @@ namespace TeeSquare.Reflection
                 {
                     if (Types.Contains(type)) continue;
 
-                    var dependencies = GetTypeDependencies(type);
+                    var dependencies =  _options.GetTypeDependenciesStrategy(type, _options);
                     if (dependencies.Any())
                     {
                         AddTypes(dependencies);
@@ -86,7 +86,7 @@ namespace TeeSquare.Reflection
 
                     if (Types.Contains(genericType)) continue;
 
-                    var dependencies = GetTypeDependencies(type);
+                    var dependencies = _options.GetTypeDependenciesStrategy(type, _options);
                     if (dependencies.Any())
                     {
                         AddTypes(dependencies);
@@ -102,7 +102,7 @@ namespace TeeSquare.Reflection
 
                     if (!type.IsEnum)
                     {
-                        var dependencies = GetTypeDependencies(type);
+                        var dependencies = _options.GetTypeDependenciesStrategy(type, _options);
                         if (dependencies.Any())
                         {
                             AddTypes(dependencies);
@@ -112,32 +112,31 @@ namespace TeeSquare.Reflection
             }
         }
 
-        private Type[] GetTypeDependencies(Type type)
+        public static Type[] GetTypeDependencies(Type type, IReflectiveWriterOptions options)
         {
             // Don't reflect dependencies on statically mapped types
-            if (TypeConverter.HasStaticMapping(type))
+            if (options.TypeConverter.HasStaticMapping(type))
                 return new Type[0];
             var propertyDependencies = type
-                .GetProperties(_options.PropertyFlags)
+                .GetProperties(options.PropertyFlags)
                 .Select(p => p.PropertyType)
                 .Distinct()
                 .ToArray();
             var fieldDependencies = type
-                .GetFields(_options.FieldFlags)
+                .GetFields(options.FieldFlags)
                 .Select(f => f.FieldType)
                 .Distinct()
                 .ToArray();
-            if (!_options.ReflectMethods(type))
-                return propertyDependencies
-                    .Union(fieldDependencies)
-                    .ToArray();
-            var methodDependencies = type
-                .GetMethods(_options.MethodFlags)
-                .Where(m => !m.IsSpecialName)
-                .Where(m => _options.ReflectMethod(type, m))
-                .SelectMany(m => m.GetParameters().Select(p => p.ParameterType).Union(new[] {m.ReturnType}))
-                .Where(m => m != typeof(void))
-                .ToArray();
+
+            var methodDependencies = options.ReflectMethods(type)
+                ? type
+                    .GetMethods(options.MethodFlags)
+                    .Where(m => !m.IsSpecialName)
+                    .Where(m => options.ReflectMethod(type, m))
+                    .SelectMany(m => m.GetParameters().Select(p => p.ParameterType).Union(new[] {m.ReturnType}))
+                    .Where(m => m != typeof(void))
+                    .ToArray()
+                : Array.Empty<Type>();
 
             return propertyDependencies
                 .Union(fieldDependencies)
@@ -264,7 +263,7 @@ namespace TeeSquare.Reflection
                             }
                         }
                     })
-                    .Done());
+                    .Done(), type);
             }
 
             writer.Flush();

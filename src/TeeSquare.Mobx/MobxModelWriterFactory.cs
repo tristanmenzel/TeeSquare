@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using TeeSquare.TypeMetadata;
+﻿using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
 
 namespace TeeSquare.Mobx

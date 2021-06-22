@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using BlurkCompare;
 using NUnit.Framework;
 using TeeSquare.Reflection;
@@ -247,7 +246,10 @@ namespace TeeSquare.Tests.Reflection
         public void OutputClassStrategy()
         {
             var res = TeeSquareFluent.ReflectiveWriter()
-                .Configure(options => { options.ComplexTypeStrategy = (writer, type) => writer.WriteClass(type); })
+                .Configure(options =>
+                {
+                    options.ComplexTypeStrategy = (writer, typeInfo, type) => writer.WriteClass(typeInfo);
+                })
                 .AddTypes(typeof(Library))
                 .WriteToString();
 
@@ -281,33 +283,15 @@ namespace TeeSquare.Tests.Reflection
         }
 
         [Test]
-        public void DiscriminatorProperty()
+        public void ConstProperties()
         {
             var res = TeeSquareFluent.ReflectiveWriter()
-                .Configure(options => { options.TypeConverter = new DiscriminatedUnionTypeConverter(); })
-                .AddTypes(typeof(Circle), typeof(Square), typeof(Rectangle))
+                .AddTypes(typeof(Square), typeof(Circle), typeof(Rectangle))
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
-        }
-
-        class DiscriminatedUnionTypeConverter : TypeConverter
-        {
-            public override ITypeReference Convert(Type type, Type parentType = null, MemberInfo info = null)
-            {
-                if (info is PropertyInfo pi)
-                {
-                    if (DiscriminatedUnionsHelper.IsDiscriminator(parentType, pi))
-                    {
-                        var value = DiscriminatedUnionsHelper.GetDiscriminatorValue(parentType, pi);
-                        return new TypeReference($"'{value}'") {ExistingType = true};
-                    }
-                }
-
-                return base.Convert(type, parentType, info);
-            }
         }
 
         [Test]

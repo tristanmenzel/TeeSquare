@@ -1,6 +1,5 @@
 using System;
 using System.Reflection;
-using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
 using MethodInfo = System.Reflection.MethodInfo;
 
@@ -45,11 +44,13 @@ namespace TeeSquare.Reflection
         /// </summary>
         Func<Type, MethodInfo, bool> ReflectMethod { get; }
 
+        GetTypeDependenciesStrategy GetTypeDependenciesStrategy { get; }
+
         /// <summary>
         /// Strategy for rendering complex types. The default is to output them as interfaces but could
         /// be overridden to output classes
         /// </summary>
-        WriteComplexType ComplexTypeStrategy { get; }
+        ComplexTypeStrategy ComplexTypeStrategy { get; }
 
         /// <summary>
         /// Delegate to write a custom header at the top of the file. Default is a comment about the
@@ -66,5 +67,6 @@ namespace TeeSquare.Reflection
         /// Determines whether enums are reflected to numeric types, or strings (using the member name as the value)
         /// </summary>
         public EnumValueTypeStrategy EnumValueTypeStrategy { get; }
+
     }
 }

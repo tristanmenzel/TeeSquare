@@ -1,5 +1,4 @@
 using BlurkCompare;
-using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using TeeSquare.DemoApi.Controllers;
 using TeeSquare.WebApi.Reflection;

@@ -52,6 +52,15 @@ namespace TeeSquare.Reflection
             return _staticMappings.ContainsKey(type);
         }
 
+        public string ConvertCsLiteralToJsLiteral(object obj)
+        {
+            if (obj is Boolean b)
+                return b ? "true" : "false";
+            if (obj is String s)
+                return $"'{s}'";
+            return obj.ToString();
+        }
+
         /// <summary>
         /// Converts a c# type into a typescript type.
         /// </summary>
@@ -61,6 +70,14 @@ namespace TeeSquare.Reflection
         /// <returns></returns>
         public virtual ITypeReference Convert(Type type, Type parentType = null, MemberInfo info = null)
         {
+            if (info is FieldInfo {IsLiteral: true} fi)
+            {
+                return new TypeReference(ConvertCsLiteralToJsLiteral(fi.GetRawConstantValue()))
+                {
+                    ExistingType = true
+                };
+            }
+
             var isNullableReference = (info as PropertyInfo)?.IsNullableReference() ?? false;
             if (TryGetStaticMapping(type, out var mapping))
                 return new TypeReference(mapping)
@@ -86,7 +103,7 @@ namespace TeeSquare.Reflection
             if (type.IsDictionary(out var genericTypeParams))
                 return new TypeReference(
                         $"{{ [key: {Convert(genericTypeParams[0], parentType, info).FullName}]: {Convert(genericTypeParams[1], parentType, info).FullName} }}")
-                        .MakeOptional(isNullableReference)                    ;
+                    .MakeOptional(isNullableReference);
 
             if (type.IsCollection(out var itemType))
             {
@@ -97,8 +114,8 @@ namespace TeeSquare.Reflection
             {
                 var nonGenericName = TypeName(type);
                 return new TypeReference(nonGenericName, type.GetGenericArguments()
-                    .Select(t => Convert(t, parentType, info))
-                    .ToArray())
+                        .Select(t => Convert(t, parentType, info))
+                        .ToArray())
                     .MakeOptional(isNullableReference);
             }
 

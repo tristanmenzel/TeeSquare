@@ -1,7 +1,4 @@
-using System.Linq;
-using System.Reflection;
 using BlurkCompare;
-using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 using TeeSquare.DemoApi.Controllers;
 

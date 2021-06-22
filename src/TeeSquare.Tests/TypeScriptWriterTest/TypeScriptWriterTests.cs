@@ -1,8 +1,5 @@
-﻿using System;
-using System.IO;
-using BlurkCompare;
+﻿using BlurkCompare;
 using NUnit.Framework;
-using TeeSquare.Reflection;
 using TeeSquare.TypeMetadata;
 using TeeSquare.Writers;
 
