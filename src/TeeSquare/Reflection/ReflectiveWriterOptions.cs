@@ -6,7 +6,7 @@ using MethodInfo = System.Reflection.MethodInfo;
 
 namespace TeeSquare.Reflection
 {
-    public class ReflectiveWriterOptions : IReflectiveWriterOptions
+    internal class ReflectiveWriterOptions : IReflectiveWriterOptions
     {
         public TypeConverter TypeConverter { get; set; } = new TypeConverter();
         public TypeConverter ImportTypeConverter { get; set; } = null;

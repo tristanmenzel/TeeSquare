@@ -5,10 +5,10 @@ namespace TeeSquare.Mobx
 {
     public class TeeSquareMobx
     {
-        public static void ConfigureMobxWriter(ReflectiveWriterOptions options) =>
+        public static void ConfigureMobxWriter(IReflectiveWriterOptions options) =>
             ConfigureMobxWriter(new MobxOptions())(options);
 
-        public static Action<ReflectiveWriterOptions> ConfigureMobxWriter(IMobxOptions mobxOptions, TypeConverter typeConverter = null) =>
+        public static Action<IReflectiveWriterOptions> ConfigureMobxWriter(IMobxOptions mobxOptions, TypeConverter typeConverter = null) =>
             (options) =>
             {
                 var mobxWriterFactory = new MobxModelWriterFactory(mobxOptions);

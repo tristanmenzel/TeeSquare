@@ -8,7 +8,7 @@ namespace TeeSquare.UnionTypes
 {
     public static class TeeSquareUnionTypes
     {
-        public static void Configure(ReflectiveWriterOptions options)
+        public static void Configure(IReflectiveWriterOptions options)
         {
             options.GetTypeDependenciesStrategy = options.GetTypeDependenciesStrategy.ExtendStrategy(original =>
                 (type, o) =>

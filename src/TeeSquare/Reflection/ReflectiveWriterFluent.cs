@@ -16,7 +16,7 @@ namespace TeeSquare.Reflection
             _types = new List<Type>();
         }
 
-        public ReflectiveWriterFluent Configure(Action<ReflectiveWriterOptions> configure)
+        public ReflectiveWriterFluent Configure(Action<IReflectiveWriterOptions> configure)
         {
             configure(_options);
             return this;

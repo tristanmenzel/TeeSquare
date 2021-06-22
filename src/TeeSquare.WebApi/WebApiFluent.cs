@@ -34,7 +34,7 @@ namespace TeeSquare.WebApi
             return this;
         }
 
-        public WebApiFluent Configure(Action<RouteReflectorOptions> configure)
+        public WebApiFluent Configure(Action<IRouteReflectorOptions> configure)
         {
             configure(_options);
             return this;
