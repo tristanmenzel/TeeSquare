@@ -27,6 +27,9 @@ namespace TeeSquare.Reflection
 
         public Func<Type, bool> ReflectMethods { get; set; } = type => false;
 
+        public Func<Type, (bool reflect, Assembly[] additionalAssemblies)> ReflectSubTypes { get; set; }
+            = type => (false, Array.Empty<Assembly>());
+
         public Func<Type, MethodInfo, bool> ReflectMethod { get; set; } = (type, mi) => true;
 
         public string IndentCharacters { get; set; } = "  ";

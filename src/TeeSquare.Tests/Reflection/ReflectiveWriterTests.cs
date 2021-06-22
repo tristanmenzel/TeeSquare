@@ -289,31 +289,21 @@ namespace TeeSquare.Tests.Reflection
         [Test]
         public void ConstProperties()
         {
-            Type[] GetSubTypes(Type type)
-            {
-                return type.Assembly.GetTypes()
-                    .Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && type != t)
-                    .ToArray();
-            }
-
             var res = TeeSquareFluent.ReflectiveWriter()
-                .Configure(options => options.ComplexTypeStrategy = options.ComplexTypeStrategy.ExtendStrategy(
-                    original =>
-                        (writer, info, originalType) =>
-                        {
-                            if (originalType == typeof(Shape))
-                            {
-                                var unionDefinition = String.Join(" | ",
-                                    GetSubTypes(originalType).Select(options.TypeConverter.TypeName));
-                                writer.WriteLine(
-                                    $"export type {info.TypeReference.TypeName} = {unionDefinition};");
-                            }
-                            else
-                            {
-                                original(writer, info, originalType);
-                            }
-                        }))
-                .AddTypes(typeof(Circle), typeof(Square), typeof(Rectangle), typeof(Shape))
+                .AddTypes(typeof(Square), typeof(Circle), typeof(Rectangle))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res, true)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+        [Test]
+        public void ReflectSubTypes()
+        {
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .Configure(options => options.ReflectSubTypes = type => (type == typeof(Shape), Array.Empty<Assembly>()))
+                .AddTypes(typeof(Shape))
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")

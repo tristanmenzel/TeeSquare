@@ -24,14 +24,14 @@ namespace TeeSquare.Reflection
         {
             foreach (var type in types)
             {
-                #if !NET48
+#if !NET48
                 // This property doesn't exist in net48. As a result, a dummy interface will
                 // be written to the output. eg. export interface T { }
                 if (type.IsGenericTypeParameter)
                 {
                     continue;
                 }
-                #endif
+#endif
 
                 if (type.IsExtendedPrimitive())
                 {
@@ -127,21 +127,30 @@ namespace TeeSquare.Reflection
                 .Select(f => f.FieldType)
                 .Distinct()
                 .ToArray();
-            if (!_options.ReflectMethods(type))
-                return propertyDependencies
-                    .Union(fieldDependencies)
-                    .ToArray();
-            var methodDependencies = type
-                .GetMethods(_options.MethodFlags)
-                .Where(m => !m.IsSpecialName)
-                .Where(m => _options.ReflectMethod(type, m))
-                .SelectMany(m => m.GetParameters().Select(p => p.ParameterType).Union(new[] {m.ReturnType}))
-                .Where(m => m != typeof(void))
-                .ToArray();
+
+
+            var (reflectSubTypes, additionalAssemblies) = _options.ReflectSubTypes(type);
+            var subTypes = reflectSubTypes
+                ? additionalAssemblies.Union(new[] {type.Assembly})
+                    .SelectMany(a => a.GetExportedTypes())
+                    .Where(t => type.IsAssignableFrom(t) && t != type)
+                    .ToArray()
+                : Array.Empty<Type>();
+
+            var methodDependencies = _options.ReflectMethods(type)
+                ? type
+                    .GetMethods(_options.MethodFlags)
+                    .Where(m => !m.IsSpecialName)
+                    .Where(m => _options.ReflectMethod(type, m))
+                    .SelectMany(m => m.GetParameters().Select(p => p.ParameterType).Union(new[] {m.ReturnType}))
+                    .Where(m => m != typeof(void))
+                    .ToArray()
+                : Array.Empty<Type>();
 
             return propertyDependencies
                 .Union(fieldDependencies)
                 .Union(methodDependencies)
+                .Union(subTypes)
                 .ToArray();
         }
 

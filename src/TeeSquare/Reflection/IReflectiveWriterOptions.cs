@@ -40,6 +40,13 @@ namespace TeeSquare.Reflection
         Func<Type, bool> ReflectMethods { get; }
 
         /// <summary>
+        /// Delegate to determine if sub-types should be reflected for a type. The assembly of the parent type is
+        /// included by default. Tuple response can include additional assemblies to search for sub-types.
+        /// Defaults to (false, [])
+        /// </summary>
+        Func<Type, (bool reflect, Assembly[] additionalAssemblies)> ReflectSubTypes { get; }
+
+        /// <summary>
         /// Delegate to determine if a single method should be reflected on a type. Defaults to true.
         /// Only checked if ReflectMethods returns true and the method matches MethodFlags
         /// </summary>
