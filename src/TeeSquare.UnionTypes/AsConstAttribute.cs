@@ -7,10 +7,10 @@ namespace TeeSquare.UnionTypes
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class AsConstAttribute : Attribute
     {
-        public readonly string ConstType;
+        public readonly object ConstValue;
         public AsConstAttribute(object value)
         {
-            ConstType = TypeExtensions.ConvertCsLiteralToJsLiteral(value);
+            ConstValue = value;
         }
 
     }

@@ -26,7 +26,7 @@ namespace TeeSquare.Mobx
                     (typeof(Single), "types.number"),
                     (typeof(DateTime), "types.Date"),
                     (typeof(DateTimeOffset), "types.Date"),
-                    (typeof(bool), "types.boolean"));;
+                    (typeof(bool), "types.boolean"));
                 options.Types.AddLiteralImport("mobx-state-tree", "types");
                 options.Types.AddLiteralImport("mobx-state-tree", "Instance");
             };

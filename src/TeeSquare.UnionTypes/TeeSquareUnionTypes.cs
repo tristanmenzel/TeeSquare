@@ -41,7 +41,22 @@ namespace TeeSquare.UnionTypes
                         var constAttr = pi.GetCustomAttribute<AsConstAttribute>();
                         if (constAttr != null)
                         {
-                            return new TypeReference(constAttr.ConstType) {ExistingType = true};
+                            string literalType;
+                            var value = constAttr.ConstValue;
+                            if (value is Boolean b)
+                                literalType = b ? "true" : "false";
+                            else if (value is String s)
+                                literalType = $"'{s}'";
+                            else if (value is Enum)
+                            {
+                                var enumTypeName = options.TypeConverter.TypeName(value.GetType());
+                                var enumMemberName = options.TypeConverter.EnumName(value.ToString());
+                                literalType = $"{enumTypeName}.{enumMemberName}";
+                            }
+                            else
+                                literalType = value.ToString();
+
+                            return new TypeReference(literalType) {ExistingType = true};
                         }
                     }
 

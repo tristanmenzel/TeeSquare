@@ -75,7 +75,6 @@ namespace TeeSquare.Reflection
 
         public ConvertType Convert { get; set; }
 
-
         /// <summary>
         /// Converts a c# type into a typescript type.
         /// </summary>
