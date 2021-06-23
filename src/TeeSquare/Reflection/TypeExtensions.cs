@@ -91,5 +91,14 @@ namespace TeeSquare.Reflection
             genericTypeParams = null;
             return false;
         }
+
+        public static string ConvertCsLiteralToJsLiteral(object obj)
+        {
+            if (obj is Boolean b)
+                return b ? "true" : "false";
+            if (obj is String s)
+                return $"'{s}'";
+            return obj.ToString();
+        }
     }
 }

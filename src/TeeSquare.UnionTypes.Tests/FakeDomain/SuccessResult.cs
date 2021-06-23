@@ -1,8 +1,11 @@
+using TeeSquare.UnionTypes;
+
 namespace RPS.myProjects.Infrastructure.Util
 {
     public class SuccessResult<TSuccess>: Result<TSuccess>
     {
-        public const bool IsSuccess = true;
+        [AsConst(true)]
+        public  bool IsSuccess => true;
 
         public TSuccess Value { get; }
 

@@ -9,10 +9,31 @@ using static TeeSquare.Util.CaseHelper;
 
 namespace TeeSquare.Reflection
 {
-    public class TypeConverter
+    public sealed class TypeConverter
     {
-        public TypeConverter(
-            params (Type type, string tsType)[] staticMappings)
+        public TypeConverter(params (Type type, string tsType)[] staticMappings)
+        {
+            EnumName = (member) => ToCase(member, NamingConventions.EnumsMembers);
+            MethodName = (member) => ToCase(member.Name, NamingConventions.Methods);
+            PropertyName = (member) => ToCase(member.Name, NamingConventions.Properties);
+            FieldName = (member) => ToCase(member.Name, NamingConventions.Properties);
+
+            TypeName = (type) =>
+            {
+                var name = type.Name;
+                if (type.IsGenericType)
+                    name = type.Name.Split('`').First();
+                if (type.IsInterface && RemovePrefixFromInterfaces && name.StartsWith("I"))
+                    name = name.Substring(1);
+
+                return ToCase(name, NamingConventions.Types);
+            };
+
+            Convert = ConvertInternal;
+            AddStaticMappings(staticMappings);
+        }
+
+        public void AddStaticMappings(params (Type type, string tsType)[] staticMappings)
         {
             foreach (var mapping in staticMappings)
             {
@@ -52,14 +73,8 @@ namespace TeeSquare.Reflection
             return _staticMappings.ContainsKey(type);
         }
 
-        public string ConvertCsLiteralToJsLiteral(object obj)
-        {
-            if (obj is Boolean b)
-                return b ? "true" : "false";
-            if (obj is String s)
-                return $"'{s}'";
-            return obj.ToString();
-        }
+        public ConvertType Convert { get; set; }
+
 
         /// <summary>
         /// Converts a c# type into a typescript type.
@@ -68,16 +83,8 @@ namespace TeeSquare.Reflection
         /// <param name="parentType">If this type is from a property or a method param, the parentType is the type which has this property or method</param>
         /// <param name="info">PropertyInfo or MethodInfo if this is a property or method param</param>
         /// <returns></returns>
-        public virtual ITypeReference Convert(Type type, Type parentType = null, MemberInfo info = null)
+        private ITypeReference ConvertInternal(Type type, Type parentType = null, MemberInfo info = null)
         {
-            if (info is FieldInfo {IsLiteral: true} fi)
-            {
-                return new TypeReference(ConvertCsLiteralToJsLiteral(fi.GetRawConstantValue()))
-                {
-                    ExistingType = true
-                };
-            }
-
             var isNullableReference = (info as PropertyInfo)?.IsNullableReference() ?? false;
             if (TryGetStaticMapping(type, out var mapping))
                 return new TypeReference(mapping)
@@ -86,7 +93,7 @@ namespace TeeSquare.Reflection
                 }.MakeOptional(isNullableReference);
             if (type.IsTask(out var resultType))
             {
-                return Convert(resultType, parentType, info);
+                return ConvertInternal(resultType, parentType, info);
             }
 
             if (type.IsEnum)
@@ -97,24 +104,24 @@ namespace TeeSquare.Reflection
 
             if (type.IsNullable(out var underlyingType))
             {
-                return Convert(underlyingType, parentType, info).MakeOptional();
+                return ConvertInternal(underlyingType, parentType, info).MakeOptional();
             }
 
             if (type.IsDictionary(out var genericTypeParams))
                 return new TypeReference(
-                        $"{{ [key: {Convert(genericTypeParams[0], parentType, info).FullName}]: {Convert(genericTypeParams[1], parentType, info).FullName} }}")
+                        $"{{ [key: {ConvertInternal(genericTypeParams[0], parentType, info).FullName}]: {ConvertInternal(genericTypeParams[1], parentType, info).FullName} }}")
                     .MakeOptional(isNullableReference);
 
             if (type.IsCollection(out var itemType))
             {
-                return Convert(itemType, parentType, info).MakeArray().MakeOptional(isNullableReference);
+                return ConvertInternal(itemType, parentType, info).MakeArray().MakeOptional(isNullableReference);
             }
 
             if (type.IsGenericType)
             {
                 var nonGenericName = TypeName(type);
                 return new TypeReference(nonGenericName, type.GetGenericArguments()
-                        .Select(t => Convert(t, parentType, info))
+                        .Select(t => ConvertInternal(t, parentType, info))
                         .ToArray())
                     .MakeOptional(isNullableReference);
             }
@@ -122,36 +129,15 @@ namespace TeeSquare.Reflection
             return new TypeReference(TypeName(type)).MakeOptional(isNullableReference);
         }
 
-        public virtual string PropertyName(PropertyInfo propertyInfo)
-        {
-            return ToCase(propertyInfo.Name, NamingConventions.Properties);
-        }
+        public NameStrategy<Type> TypeName { get; set; }
 
-        public virtual string FieldName(FieldInfo fieldInfo)
-        {
-            return ToCase(fieldInfo.Name, NamingConventions.Properties);
-        }
-
-        public virtual string MethodName(MethodInfo methodInfo)
-        {
-            return ToCase(methodInfo.Name, NamingConventions.Methods);
-        }
-
-        public virtual string TypeName(Type type)
-        {
-            var name = type.Name;
-            if (type.IsGenericType)
-                name = type.Name.Split('`').First();
-            if (type.IsInterface && RemovePrefixFromInterfaces && name.StartsWith("I"))
-                name = name.Substring(1);
-
-            return ToCase(name, NamingConventions.Types);
-        }
-
-
-        public string EnumName(string name)
-        {
-            return ToCase(name, NamingConventions.EnumsMembers);
-        }
+        public NameStrategy<string> EnumName { get; set; }
+        public NameStrategy<FieldInfo> FieldName { get; set; }
+        public NameStrategy<MethodInfo> MethodName { get; set; }
+        public NameStrategy<PropertyInfo> PropertyName { get; set; }
     }
+
+    public delegate string NameStrategy<T>(T item);
+
+    public delegate ITypeReference ConvertType(Type type, Type? parentType = null, MemberInfo? info = null);
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using BlurkCompare;
 using NUnit.Framework;
+using TeeSquare.Configuration;
 using TeeSquare.Reflection;
 using TeeSquare.Tests.Reflection.Enums;
 using TeeSquare.Tests.Reflection.FakeDomain;
@@ -146,7 +147,8 @@ namespace TeeSquare.Tests.Reflection
             var res = TeeSquareFluent.ReflectiveWriter()
                 .Configure(options =>
                 {
-                    options.TypeConverter = new CustomTypeConverter();
+                    options.TypeConverter.TypeName = options.TypeConverter.TypeName.ExtendStrategy(original =>
+                        type => type == typeof(Book) ? $"{original(type)}Renamed" : original(type));
                     options.ImportTypeConverter = new TypeConverter();
                 })
                 .AddImportedTypes(("./ReflectiveWriterTests.EntireTree", new[]
@@ -160,19 +162,6 @@ namespace TeeSquare.Tests.Reflection
             Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
-        }
-
-        public class CustomTypeConverter : TypeConverter
-        {
-            public override string TypeName(Type type)
-            {
-                if (type == typeof(Book))
-                {
-                    return $"{base.TypeName(type)}Renamed";
-                }
-
-                return base.TypeName(type);
-            }
         }
 
         [Test]
@@ -275,18 +264,6 @@ namespace TeeSquare.Tests.Reflection
         {
             var res = TeeSquareFluent.ReflectiveWriter()
                 .AddTypes(typeof(Result<>), typeof(Result<int>))
-                .WriteToString();
-
-            Blurk.CompareImplicitFile("ts")
-                .To(res)
-                .AssertAreTheSame(Assert.Fail);
-        }
-
-        [Test]
-        public void ConstProperties()
-        {
-            var res = TeeSquareFluent.ReflectiveWriter()
-                .AddTypes(typeof(Square), typeof(Circle), typeof(Rectangle))
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")

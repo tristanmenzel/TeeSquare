@@ -1,15 +1,11 @@
-﻿namespace TeeSquare.Tests.Reflection.FakeDomain
+﻿using TeeSquare.UnionTypes;
+
+namespace TeeSquare.Tests.Reflection.FakeDomain
 {
     public class Square : Shape
     {
         public int Side { get; set; }
-        public const string Kind = nameof(Square);
-    }
-
-    public class Rectangle : Shape
-    {
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public const string Kind = nameof(Rectangle);
+        [AsConst(nameof(Square))]
+        public string Kind => nameof(Square);
     }
 }
