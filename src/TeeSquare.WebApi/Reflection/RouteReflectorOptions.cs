@@ -25,8 +25,7 @@ namespace TeeSquare.WebApi.Reflection
                                                           | BindingFlags.Instance;
 
         public BindingFlags FieldFlags { get; set; } = BindingFlags.Public
-                                                       | BindingFlags.Instance
-                                                       | BindingFlags.Static;
+                                                       | BindingFlags.Instance;
 
         public BindingFlags MethodFlags { get; set; } = BindingFlags.Instance
                                                         | BindingFlags.Public

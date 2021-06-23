@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using TeeSquare.Configuration;
 using TeeSquare.Reflection;
+using TeeSquare.TypeMetadata;
 
 namespace TeeSquare.UnionTypes
 {
@@ -31,6 +32,20 @@ namespace TeeSquare.UnionTypes
 
                         writer.WriteLine($"export type {typeInfo.TypeReference.FullName} = {unionTypes};");
                     }
+                });
+            options.TypeConverter.Convert = options.TypeConverter.Convert.ExtendStrategy(original =>
+                (type, parent, memberInfo) =>
+                {
+                    if (memberInfo is PropertyInfo pi)
+                    {
+                        var constAttr = pi.GetCustomAttribute<AsConstAttribute>();
+                        if (constAttr != null)
+                        {
+                            return new TypeReference(constAttr.ConstType) {ExistingType = true};
+                        }
+                    }
+
+                    return original(type, parent, memberInfo);
                 });
         }
     }

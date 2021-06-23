@@ -1,6 +1,7 @@
 using System;
 using BlurkCompare;
 using NUnit.Framework;
+using TeeSquare.Configuration;
 using TeeSquare.Tests.Reflection.FakeDomain;
 
 namespace TeeSquare.Mobx.Tests
@@ -85,21 +86,15 @@ namespace TeeSquare.Mobx.Tests
                 .Configure(TeeSquareMobx.ConfigureMobxWriter(new MobxOptions
                 {
                     EmitInstanceType = false
-                }, new CustomMobxTypeConverter()))
+                }))
+                .Configure(options => options.TypeConverter.TypeName = options.TypeConverter.TypeName.ExtendStrategy(original =>
+                    type => $"{original(type)}BaseModel"))
                 .AddTypes(typeof(Library))
                 .WriteToString();
 
             Blurk.CompareImplicitFile("ts")
                 .To(res)
                 .AssertAreTheSame(Assert.Fail);
-        }
-
-        class CustomMobxTypeConverter: MobxTypeConverter
-        {
-            public override string TypeName(Type type)
-            {
-                return base.TypeName(type) + "BaseModel";
-            }
         }
     }
 }
