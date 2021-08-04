@@ -1,23 +1,20 @@
 // Auto-generated Code - Do Not Edit
 
-export enum Audience {
-  Children = 0,
-  Teenagers = 1,
-  YoungAdults = 2,
-  Adults = 3
+export enum DescribedEnum {
+  Zero = 0,
+  One = 1,
+  NegativeOne = -1
 }
-export const AllAudience: Audience[] = [
-  Audience.Children,
-  Audience.Teenagers,
-  Audience.YoungAdults,
-  Audience.Adults
+export const AllDescribedEnum: DescribedEnum[] = [
+  DescribedEnum.Zero,
+  DescribedEnum.One,
+  DescribedEnum.NegativeOne
 ];
-export const AudienceDesc: { [key: number]: string } = {
-  0: `Children`,
-  1: `Teenagers`,
-  2: `Young Adults`,
-  3: `Adults`
+export const DescribedEnumDesc: { [key: number]: string } = {
+  0: `Zero`,
+  1: `Positive One`,
+  '-1': `Negative One`
 };
-export const GetAudienceDescription = (value: Audience): string => {
-  return AudienceDesc[value];
+export const GetDescribedEnumDescription = (value: DescribedEnum): string => {
+  return DescribedEnumDesc[value];
 };

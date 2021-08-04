@@ -86,7 +86,7 @@ namespace TeeSquare.Tests.Reflection
         public void EnumDescriptions()
         {
             var res = TeeSquareFluent.ReflectiveWriter()
-                .AddTypes(typeof(Audience))
+                .AddTypes(typeof(DescribedEnum))
                 .Configure(o =>
                 {
                     o.EnumWriterFactory = new EnumWriterFactory()

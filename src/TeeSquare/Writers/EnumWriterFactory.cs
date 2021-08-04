@@ -39,11 +39,21 @@ namespace TeeSquare.Writers
         private CodeSnippetWriter BuildDescGetterFunc(IEnumInfo enumInfo)
         {
             var methodInfo = new MethodInfo($"Get{enumInfo.Name}Description")
-                .WithReturnType(new TypeReference( "string"))
-                .WithParams(p => p.Param("value",new TypeReference(enumInfo.Name){ Enum = true}))
+                .WithReturnType(new TypeReference("string"))
+                .WithParams(p => p.Param("value", new TypeReference(enumInfo.Name) { Enum = true }))
                 .WithBody(body => { body.WriteLine($"return {enumInfo.Name}Desc[value];"); })
                 .Done();
             return new FunctionWriterFactory().Build(methodInfo);
+        }
+
+        private string AsSafeObjectKey(string enumValue)
+        {
+            var quotes = new[] { '`', '\'', '"' };
+            if (quotes.Contains(enumValue[0]) && enumValue[0] == enumValue.Last())
+                return enumValue;
+            if (enumValue.All(c => c >= '0' && c <= '9'))
+                return enumValue;
+            return $"'{enumValue}'";
         }
 
         public CodeSnippetWriter Build(IEnumInfo enumInfo)
@@ -67,7 +77,8 @@ namespace TeeSquare.Writers
                 {
                     var dictionaryKeyType = enumInfo.ValueType == EnumValueType.Number ? "number" : "string";
                     writer.OpenBlock($"export const {enumInfo.Name}Desc: {{ [key: {dictionaryKeyType}]: string }} =");
-                    writer.WriteDelimitedLines(enumInfo.Values, v => $"{v.FormattedValue}: `{v.Description ?? v.Name}`",
+                    writer.WriteDelimitedLines(enumInfo.Values,
+                        v => $"{AsSafeObjectKey(v.FormattedValue)}: `{v.Description ?? v.Name}`",
                         ",");
                     writer.CloseBlock("};");
                     if (_includeDescriptionGetter)
