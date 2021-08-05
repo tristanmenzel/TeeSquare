@@ -63,6 +63,13 @@ export abstract class RequestFactory {
       url: `/from-query${query}`
     };
   }
+  static GetGetSomething(realPrimitive?: number, fauxPrimitive: Partial<FauxPrimitive>): GetRequest<number> {
+    const query = toQuery({ realPrimitive, ...fauxPrimitive });
+    return {
+      method: 'GET',
+      url: `/get-something${query}`
+    };
+  }
   static PostFormvaluePostsomevalues(name: string, specialFile: File): PostRequest<FormData, number> {
     const data = new FormData();
     data.append('name', name);
@@ -242,6 +249,9 @@ export abstract class RequestFactory {
       url: `/api/values/${id}`
     };
   }
+}
+export interface FauxPrimitive {
+  value: string;
 }
 export interface ActionResult {
 }

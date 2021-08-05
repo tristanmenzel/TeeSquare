@@ -47,23 +47,23 @@ namespace TeeSquare.Reflection
         private readonly IDictionary<Type, string> _staticMappings =
             new Dictionary<Type, string>
             {
-                {typeof(string), "string"},
-                {typeof(Guid), "string"},
-                {typeof(void), "void"},
-                {typeof(Decimal), "number"},
-                {typeof(byte), "number"},
-                {typeof(Int16), "number"},
-                {typeof(Int32), "number"},
-                {typeof(Int64), "number"},
-                {typeof(double), "number"},
-                {typeof(Single), "number"},
-                {typeof(DateTime), "string"},
-                {typeof(DateTimeOffset), "string"},
-                {typeof(bool), "boolean"}
+                { typeof(string), "string" },
+                { typeof(Guid), "string" },
+                { typeof(void), "void" },
+                { typeof(Decimal), "number" },
+                { typeof(byte), "number" },
+                { typeof(Int16), "number" },
+                { typeof(Int32), "number" },
+                { typeof(Int64), "number" },
+                { typeof(double), "number" },
+                { typeof(Single), "number" },
+                { typeof(DateTime), "string" },
+                { typeof(DateTimeOffset), "string" },
+                { typeof(bool), "boolean" }
             };
 
 
-        protected bool TryGetStaticMapping(Type type, out string tsType)
+        private bool TryGetStaticMapping(Type type, out string tsType)
         {
             return _staticMappings.TryGetValue(type, out tsType);
         }
@@ -72,6 +72,14 @@ namespace TeeSquare.Reflection
         {
             return _staticMappings.ContainsKey(type);
         }
+
+        public Func<Type, bool> TreatAsPrimitive { get; set; } = type => type.IsEnum
+                                                                         || type.IsPrimitive
+                                                                         || type == typeof(Guid)
+                                                                         || type == typeof(decimal)
+                                                                         || type == typeof(DateTime)
+                                                                         || type == typeof(DateTimeOffset)
+                                                                         || type == typeof(string);
 
         public ConvertType Convert { get; set; }
 
@@ -98,7 +106,7 @@ namespace TeeSquare.Reflection
             if (type.IsEnum)
             {
                 return new TypeReference(ToCase(type.Name, NamingConventions.Types))
-                    {Enum = true};
+                    { Enum = true };
             }
 
             if (type.IsNullable(out var underlyingType))
@@ -138,5 +146,5 @@ namespace TeeSquare.Reflection
 
     public delegate string NameStrategy<T>(T item);
 
-    public delegate ITypeReference ConvertType(Type type, Type? parentType = null, MemberInfo? info = null);
+    public delegate ITypeReference ConvertType(Type type, Type parentType = null, MemberInfo info = null);
 }

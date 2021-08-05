@@ -7,19 +7,9 @@ namespace TeeSquare.Reflection
 {
     public static class TypeExtensions
     {
-        public static bool IsExtendedPrimitive(this Type type, bool unwrapNullable = false)
+        public static Type UnwrapNullable(this Type type)
         {
-            if (unwrapNullable && type.IsNullable(out var underlyingType))
-            {
-                return underlyingType.IsExtendedPrimitive();
-            }
-            return type.IsEnum
-                   || type.IsPrimitive
-                   || type == typeof(Guid)
-                   || type == typeof(Decimal)
-                   || type == typeof(DateTime)
-                   || type == typeof(DateTimeOffset)
-                   || type == typeof(String);
+            return type.IsNullable(out var underlyingType) ? underlyingType : type;
         }
 
         public static bool IsNullable(this Type type, out Type underlyingType)
