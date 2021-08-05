@@ -8,6 +8,12 @@ namespace TeeSquare.WebApi.Reflection
 {
     internal class RouteReflectorOptions : IRouteReflectorOptions
     {
+        public RouteReflectorOptions()
+        {
+            BuildRouteStrategy = (controller, action, defaultRoute) =>
+                RouteReflector.DefaultBuildRouteStrategy(controller, action, defaultRoute, this);
+        }
+
         public string DefaultRoute { get; set; } = "{controller=Home}/{action=Index}/{id?}";
 
         public string RoutePrefix { get; set; } = "/";
@@ -35,10 +41,12 @@ namespace TeeSquare.WebApi.Reflection
 
         public Func<Type, (bool reflect, Assembly[] additionalAssemblies)> ReflectSubTypes { get; set; }
             = type => (false, Array.Empty<Assembly>());
+
         public Func<Type, MethodInfo, bool> ReflectMethod { get; set; } = (type, mi) => true;
 
         public GetTypeDependenciesStrategy GetTypeDependenciesStrategy { get; set; } =
             ReflectiveWriter.GetTypeDependencies;
+
         public string IndentCharacters { get; set; } = "  ";
 
         public IEnumWriterFactory EnumWriterFactory { get; set; } = new EnumWriterFactory();
@@ -51,7 +59,7 @@ namespace TeeSquare.WebApi.Reflection
 
 
         public GetApiReturnType GetApiReturnTypeStrategy { get; set; } = RouteReflector.DefaultApiReturnTypeStrategy;
-        public BuildRoute BuildRouteStrategy { get; set; } = RouteReflector.DefaultBuildRouteStrategy;
+        public BuildRoute BuildRouteStrategy { get; set; }
         public NameRoute NameRouteStrategy { get; set; } = RouteReflector.DefaultNameRouteStrategy;
         public RequestHelperTypeOptions RequestHelperTypeOption { get; set; } = RequestHelperTypeOptions.EmitTypes;
 

@@ -88,7 +88,7 @@ namespace TeeSquare.WebApi.Reflection
 
         private DestructuredPropertyInfo[] GetDestructuredProperties(ParameterInfo parameterInfo, string route)
         {
-            if (parameterInfo.ParameterType.IsExtendedPrimitive())
+            if (_options.TypeConverter.TreatAsPrimitive(parameterInfo.ParameterType))
             {
                 return Array.Empty<DestructuredPropertyInfo>();
             }
@@ -181,7 +181,7 @@ namespace TeeSquare.WebApi.Reflection
             return method.GetName() + string.Join("", parts);
         }
 
-        internal static string DefaultBuildRouteStrategy(Type controller, MethodInfo action, string defaultRoute)
+        internal static string DefaultBuildRouteStrategy(Type controller, MethodInfo action, string defaultRoute, IRouteReflectorOptions options)
         {
             var controllerRouteTemplate = controller.GetCustomAttributes(StaticConfig.Instance.RouteAttribute)
                 .Select(StaticConfig.Instance.GetTemplateFromRouteAttribute)
@@ -212,11 +212,11 @@ namespace TeeSquare.WebApi.Reflection
             var routeTemplate = parts.Any() ? string.Join("/", parts) : defaultRoute;
 
 
-            return ReplaceRoutePlaceholders(routeTemplate, controller, action)
+            return ReplaceRoutePlaceholders(routeTemplate, controller, action, options)
                 .Trim('/');
         }
 
-        public static string ReplaceRoutePlaceholders(string routeTemplate, Type controller, MethodInfo action)
+        private static string ReplaceRoutePlaceholders(string routeTemplate, Type controller, MethodInfo action, IRouteReflectorOptions options)
         {
             var partRegexSquare = new Regex(@"\[(?<part>[^]=?]+)[?]?(=[^]]+)?\]");
             var partRegexBraces = new Regex(@"\{(?<part>[^}=?]+)[?]?(=[^}]+)?\}");
@@ -230,7 +230,7 @@ namespace TeeSquare.WebApi.Reflection
                     .Any(p => p.Name.Equals(paramName, StringComparison.InvariantCultureIgnoreCase)))
                     return true;
                 if (action.GetParameters()
-                    .Where(p => !p.ParameterType.IsExtendedPrimitive()
+                    .Where(p => !options.TypeConverter.TreatAsPrimitive(p.ParameterType.UnwrapNullable())
                                 && p.GetCustomAttributes(StaticConfig.Instance.FromRouteAttribute).Any())
                     .Any(p => p.ParameterType.GetProperties().Any(p =>
                         p.Name.Equals(paramName, StringComparison.InvariantCultureIgnoreCase))))
@@ -399,9 +399,10 @@ namespace TeeSquare.WebApi.Reflection
                                         p.Param(rp.NameOrDestructureExpression,
                                             _options.TypeConverter.Convert(rp.Type)
                                                 .MakeOptional(rp.Kind == ParameterKind.Query &&
-                                                              rp.Type.IsExtendedPrimitive(true))
+                                                              _options.TypeConverter.TreatAsPrimitive(rp.Type.UnwrapNullable())
+                                                              )
                                                 .MakePartial(rp.Kind == ParameterKind.Query &&
-                                                             !rp.Type.IsExtendedPrimitive(true)));
+                                                             !_options.TypeConverter.TreatAsPrimitive(rp.Type.UnwrapNullable())));
                                     }
 
                                     if (req.Method.HasRequestBody() && req.GetRequestBodyKind() == RequestBodyKind.Json)
@@ -415,7 +416,7 @@ namespace TeeSquare.WebApi.Reflection
                                     {
                                         w.Write($"const {_options.QueryVariableName} = toQuery({{ ", true);
                                         w.WriteDelimited(queryParams,
-                                            (p, wr) => wr.Write(p.Type.IsExtendedPrimitive(true) ? p.Name : $"...{p.Name}"),
+                                            (p, wr) => wr.Write(_options.TypeConverter.TreatAsPrimitive(p.Type.UnwrapNullable()) ? p.Name : $"...{p.Name}"),
                                             ", ");
                                         w.WriteLine(" });", false);
                                     }

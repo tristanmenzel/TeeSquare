@@ -33,7 +33,7 @@ namespace TeeSquare.Reflection
                 }
 #endif
 
-                if (type.IsExtendedPrimitive())
+                if (_options.TypeConverter.TreatAsPrimitive(type))
                 {
                     if (!Types.Contains(type))
                         Types.AddLocal(type);
