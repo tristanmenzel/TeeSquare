@@ -44,7 +44,7 @@ export abstract class RequestFactory {
       url: `/from-route/${id}/${name}`
     };
   }
-  static GetFromQuery(obj: Partial<TestObject>): GetRequest<TestObject> {
+  static GetFromQuery(obj: TestObject): GetRequest<TestObject> {
     const query = toQuery({ ...obj });
     return {
       method: 'GET',

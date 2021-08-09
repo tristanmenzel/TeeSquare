@@ -50,7 +50,7 @@ export abstract class RequestFactory {
       url: `/defaultroute/getnum/${id}`
     };
   }
-  static GetApiOtherImplicitQuery(id?: number): GetRequest<number> {
+  static GetApiOtherImplicitQuery(id: number): GetRequest<number> {
     const query = toQuery({ id });
     return {
       method: 'GET',

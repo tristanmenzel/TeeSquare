@@ -38,12 +38,12 @@ namespace TeeSquare.TypeMetadata
             return this;
         }
 
-        void IEnumConfigurator.AddValue(string name, object value, string description)
+        void IEnumConfigurator.AddValue(string name, object value, string? description)
         {
             _values.Add(new EnumValueInfo(name, value, description));
         }
 
-        void IEnumConfigurator.AddValue(string name, string value, string description)
+        void IEnumConfigurator.AddValue(string name, string value, string? description)
         {
             _values.Add(new EnumValueInfo(name, value, description));
         }

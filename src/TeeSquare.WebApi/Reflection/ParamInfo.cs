@@ -5,6 +5,14 @@ namespace TeeSquare.WebApi.Reflection
 {
     public class ParamInfo
     {
+        public ParamInfo(ParameterKind kind, string name, Type type, DestructuredPropertyInfo[] destructuredProperties)
+        {
+            Kind = kind;
+            Name = name;
+            Type = type;
+            DestructuredProperties = destructuredProperties;
+        }
+
         public ParameterKind Kind { get; set; }
         public string Name { get; set; }
         public Type Type { get; set; }

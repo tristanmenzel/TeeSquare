@@ -8,8 +8,8 @@ namespace TeeSquare.WebApi.Reflection
         {
             return !action.IsDefined(StaticConfig.Instance.IgnoreActionAttribute)
                    && !action.IsSpecialName
-                   && !action.DeclaringType.Namespace.StartsWith("System")
-                   && !action.DeclaringType.Namespace.StartsWith("Microsoft");
+                   && !(action.DeclaringType?.Namespace?.StartsWith("System") ?? false)
+                   && !(action.DeclaringType?.Namespace?.StartsWith("Microsoft") ?? false);
         }
     }
 }

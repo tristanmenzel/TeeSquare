@@ -23,7 +23,7 @@ namespace TeeSquare.WebApi.Reflection
 
         public string ImportFrom { get; }
 
-        public static RequestHelperTypeOptions EmitTypes => new RequestHelperTypeOptions(true, null);
+        public static RequestHelperTypeOptions EmitTypes => new RequestHelperTypeOptions(true, string.Empty);
 
         public static RequestHelperTypeOptions ImportTypes(string importFrom) =>
             new RequestHelperTypeOptions(false, importFrom);

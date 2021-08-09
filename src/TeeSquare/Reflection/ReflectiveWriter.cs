@@ -11,11 +11,11 @@ namespace TeeSquare.Reflection
     {
         private bool _importsWritten;
         private TypeConverter TypeConverter => _options.TypeConverter;
-        private TypeConverter ImportTypeConverter => _options.ImportTypeConverter;
+        private TypeConverter? ImportTypeConverter => _options.ImportTypeConverter;
         private TypeCollection Types => _options.Types;
         private readonly IReflectiveWriterOptions _options;
 
-        public ReflectiveWriter(IReflectiveWriterOptions options = null)
+        public ReflectiveWriter(IReflectiveWriterOptions? options = null)
         {
             _options = options ?? new ReflectiveWriterOptions();
         }
@@ -42,25 +42,25 @@ namespace TeeSquare.Reflection
 
                 if (type.IsTask(out var resultType))
                 {
-                    AddTypes(resultType);
+                    AddTypes(resultType!);
                     continue;
                 }
 
                 if (type.IsNullable(out var underlyingType))
                 {
-                    AddTypes(underlyingType);
+                    AddTypes(underlyingType!);
                     continue;
                 }
 
                 if (type.IsCollection(out var itemType))
                 {
-                    AddTypes(itemType);
+                    AddTypes(itemType!);
                     continue;
                 }
 
                 if (type.IsDictionary(out var keyValueTypes))
                 {
-                    AddTypes(keyValueTypes);
+                    AddTypes(keyValueTypes!);
                     continue;
                 }
 
@@ -159,7 +159,7 @@ namespace TeeSquare.Reflection
             return TypeConverter.Convert(type).TypeName;
         }
 
-        private string BuildImport(string typeName, string importAs)
+        private string BuildImport(string typeName, string? importAs)
         {
             if (importAs != null)
             {
@@ -257,7 +257,7 @@ namespace TeeSquare.Reflection
                                     {
                                         foreach (var pi in mi.GetParameters())
                                         {
-                                            p.Param(pi.Name, TypeConverter.Convert(pi.ParameterType, type, mi));
+                                            p.Param(pi.Name ?? string.Empty, TypeConverter.Convert(pi.ParameterType, type, mi));
                                         }
                                     });
                             }

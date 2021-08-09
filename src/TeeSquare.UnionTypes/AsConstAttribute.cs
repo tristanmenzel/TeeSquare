@@ -1,5 +1,6 @@
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using TeeSquare.Reflection;
 
 namespace TeeSquare.UnionTypes

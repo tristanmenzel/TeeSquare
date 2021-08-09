@@ -19,11 +19,13 @@ namespace TeeSquare.WebApi
         public WebApiFluent(Assembly[] assemblies)
         {
             _assemblies = assemblies;
+            _controllers = Array.Empty<Type>();
             _options = new RouteReflectorOptions();
         }
 
         public WebApiFluent(Type[] controllers)
         {
+            _assemblies = Array.Empty<Assembly>();
             _controllers = controllers;
             _options = new RouteReflectorOptions();
         }

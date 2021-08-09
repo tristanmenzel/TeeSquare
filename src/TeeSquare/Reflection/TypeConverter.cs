@@ -63,7 +63,7 @@ namespace TeeSquare.Reflection
             };
 
 
-        private bool TryGetStaticMapping(Type type, out string tsType)
+        private bool TryGetStaticMapping(Type type, out string? tsType)
         {
             return _staticMappings.TryGetValue(type, out tsType);
         }
@@ -90,17 +90,17 @@ namespace TeeSquare.Reflection
         /// <param name="parentType">If this type is from a property or a method param, the parentType is the type which has this property or method</param>
         /// <param name="info">PropertyInfo or MethodInfo if this is a property or method param</param>
         /// <returns></returns>
-        private ITypeReference ConvertInternal(Type type, Type parentType = null, MemberInfo info = null)
+        private ITypeReference ConvertInternal(Type type, Type? parentType = null, MemberInfo? info = null)
         {
             var isNullableReference = (info as PropertyInfo)?.IsNullableReference() ?? false;
             if (TryGetStaticMapping(type, out var mapping))
-                return new TypeReference(mapping)
+                return new TypeReference(mapping!)
                 {
                     ExistingType = true
                 }.MakeOptional(isNullableReference);
             if (type.IsTask(out var resultType))
             {
-                return ConvertInternal(resultType, parentType, info);
+                return ConvertInternal(resultType!, parentType, info);
             }
 
             if (type.IsEnum)
@@ -111,17 +111,17 @@ namespace TeeSquare.Reflection
 
             if (type.IsNullable(out var underlyingType))
             {
-                return ConvertInternal(underlyingType, parentType, info).MakeOptional();
+                return ConvertInternal(underlyingType!, parentType, info).MakeOptional();
             }
 
             if (type.IsDictionary(out var genericTypeParams))
                 return new TypeReference(
-                        $"{{ [key: {ConvertInternal(genericTypeParams[0], parentType, info).FullName}]: {ConvertInternal(genericTypeParams[1], parentType, info).FullName} }}")
+                        $"{{ [key: {ConvertInternal(genericTypeParams![0], parentType, info).FullName}]: {ConvertInternal(genericTypeParams[1], parentType, info).FullName} }}")
                     .MakeOptional(isNullableReference);
 
             if (type.IsCollection(out var itemType))
             {
-                return ConvertInternal(itemType, parentType, info).MakeArray().MakeOptional(isNullableReference);
+                return ConvertInternal(itemType!, parentType, info).MakeArray().MakeOptional(isNullableReference);
             }
 
             if (type.IsGenericType)
@@ -146,5 +146,5 @@ namespace TeeSquare.Reflection
 
     public delegate string NameStrategy<T>(T item);
 
-    public delegate ITypeReference ConvertType(Type type, Type parentType = null, MemberInfo info = null);
+    public delegate ITypeReference ConvertType(Type type, Type? parentType = null, MemberInfo? info = null);
 }

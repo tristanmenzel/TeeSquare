@@ -2,8 +2,13 @@ namespace TeeSquare.WebApi.Reflection
 {
     public class DestructuredPropertyInfo
     {
-        public string DestructureAs { get; set; }
-        public string PropertyName { get; set; }
+        public DestructuredPropertyInfo(string destructureAs, string propertyName)
+        {
+            DestructureAs = destructureAs;
+            PropertyName = propertyName;
+        }
+        public string DestructureAs { get;  }
+        public string PropertyName { get; }
 
         public string DestructureExpression =>
             DestructureAs == PropertyName ? PropertyName : $"{DestructureAs}: {PropertyName}";

@@ -9,10 +9,10 @@ namespace TeeSquare.Reflection
     {
         public static Type UnwrapNullable(this Type type)
         {
-            return type.IsNullable(out var underlyingType) ? underlyingType : type;
+            return type.IsNullable(out var underlyingType) ? underlyingType! : type;
         }
 
-        public static bool IsNullable(this Type type, out Type underlyingType)
+        public static bool IsNullable(this Type type, out Type? underlyingType)
         {
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
@@ -24,7 +24,9 @@ namespace TeeSquare.Reflection
             return false;
         }
 
-        public static bool IsCollection(this Type type, out Type itemType)
+        public static bool IsNullable(this Type type) => type.IsNullable(out _);
+
+        public static bool IsCollection(this Type type, out Type? itemType)
         {
             if (type == typeof(string))
             {
@@ -48,7 +50,7 @@ namespace TeeSquare.Reflection
             return false;
         }
 
-        public static bool IsTask(this Type type, out Type resultType)
+        public static bool IsTask(this Type type, out Type? resultType)
         {
             if (type.IsGenericType && typeof(Task<>)
                     .MakeGenericType(type.GetGenericArguments().First()).IsAssignableFrom(type))
@@ -67,12 +69,12 @@ namespace TeeSquare.Reflection
             return false;
         }
 
-        public static bool IsDictionary(this Type type, out Type[] genericTypeParams)
+        public static bool IsDictionary(this Type type, out Type[]? genericTypeParams)
         {
             if (type.IsGenericType && type.GetGenericArguments().Length == 2 && typeof(IDictionary<,>)
                     .MakeGenericType(
                         type.GetGenericArguments().First(),
-                        type.GetGenericArguments().Skip(1).FirstOrDefault()).IsAssignableFrom(type))
+                        type.GetGenericArguments().Skip(1).First()).IsAssignableFrom(type))
             {
                 genericTypeParams = type.GetGenericArguments();
                 return true;

@@ -35,7 +35,7 @@ namespace TeeSquare.Reflection
             _items.Add(type, new LocalType(type));
         }
 
-        public void AddLiteralImport(string path, string type, string importAs = null)
+        public void AddLiteralImport(string path, string type, string? importAs = null)
         {
             _literalImports.Add(new LiteralImport(type, path, importAs));
         }
@@ -58,7 +58,7 @@ namespace TeeSquare.Reflection
 
     public class LiteralImport
     {
-        public LiteralImport(string typeName, string importFrom, string importAs = null)
+        public LiteralImport(string typeName, string importFrom, string? importAs = null)
         {
             TypeName = typeName;
             ImportAs = importAs;
@@ -66,7 +66,7 @@ namespace TeeSquare.Reflection
         }
 
         public string TypeName { get; }
-        public string ImportAs { get; }
+        public string? ImportAs { get; }
         public string ImportFrom { get; }
     }
 

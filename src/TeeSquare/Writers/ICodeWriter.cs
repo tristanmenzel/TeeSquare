@@ -13,7 +13,7 @@ namespace TeeSquare.Writers
         void WriteDelimited<T>(T[] items, Action<T, ICodeWriter> lineFunc, string delimiter);
         void WriteTypeRef(ITypeReference typeReference);
         void WriteTypeDec(string typeName, ITypeReference[] genericTypeParams);
-        void OpenBlock(string text = null, string openBlockDelimiter = "{");
+        void OpenBlock(string? text = null, string openBlockDelimiter = "{");
         void CloseBlock(string closeBlockDelimiter = "}");
 
         void Flush();

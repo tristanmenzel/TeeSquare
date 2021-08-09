@@ -24,7 +24,7 @@ namespace TeeSquare.WebApi.Reflection
         public TypeConverter TypeConverter { get; set; } =
             new TypeConverter(StaticConfig.Instance.DefaultStaticMappings);
 
-        public TypeConverter ImportTypeConverter { get; set; } = null;
+        public TypeConverter? ImportTypeConverter { get; set; } = null;
 
         public BindingFlags PropertyFlags { get; set; } = BindingFlags.GetProperty
                                                           | BindingFlags.Public

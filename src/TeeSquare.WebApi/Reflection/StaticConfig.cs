@@ -1,15 +1,19 @@
 using System;
+using System.Configuration;
 
 namespace TeeSquare.WebApi.Reflection
 {
     public static class StaticConfig
     {
+        private static IWebApiConfig? _instance;
+
         public static void Configure(IWebApiConfig configuration)
         {
-            Instance = configuration;
+            _instance = configuration;
         }
 
-        public static IWebApiConfig Instance { get; private set; }
+        public static IWebApiConfig Instance => _instance ?? throw new Exception(
+            "WebApi reflector has not been configured. Please include a TeeSquare.WebApi.{Platform} library or provide a manual configuration.");
     }
 
     public interface IWebApiConfig
@@ -38,22 +42,60 @@ namespace TeeSquare.WebApi.Reflection
 
     public abstract class WebApiConfig : IWebApiConfig
     {
-        public Type ControllerType { get; protected set; }
-        public Type FromFormAttribute { get; protected set; }
-        public Type FromBodyAttribute { get; protected set; }
-        public Type FromQueryAttribute { get; protected set; }
-        public Type FromRouteAttribute { get; protected set; }
-        public Type HttpMethodBaseAttribute { get; protected set; }
-        public Type HttpGetAttribute { get; protected set; }
-        public Type HttpPutAttribute { get; protected set; }
-        public Type HttpPostAttribute { get; protected set; }
-        public Type HttpDeleteAttribute { get; protected set; }
-        public Type IgnoreActionAttribute { get; protected set; }
-        public Type RouteAttribute { get; protected set; }
-        public Func<object, string> GetTemplateFromRouteAttribute { get; protected set; }
-        public Func<object, string> GetTemplateFromHttpMethodAttribute { get; protected set; }
-        public (Type type, string tsType)[] DefaultStaticMappings { get; protected set; }
-        public Type HttpPatchAttribute { get; protected set; }
-        public Type HttpOptionsAttribute { get; protected set; }
+        protected WebApiConfig(
+            Type controllerType,
+            Type fromFormAttribute,
+            Type fromBodyAttribute,
+            Type fromQueryAttribute,
+            Type fromRouteAttribute,
+            Type httpMethodBaseAttribute,
+            Type httpGetAttribute,
+            Type httpPutAttribute,
+            Type httpPostAttribute,
+            Type httpDeleteAttribute,
+            Type httpPatchAttribute,
+            Type httpOptionsAttribute,
+            Type ignoreActionAttribute,
+            Type routeAttribute,
+            Func<object, string> getTemplateFromRouteAttribute,
+            Func<object, string> getTemplateFromHttpMethodAttribute,
+            (Type type, string tsType)[] defaultStaticMappings)
+        {
+            ControllerType = controllerType;
+            FromFormAttribute = fromFormAttribute;
+            FromBodyAttribute = fromBodyAttribute;
+            FromQueryAttribute = fromQueryAttribute;
+            FromRouteAttribute = fromRouteAttribute;
+            HttpMethodBaseAttribute = httpMethodBaseAttribute;
+            HttpGetAttribute = httpGetAttribute;
+            HttpPutAttribute = httpPutAttribute;
+            HttpPostAttribute = httpPostAttribute;
+            HttpDeleteAttribute = httpDeleteAttribute;
+            IgnoreActionAttribute = ignoreActionAttribute;
+            RouteAttribute = routeAttribute;
+            GetTemplateFromRouteAttribute = getTemplateFromRouteAttribute;
+            GetTemplateFromHttpMethodAttribute = getTemplateFromHttpMethodAttribute;
+            DefaultStaticMappings = defaultStaticMappings;
+            HttpPatchAttribute = httpPatchAttribute;
+            HttpOptionsAttribute = httpOptionsAttribute;
+        }
+
+        public Type ControllerType { get;  }
+        public Type FromFormAttribute { get;  }
+        public Type FromBodyAttribute { get;  }
+        public Type FromQueryAttribute { get;  }
+        public Type FromRouteAttribute { get;  }
+        public Type HttpMethodBaseAttribute { get;  }
+        public Type HttpGetAttribute { get;  }
+        public Type HttpPutAttribute { get;  }
+        public Type HttpPostAttribute { get;  }
+        public Type HttpDeleteAttribute { get;  }
+        public Type IgnoreActionAttribute { get;  }
+        public Type RouteAttribute { get;  }
+        public Func<object, string> GetTemplateFromRouteAttribute { get;  }
+        public Func<object, string> GetTemplateFromHttpMethodAttribute { get;  }
+        public (Type type, string tsType)[] DefaultStaticMappings { get;  }
+        public Type HttpPatchAttribute { get;  }
+        public Type HttpOptionsAttribute { get;  }
     }
 }
