@@ -76,7 +76,7 @@ namespace TeeSquare.Writers
                 _writer.Write($"{typeName}");
         }
 
-        public void OpenBlock(string text = null, string openBlockDelimiter = "{")
+        public void OpenBlock(string? text = null, string openBlockDelimiter = "{")
         {
             _writer.WriteLine($"{text} {openBlockDelimiter}");
             _indent++;
@@ -103,7 +103,7 @@ namespace TeeSquare.Writers
         {
             if (disposing)
             {
-                _writer?.Dispose();
+                _writer.Dispose();
             }
         }
     }

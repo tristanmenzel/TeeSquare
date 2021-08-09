@@ -16,7 +16,7 @@ namespace TeeSquare.TypeMetadata
 
     class ComplexTypeInfo : IComplexTypeConfigurator, IComplexTypeInfo
     {
-        public ComplexTypeInfo(string name, ITypeReference[] genericTypeParams = null)
+        public ComplexTypeInfo(string name, ITypeReference[]? genericTypeParams = null)
         {
             Name = name;
             GenericTypeParams = genericTypeParams ?? Array.Empty<ITypeReference>();
@@ -24,7 +24,6 @@ namespace TeeSquare.TypeMetadata
 
         public ITypeReference[] GenericTypeParams { get; }
 
-        public Type OriginalType { get; }
         public string Name { get;  }
 
         public ITypeReference TypeReference => new TypeReference(Name, GenericTypeParams);

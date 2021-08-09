@@ -17,38 +17,35 @@ namespace TeeSquare.WebApi.Net50
 
         class Net50Configuration : WebApiConfig
         {
-            public Net50Configuration()
+            public Net50Configuration():base(
+            typeof(ControllerBase),
+            typeof(FromFormAttribute),
+            typeof(FromBodyAttribute),
+            typeof(FromQueryAttribute),
+            typeof(FromRouteAttribute),
+            typeof(HttpMethodAttribute),
+            typeof(HttpGetAttribute),
+            typeof(HttpPutAttribute),
+            typeof(HttpPostAttribute),
+            typeof(HttpDeleteAttribute),
+            typeof(HttpPatchAttribute),
+            typeof(HttpOptionsAttribute),
+            typeof(NonActionAttribute),
+            typeof(RouteAttribute),
+            obj =>
             {
-                ControllerType = typeof(ControllerBase);
+                if (obj is RouteAttribute routeAttribute)
+                    return routeAttribute.Template;
+                return null;
+            }, obj =>
+            {
+                if (obj is HttpMethodAttribute httpMethodAttribute)
+                    return httpMethodAttribute.Template;
+                return null;
+            },
+            new[] { (typeof(IActionResult), "unknown") })
+            {
 
-                FromFormAttribute = typeof(FromFormAttribute);
-                FromBodyAttribute = typeof(FromBodyAttribute);
-                FromQueryAttribute = typeof(FromQueryAttribute);
-                FromRouteAttribute = typeof(FromRouteAttribute);
-
-                HttpMethodBaseAttribute = typeof(HttpMethodAttribute);
-                HttpGetAttribute = typeof(HttpGetAttribute);
-                HttpPatchAttribute = typeof(HttpPatchAttribute);
-                HttpOptionsAttribute = typeof(HttpOptionsAttribute);
-                HttpPutAttribute = typeof(HttpPutAttribute);
-                HttpPostAttribute = typeof(HttpPostAttribute);
-                HttpDeleteAttribute = typeof(HttpDeleteAttribute);
-                IgnoreActionAttribute = typeof(NonActionAttribute);
-                RouteAttribute = typeof(RouteAttribute);
-
-                GetTemplateFromRouteAttribute = obj =>
-                {
-                    if (obj is RouteAttribute routeAttribute)
-                        return routeAttribute.Template;
-                    return null;
-                };
-                GetTemplateFromHttpMethodAttribute = obj =>
-                {
-                    if (obj is HttpMethodAttribute httpMethodAttribute)
-                        return httpMethodAttribute.Template;
-                    return null;
-                };
-                DefaultStaticMappings = new[] {(typeof(IActionResult), "unknown")};
             }
         }
     }

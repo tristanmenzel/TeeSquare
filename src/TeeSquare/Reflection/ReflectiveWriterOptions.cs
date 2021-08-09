@@ -9,7 +9,7 @@ namespace TeeSquare.Reflection
     internal class ReflectiveWriterOptions : IReflectiveWriterOptions
     {
         public TypeConverter TypeConverter { get; set; } = new TypeConverter();
-        public TypeConverter ImportTypeConverter { get; set; } = null;
+        public TypeConverter? ImportTypeConverter { get; set; } = null;
 
         public BindingFlags PropertyFlags { get; set; } = BindingFlags.GetProperty
                                                           | BindingFlags.Public

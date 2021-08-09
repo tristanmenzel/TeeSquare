@@ -2,7 +2,7 @@
 
 namespace TeeSquare.WebApi.Reflection
 {
-    public  class HttpMethod
+    public class HttpMethod
     {
         private readonly string _method;
 
@@ -22,9 +22,9 @@ namespace TeeSquare.WebApi.Reflection
             return this == Put || this == Post || this == Patch;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            return obj is HttpMethod && _method.Equals(((HttpMethod) obj)._method);
+            return obj is HttpMethod method && _method.Equals(method._method);
         }
 
         protected bool Equals(HttpMethod other)

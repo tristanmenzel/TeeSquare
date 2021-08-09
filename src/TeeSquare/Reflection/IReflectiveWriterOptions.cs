@@ -16,7 +16,7 @@ namespace TeeSquare.Reflection
         /// An optional alternative typeConverter used to determine the name used for imports. If set,
         /// types will be imported with ImportName as Name
         /// </summary>
-        TypeConverter ImportTypeConverter { get; set; }
+        TypeConverter? ImportTypeConverter { get; set; }
 
         /// <summary>
         /// Specifies flags to check for when reflecting properties

@@ -47,14 +47,14 @@ namespace TeeSquare.UnionTypes
                                 literalType = b ? "true" : "false";
                             else if (value is String s)
                                 literalType = $"'{s}'";
-                            else if (value is Enum)
+                            else if (value is Enum e)
                             {
-                                var enumTypeName = options.TypeConverter.TypeName(value.GetType());
-                                var enumMemberName = options.TypeConverter.EnumName(value.ToString());
+                                var enumTypeName = options.TypeConverter.TypeName(e.GetType());
+                                var enumMemberName = options.TypeConverter.EnumName(e.ToString());
                                 literalType = $"{enumTypeName}.{enumMemberName}";
                             }
                             else
-                                literalType = value.ToString();
+                                literalType = value.ToString() ?? string.Empty;
 
                             return new TypeReference(literalType) {ExistingType = true};
                         }
