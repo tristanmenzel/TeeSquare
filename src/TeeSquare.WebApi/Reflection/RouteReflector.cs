@@ -398,11 +398,7 @@ namespace TeeSquare.WebApi.Reflection
                                     {
                                         p.Param(rp.NameOrDestructureExpression,
                                             _options.TypeConverter.Convert(rp.Type)
-                                                .MakeOptional(rp.Kind == ParameterKind.Query &&
-                                                              _options.TypeConverter.TreatAsPrimitive(rp.Type.UnwrapNullable())
-                                                              )
-                                                .MakePartial(rp.Kind == ParameterKind.Query &&
-                                                             !_options.TypeConverter.TreatAsPrimitive(rp.Type.UnwrapNullable())));
+                                                .MakeOptional(rp.Kind == ParameterKind.Query && rp.Type.IsNullable()));
                                     }
 
                                     if (req.Method.HasRequestBody() && req.GetRequestBodyKind() == RequestBodyKind.Json)

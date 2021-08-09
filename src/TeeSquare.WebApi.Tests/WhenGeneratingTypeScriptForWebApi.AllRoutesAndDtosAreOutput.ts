@@ -56,14 +56,14 @@ export abstract class RequestFactory {
       url: `/from-route/${id}/${name}`
     };
   }
-  static GetFromQuery(obj: Partial<TestObject>): GetRequest<TestObject> {
+  static GetFromQuery(obj: TestObject): GetRequest<TestObject> {
     const query = toQuery({ ...obj });
     return {
       method: 'GET',
       url: `/from-query${query}`
     };
   }
-  static GetGetSomething(realPrimitive?: number, fauxPrimitive: Partial<FauxPrimitive>): GetRequest<number> {
+  static GetGetSomething(realPrimitive?: number, fauxPrimitive?: FauxPrimitive): GetRequest<number> {
     const query = toQuery({ realPrimitive, ...fauxPrimitive });
     return {
       method: 'GET',
@@ -80,7 +80,7 @@ export abstract class RequestFactory {
       url: `/formvalue/postsomevalues`
     };
   }
-  static GetApiOtherImplicitQuery(id?: number): GetRequest<number> {
+  static GetApiOtherImplicitQuery(id: number): GetRequest<number> {
     const query = toQuery({ id });
     return {
       method: 'GET',

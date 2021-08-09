@@ -60,7 +60,7 @@ export abstract class RequestFactory {
       url: `/formvalue/postsomevalues`
     };
   }
-  static GetApiOtherImplicitQuery(id?: number): GetRequest<number> {
+  static GetApiOtherImplicitQuery(id: number): GetRequest<number> {
     const query = toQuery({ id });
     return {
       method: 'GET',

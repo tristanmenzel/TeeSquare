@@ -64,7 +64,7 @@ export abstract class FormValueRequestFactory {
   }
 }
 export abstract class ImplicitParametersRequestFactory {
-  static GetApiOtherImplicitQuery(id?: number): GetRequest<number> {
+  static GetApiOtherImplicitQuery(id: number): GetRequest<number> {
     const query = toQuery({ id });
     return {
       method: 'GET',

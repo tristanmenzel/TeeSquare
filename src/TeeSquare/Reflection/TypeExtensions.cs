@@ -24,6 +24,8 @@ namespace TeeSquare.Reflection
             return false;
         }
 
+        public static bool IsNullable(this Type type) => type.IsNullable(out _);
+
         public static bool IsCollection(this Type type, out Type itemType)
         {
             if (type == typeof(string))
