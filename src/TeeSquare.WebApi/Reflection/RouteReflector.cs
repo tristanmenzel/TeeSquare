@@ -221,7 +221,7 @@ namespace TeeSquare.WebApi.Reflection
             bool DoesRouteParamExist(string paramName)
             {
                 if (action.GetParameters()
-                    .Any(p => p.Name.Equals(paramName, StringComparison.InvariantCultureIgnoreCase)))
+                    .Any(p => p.Name?.Equals(paramName, StringComparison.InvariantCultureIgnoreCase) ?? false))
                     return true;
                 if (action.GetParameters()
                     .Where(p => !options.TypeConverter.TreatAsPrimitive(p.ParameterType.UnwrapNullable())

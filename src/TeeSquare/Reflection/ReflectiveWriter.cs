@@ -24,14 +24,10 @@ namespace TeeSquare.Reflection
         {
             foreach (var type in types)
             {
-#if !NET48
-                // This property doesn't exist in net48. As a result, a dummy interface will
-                // be written to the output. eg. export interface T { }
                 if (type.IsGenericTypeParameter)
                 {
                     continue;
                 }
-#endif
 
                 if (_options.TypeConverter.TreatAsPrimitive(type))
                 {
@@ -42,25 +38,25 @@ namespace TeeSquare.Reflection
 
                 if (type.IsTask(out var resultType))
                 {
-                    AddTypes(resultType!);
+                    AddTypes(resultType);
                     continue;
                 }
 
                 if (type.IsNullable(out var underlyingType))
                 {
-                    AddTypes(underlyingType!);
+                    AddTypes(underlyingType);
                     continue;
                 }
 
                 if (type.IsCollection(out var itemType))
                 {
-                    AddTypes(itemType!);
+                    AddTypes(itemType);
                     continue;
                 }
 
                 if (type.IsDictionary(out var keyValueTypes))
                 {
-                    AddTypes(keyValueTypes!);
+                    AddTypes(keyValueTypes);
                     continue;
                 }
 
@@ -116,7 +112,7 @@ namespace TeeSquare.Reflection
         {
             // Don't reflect dependencies on statically mapped types
             if (options.TypeConverter.HasStaticMapping(type))
-                return new Type[0];
+                return Type.EmptyTypes;
             var propertyDependencies = type
                 .GetProperties(options.PropertyFlags)
                 .Select(p => p.PropertyType)
