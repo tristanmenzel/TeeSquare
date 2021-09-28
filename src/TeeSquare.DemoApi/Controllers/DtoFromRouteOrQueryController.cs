@@ -22,5 +22,10 @@ namespace TeeSquare.DemoApi.Controllers
         {
             return obj;
         }
+
+        public TestObject FromQuery([FromQuery] int[] numbers)
+        {
+            return new TestObject();
+        }
     }
 }

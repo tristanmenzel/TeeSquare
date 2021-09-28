@@ -82,7 +82,7 @@ namespace TeeSquare.WebApi.Reflection
 
         private DestructuredPropertyInfo[] GetDestructuredProperties(ParameterInfo parameterInfo, string route)
         {
-            if (_options.TypeConverter.TreatAsPrimitive(parameterInfo.ParameterType))
+            if (_options.TypeConverter.TreatAsPrimitive(parameterInfo.ParameterType) || parameterInfo.ParameterType.IsCollection())
             {
                 return Array.Empty<DestructuredPropertyInfo>();
             }
@@ -225,9 +225,10 @@ namespace TeeSquare.WebApi.Reflection
                     return true;
                 if (action.GetParameters()
                     .Where(p => !options.TypeConverter.TreatAsPrimitive(p.ParameterType.UnwrapNullable())
+                                && !p.ParameterType.IsCollection()
                                 && p.GetCustomAttributes(StaticConfig.Instance.FromRouteAttribute).Any())
-                    .Any(p => p.ParameterType.GetProperties().Any(p =>
-                        p.Name.Equals(paramName, StringComparison.InvariantCultureIgnoreCase))))
+                    .Any(p => p.ParameterType.GetProperties().Any(prop =>
+                        prop.Name.Equals(paramName, StringComparison.InvariantCultureIgnoreCase))))
                     return true;
                 return false;
             }
@@ -396,7 +397,8 @@ namespace TeeSquare.WebApi.Reflection
                                     {
                                         w.Write($"const {_options.QueryVariableName} = toQuery({{ ", true);
                                         w.WriteDelimited(queryParams,
-                                            (p, wr) => wr.Write(_options.TypeConverter.TreatAsPrimitive(p.Type.UnwrapNullable()) ? p.Name : $"...{p.Name}"),
+                                            (p, wr) => wr.Write(_options.TypeConverter.TreatAsPrimitive(p.Type.UnwrapNullable())
+                                                || p.Type.IsCollection() ? p.Name : $"...{p.Name}"),
                                             ", ");
                                         w.WriteLine(" });", false);
                                     }

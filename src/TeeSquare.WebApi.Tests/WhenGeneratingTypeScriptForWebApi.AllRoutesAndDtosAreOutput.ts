@@ -63,6 +63,13 @@ export abstract class RequestFactory {
       url: `/from-query${query}`
     };
   }
+  static GetDtofromrouteorqueryFromquery(numbers: number[]): GetRequest<TestObject> {
+    const query = toQuery({ numbers });
+    return {
+      method: 'GET',
+      url: `/dtofromrouteorquery/fromquery${query}`
+    };
+  }
   static GetGetSomething(realPrimitive?: number, fauxPrimitive?: FauxPrimitive): GetRequest<number> {
     const query = toQuery({ realPrimitive, ...fauxPrimitive });
     return {

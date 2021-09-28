@@ -51,6 +51,13 @@ export abstract class RequestFactory {
       url: `/from-query${query}`
     };
   }
+  static GetDtofromrouteorqueryFromquery(numbers: number[]): GetRequest<TestObject> {
+    const query = toQuery({ numbers });
+    return {
+      method: 'GET',
+      url: `/dtofromrouteorquery/fromquery${query}`
+    };
+  }
 }
 export interface TestObject {
   id: number;
