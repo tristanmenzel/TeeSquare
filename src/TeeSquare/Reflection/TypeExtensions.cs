@@ -27,6 +27,11 @@ namespace TeeSquare.Reflection
 
         public static bool IsNullable(this Type type) => type.IsNullable(out _);
 
+        public static bool IsCollection(this Type type)
+        {
+            return type.IsCollection(out _);
+        }
+
         public static bool IsCollection(this Type type, [NotNullWhen(true)] out Type? itemType)
         {
             if (type == typeof(string))
@@ -36,7 +41,7 @@ namespace TeeSquare.Reflection
             }
             if (type.IsArray)
             {
-                itemType = type.GetElementType();
+                itemType = type.GetElementType()!;
                 return true;
             }
 
