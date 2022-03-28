@@ -115,9 +115,13 @@ namespace TeeSquare.Reflection
             }
 
             if (type.IsDictionary(out var genericTypeParams))
-                return new TypeReference(
-                        $"{{ [key: {ConvertInternal(genericTypeParams![0], parentType, info).FullName}]: {ConvertInternal(genericTypeParams[1], parentType, info).FullName} }}")
-                    .MakeOptional(isNullableReference);
+            {
+                var keyType = ConvertInternal(genericTypeParams[0], parentType, info).FullName;
+                var valueType = ConvertInternal(genericTypeParams[1], parentType, info).FullName;
+                if (keyType == "string" || keyType == "number")
+                    return new TypeReference($"{{ [key: {keyType}]: {valueType} }}").MakeOptional(isNullableReference);
+                return new TypeReference($"Record<{keyType}, {valueType}>").MakeOptional(isNullableReference);
+            }
 
             if (type.IsCollection(out var itemType))
             {

@@ -29,6 +29,19 @@ namespace TeeSquare.Tests.Reflection
         }
 
         [Test]
+        public void Dictionaries()
+        {
+
+            var res = TeeSquareFluent.ReflectiveWriter()
+                .AddTypes(typeof(Indexes))
+                .WriteToString();
+
+            Blurk.CompareImplicitFile("ts")
+                .To(res)
+                .AssertAreTheSame(Assert.Fail);
+        }
+
+        [Test]
         public void Enum()
         {
             var res = TeeSquareFluent.ReflectiveWriter()
